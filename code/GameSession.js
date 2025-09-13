@@ -31,8 +31,8 @@ export class GameSession {
 
     _initMultiplicationPromptList() {
         this.promptList = [];
-        for (var a = 0; a <= 1; a++) {
-            for (var b = 0; b <= 1; b++) {
+        for (var a = 0; a <= 10; a++) {
+            for (var b = 0; b <= 10; b++) {
                 this.promptList.push(new MultiplicationPrompt(a, b));
             }
         }
@@ -41,8 +41,8 @@ export class GameSession {
 
     _initDivisionPromptList() {
         this.promptList = [];  
-        for (var b = 1; b <= 1; b++) {
-            for (var a = 0; a <= 1; a++) {
+        for (var b = 1; b <= 10; b++) {
+            for (var a = 0; a <= 10; a++) {
                 this.promptList.push(new DivisionPrompt(a * b, b));
             }
         }
