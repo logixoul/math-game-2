@@ -1,4 +1,4 @@
-import { globals } from './Globals.js';
+import { globals } from 'Globals';
 
 export class UI {
     gameSession = null;

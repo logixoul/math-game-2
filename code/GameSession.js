@@ -1,5 +1,5 @@
-import { globals } from './Globals';
-import * as util from './util';
+import { globals } from 'Globals';
+import * as util from 'util';
 
 export class GameSession {
     constructor() {
