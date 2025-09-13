@@ -20,7 +20,7 @@ export class UIController {
             const answer = this.gameSession.getCurrentPrompt().answer;
             const info = informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
             nextQuestion();
-        });
+        }.bind(this));
         
         this.editBox.focus();
         this.editBox.addEventListener("keydown",
