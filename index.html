@@ -1,46 +1,26 @@
 ﻿<!DOCTYPE>
 <html>
 	<head>
-		<title>Умножение</title>
+		<title>Мат. игра</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<style>
-			h1 {
-				font-size: 1.5em;
-				font-weighst: bold;
+		<link rel="stylesheet" href="styles.css" />
+		<script type="importmap">
+			{
+			  "imports": {
+				"./util": "./util.js",
+				"./UI": "./UI.js",
+				"./Globals": "./Globals.js",
+				"./GameSession": "./GameSession.js"
+			  }
 			}
-			body {
-				font-size: 1.5 em !important;
-				font-family: sans-serif;
-			}
-			#container {
-				font-size: 1.5em !important;
-			}
-			input, button {
-				font-size: 1.2em !important;
-			}
-			#indicators {
-				position: fixed;
-				top: 5px;
-				right: 5px;
-				font-size: 1.2em !important;
-			}
-			#progressIndicator {
-				background-color: green;
-				border-radius: 6px;
-				color: white;
-				padding: 3px;
-				margin-bottom: 5px;
-			}
-			#errorCountIndicator {
-				background-color: #c00;
-				border-radius: 6px;
-				color: white;
-				padding: 3px;
-			}
-		</style>
+		  </script>
 	</head>
 	<body>
-		<h1>Игра с умножение</h1>
+		<h1>Математическа игра</h1>
+		<select name="gameType" id="gameType">
+			<option value="multiplication">Умножение</option>
+			<option value="division">Деление</option>
+		</select>
 		<i>Стефан Монов</i>
 		<div id="indicators">
 				<div id="progressIndicator">
@@ -55,146 +35,6 @@
 		<button id="btnSeeAnswer" style="display:block;">Виж подсказка🤔</input>
 		<button id="btnStartOver" style="display:none;">ОТНАЧАЛО :)</input>
 
-		<script type="text/javascript">
-			var whenLastStarted;
-
-			function randomInt(min, max) {
-				var result = Math.random()*(max-min)+min;
-				return Math.floor(result);
-			}
-					
-			const container = document.getElementById("container");
-			const btnStartOver = document.getElementById("btnStartOver");
-			const editBox = document.getElementById("userAnswerBox");
-			const btnSeeAnswer = document.getElementById("btnSeeAnswer");
-
-			
-			var latestPrompt;
-			var currentPromptIndex;
-			var isFirstTry = true;
-			var numCorrectAtFirstTry = 0;
-			var errorCount = 0;
-			
-			var promptList = [];
-			for(var i = 0; i <= 10; i++) {
-				for(var j = 0; j <= 10; j++) {
-					const prompt = {
-						a: i,
-						b: j
-					};
-					promptList.push(prompt);
-				}
-			}
-			
-			function shufflePromptList() {
-				var shuffled = [];
-				const initialLength = promptList.length;
-				for(var i = 0; i < initialLength; i++) {
-					var sourceIndex = randomInt(0, promptList.length);
-					var takenPrompt = promptList.splice(sourceIndex, 1)[0];
-					shuffled.push(takenPrompt);
-				}
-				promptList = shuffled;
-			}
-			
-			function reinitGame() {
-				container.textContent = "";
-				editBox.style.display = "inline";
-				
-				currentPromptIndex = 0;
-				numCorrectAtFirstTry = 0;
-				updateProgressIndicator();
-				updateErrorCountIndicator();
-				shufflePromptList();
-				showPrompt();
-			}
-
-			function win() {
-				informUser("КЪРТИШ! ПОБЕДА!", "green", true);
-				var timeElapsed = Date.now() - whenLastStarted;
-				const minutes = Math.floor(timeElapsed/60000);
-				const seconds = Math.floor(timeElapsed/1000) % 60;
-				const percentCorrectOnFirstTry = Math.round(100 * numCorrectAtFirstTry / promptList.length);
-				informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
-				editBox.style.display = "none";
-				btnStartOver.style.display = "inline";
-			}
-			
-			function nextQuestion() {
-				currentPromptIndex++;
-				updateProgressIndicator();
-				showPrompt();
-				isFirstTry = true;
-			}
-
-			function updateProgressIndicator() {
-				const progressIndicator = document.getElementById("progressIndicator");
-				progressIndicator.textContent = Math.floor(100* currentPromptIndex / promptList.length) + "% минати";
-			}
-			function updateErrorCountIndicator() {
-				const progressIndicator = document.getElementById("errorCountIndicator");
-				progressIndicator.textContent = errorCount + " грешки";
-			}
-			function scrollToBottom() {
-				btnSeeAnswer.scrollIntoView({behavior: "smooth", block: "end" });
-			}
-			function informUser(message, color, isBold) {
-				const newElement = document.createElement("p");
-				newElement.textContent = message;
-				newElement.style.color = color;
-				if(isBold)
-					newElement.style.fontWeight = "bold";
-				latestPrompt = newElement;
-				container.append(newElement);
-				scrollToBottom();
-				return latestPrompt;
-			}
-			function showPrompt() {
-				const currentPrompt = promptList[currentPromptIndex];
-				informUser(currentPrompt.a+"×"+currentPrompt.b+" = ", "black");
-			}
-			reinitGame();
-			
-			btnStartOver.addEventListener("click", function() {
-				btnStartOver.style.display = "none";
-				reinitGame();
-			});
-			btnSeeAnswer.addEventListener("click", function() {
-				const currentPrompt = promptList[currentPromptIndex];
-				const answer = currentPrompt.a * currentPrompt.b;
-				const info = informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
-				nextQuestion();
-			});
-			editBox.focus();
-			editBox.addEventListener("keydown",
-				function(event) {
-					if(event.key == "Enter") {
-						if(currentPromptIndex == 0)
-							whenLastStarted = Date.now();
-						latestPrompt.textContent = latestPrompt.textContent + editBox.value;
-						
-						const currentPrompt = promptList[currentPromptIndex];
-						if(parseInt(editBox.value) == currentPrompt.a * currentPrompt.b) {
-							informUser("Точно така!", "green");
-							if(isFirstTry) {
-								numCorrectAtFirstTry++;
-							}
-							if(currentPromptIndex == promptList.length - 1) {
-								win();
-							} else {
-								nextQuestion();
-							}
-						} else {
-							errorCount++;
-							updateErrorCountIndicator();
-							informUser("Пробвай пак.", "black");
-							showPrompt();
-							isFirstTry = false;
-						}
-						editBox.value = "";
-					}
-				}
-			);
-		</script>
+		<script src="main.js" type="module"></script>
 	</body>
 </html>

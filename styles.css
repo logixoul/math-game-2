@@ -1,0 +1,32 @@
+h1 {
+    font-size: 1.5em;
+}
+body {
+    font-size: 1.5 em !important;
+    font-family: sans-serif;
+}
+#container {
+    font-size: 1.5em !important;
+}
+input, button {
+    font-size: 1.2em !important;
+}
+#indicators {
+    position: fixed;
+    top: 5px;
+    right: 5px;
+    font-size: 1.2em !important;
+}
+#progressIndicator {
+    background-color: green;
+    border-radius: 6px;
+    color: white;
+    padding: 3px;
+    margin-bottom: 5px;
+}
+#errorCountIndicator {
+    background-color: #c00;
+    border-radius: 6px;
+    color: white;
+    padding: 3px;
+}
