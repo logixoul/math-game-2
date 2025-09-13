@@ -11,6 +11,7 @@ export class UIController {
         this.editBox = document.getElementById("userAnswerBox");
         this.btnSeeAnswer = document.getElementById("btnSeeAnswer");
         this.dropdownPromptType = document.getElementById("dropdownPromptType");
+        this.indicators = document.getElementById("indicators");
 
         this.btnStartOver.addEventListener("click", function() {
             btnStartOver.style.display = "none";
@@ -45,6 +46,15 @@ export class UIController {
         }.bind(this));
 
         this.latestPrompt = null;
+
+        this.relocateIndicators();
+        window.visualViewport.addEventListener('scroll', this.relocateIndicators.bind(this));
+        window.visualViewport.addEventListener('resize', this.relocateIndicators.bind(this));
+    }
+
+    relocateIndicators() {
+        // hack: unbreak on mobile when soft keyboard is open. Would normally just use `position: fixed`
+        this.indicators.style.top = (5 + window.visualViewport.offsetTop) + 'px';
     }
 
     onUserPressedEnter() {

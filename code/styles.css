@@ -13,8 +13,8 @@ input, button {
 }
 #indicators {
     position: fixed;
-    top: 5px;
     right: 5px;
+    /* top: 5px;  hack: unbreak on mobile when soft keyboard is open. */
     font-size: 1.2em !important;
 }
 #progressIndicator {
