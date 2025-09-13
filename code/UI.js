@@ -18,8 +18,10 @@ export class UIController {
         }.bind(this));
         this.btnSeeAnswer.addEventListener("click", function() {
             const answer = this.gameSession.getCurrentPrompt().answer;
-            const info = informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
-            nextQuestion();
+            this.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
+            this.gameSession.nextQuestion();
+            this.gameSession.errorCount++;
+            this.updateErrorCountIndicator();
         }.bind(this));
         
         this.editBox.focus();
@@ -63,11 +65,11 @@ export class UIController {
     }
     updateProgressIndicator() {
         const progressIndicator = document.getElementById("progressIndicator");
-        progressIndicator.textContent = Math.floor(100* this.gameSession.currentPromptIndex / this.gameSession.promptList.length) + "% минати";
+        progressIndicator.textContent = "Прогрес: " + Math.floor(100* this.gameSession.currentPromptIndex / this.gameSession.promptList.length) + "%";
     }
     updateErrorCountIndicator() {
         const progressIndicator = document.getElementById("errorCountIndicator");
-        progressIndicator.textContent = this.gameSession.errorCount + " грешки";
+        progressIndicator.textContent = "Не знаеш: " + this.gameSession.errorCount;
     }
     scrollToBottom() {
         this.btnSeeAnswer.scrollIntoView({behavior: "smooth", block: "end" });
