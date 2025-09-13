@@ -1,3 +1,3 @@
-import { GameSession } from 'GameSession';
+import { AppController } from "AppController";
 
-const gameSession = new GameSession();
+const app = new AppController();

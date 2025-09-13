@@ -10,16 +10,18 @@
 				"util": "./code/util.js",
 				"UI": "./code/UI.js",
 				"Globals": "./code/Globals.js",
-				"GameSession": "./code/GameSession.js"
+				"GameSession": "./code/GameSession.js",
+				"PromptTypes": "./code/PromptTypes.js",
+				"AppController": "./code/AppController.js"
 			  }
 			}
 		  </script>
 	</head>
 	<body>
 		<h1>Математическа игра</h1>
-		<select name="gameType" id="gameType">
-			<option value="multiplication">Умножение</option>
-			<option value="division">Деление</option>
+		<select name="dropdownPromptType" id="dropdownPromptType">
+			<option value="MultiplicationPrompt">Умножение</option>
+			<option value="DivisionPrompt">Деление</option>
 		</select>
 		<i>Стефан Монов</i>
 		<div id="indicators">

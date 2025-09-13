@@ -1,18 +1,21 @@
 import { globals } from 'Globals';
+import * as PromptTypes from 'PromptTypes';
+import { AppController } from 'AppController';
 
-export class UI {
-    gameSession = null;
+export class UIController {
+    constructor(appController) {
+        this.appController = appController;
 
-    constructor() {
         this.container = document.getElementById("container");
         this.btnStartOver = document.getElementById("btnStartOver");
         this.editBox = document.getElementById("userAnswerBox");
         this.btnSeeAnswer = document.getElementById("btnSeeAnswer");
+        this.dropdownPromptType = document.getElementById("dropdownPromptType");
 
         this.btnStartOver.addEventListener("click", function() {
             btnStartOver.style.display = "none";
-            globals.gameSession = new GameSession();
-        });
+            this.appController.startNewGame(PromptTypes[this.dropdownPromptType.value]);
+        }.bind(this));
         this.btnSeeAnswer.addEventListener("click", function() {
             const currentPrompt = promptList[currentPromptIndex];
             const answer = currentPrompt.a * currentPrompt.b;
@@ -28,6 +31,18 @@ export class UI {
                 }
             }.bind(this)
         );
+
+        this.dropdownPromptType.addEventListener("change", function() {
+            const selectedValue = this.dropdownPromptType.value;
+            let promptTypeClass = null;
+            if(selectedValue in PromptTypes) {
+                promptTypeClass = PromptTypes[selectedValue];
+            }
+            if(promptTypeClass) {
+                this.gameSession = new GameSession(promptTypeClass);
+            }
+        }.bind(this));
+
         this.latestPrompt = null;
     }
 
@@ -37,7 +52,7 @@ export class UI {
         this.latestPrompt.textContent = this.latestPrompt.textContent + this.editBox.value;
         
         const currentPrompt = this.gameSession.promptList[this.gameSession.currentPromptIndex];
-        if(parseInt(this.editBox.value) == currentPrompt.a * currentPrompt.b) {
+        if(parseInt(this.editBox.value) == currentPrompt.answer) {
             this.informUser("Точно така!", "green");
             if(this.gameSession.isFirstTry) {
                 this.gameSession.numCorrectAtFirstTry++;

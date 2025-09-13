@@ -1,10 +1,9 @@
-import { UI } from 'UI';
+//import { UIController } from './UI';
 
 export class Globals {
     constructor() {
         this.currentPromptIndex=null;
         this.numCorrectAtFirstTry = 0;
-        this.ui = new UI();
     }
 }
 

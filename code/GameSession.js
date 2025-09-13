@@ -1,8 +1,13 @@
 import { globals } from 'Globals';
 import * as util from 'util';
+import { MultiplicationPrompt, DivisionPrompt } from 'PromptTypes';
 
 export class GameSession {
-    constructor() {
+    constructor(appController, promptType) {
+        this.appController = appController;
+        this.uiController = appController.uiController;
+        
+        this.promptType = promptType;
         this.errorCount = 0;
         this.whenLastStarted = null;
         this.isFirstTry = true;
@@ -10,38 +15,56 @@ export class GameSession {
 
         this.currentPromptIndex = 0;
         this.numCorrectAtFirstTry = 0;
-        globals.ui.gameSession = this;
-        globals.ui.onNewSession();
+        this.uiController.gameSession = this;
+        this.uiController.onNewSession();
 
         this.errorCount = 0;
         this.isFirstTry = true;
     }
 
     _initPromptList() {
+        if(this.promptType == MultiplicationPrompt) {
+            this._initMultiplicationPromptList();
+        } else if (this.promptType == DivisionPrompt) {
+            this._initDivisionPromptList();
+        }
+    }
+
+    _initMultiplicationPromptList() {
         this.promptList = [];
-        for (var a = 2; a <= 10; a++) {
-            for (var b = 2; b <= 10; b++) {
-                this.promptList.push({ a: a, b: b });
+        for (var a = 0; a <= 10; a++) {
+            for (var b = 0; b <= 10; b++) {
+                this.promptList.push(new MultiplicationPrompt(a, b));
+            }
+        }
+        this.promptList = util.shuffleList(this.promptList);
+    }
+
+    _initDivisionPromptList() {
+        this.promptList = [];  
+        for (var b = 1; b <= 10; b++) {
+            for (var a = 0; a <= 10; a++) {
+                this.promptList.push(new DivisionPrompt(a * b, b));
             }
         }
         this.promptList = util.shuffleList(this.promptList);
     }
 
     win() {
-        globals.ui.informUser("КЪРТИШ! ПОБЕДА!", "green", true);
+        this.uiController.informUser("КЪРТИШ! ПОБЕДА!", "green", true);
         var timeElapsed = Date.now() - whenLastStarted;
         const minutes = Math.floor(timeElapsed / 60000);
         const seconds = Math.floor(timeElapsed / 1000) % 60;
         const percentCorrectOnFirstTry = Math.round(100 * numCorrectAtFirstTry / promptList.length);
-        globals.ui.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
-        globals.ui.editBox.style.display = "none";
-        globals.ui.btnStartOver.style.display = "inline";
+        this.uiController.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
+        this.uiController.editBox.style.display = "none";
+        this.uiController.btnStartOver.style.display = "inline";
     }
 
     nextQuestion() {
         this.currentPromptIndex++;
-        globals.ui.updateProgressIndicator();
-        globals.ui.showPrompt();
+        this.uiController.updateProgressIndicator();
+        this.uiController.showPrompt();
         this.isFirstTry = true;
     }
 }
