@@ -1,4 +1,3 @@
-import { globals } from 'Globals';
 import * as util from 'util';
 import { MultiplicationPrompt, DivisionPrompt } from 'PromptTypes';
 
@@ -66,5 +65,30 @@ export class GameSession {
         this.uiController.updateProgressIndicator();
         this.uiController.showPrompt();
         this.isFirstTry = true;
+    }
+
+    getCurrentPrompt() {
+        return this.promptList[this.currentPromptIndex];
+    }
+
+    onUserAnswered(userAnswer) {
+        const currentPrompt = this.getCurrentPrompt();
+        if(userAnswer == currentPrompt.answer) {
+            this.uiController.informUser("✅ Точно така!", "#00c000");
+            if(this.isFirstTry) {
+                this.numCorrectAtFirstTry++;
+            }
+            if(this.currentPromptIndex == this.promptList.length - 1) {
+                this.win();
+            } else {
+                this.nextQuestion();
+            }
+        } else {
+            this.errorCount++;
+            this.uiController.updateErrorCountIndicator();
+            this.uiController.informUser("❌ Пробвай пак.", "black");
+            this.uiController.showPrompt();
+            this.isFirstTry = false;
+        }
     }
 }

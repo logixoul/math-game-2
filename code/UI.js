@@ -1,6 +1,6 @@
-import { globals } from 'Globals';
 import * as PromptTypes from 'PromptTypes';
 import { AppController } from 'AppController';
+import { GameSession } from 'GameSession';
 
 export class UIController {
     constructor(appController) {
@@ -17,8 +17,7 @@ export class UIController {
             this.appController.startNewGame(PromptTypes[this.dropdownPromptType.value]);
         }.bind(this));
         this.btnSeeAnswer.addEventListener("click", function() {
-            const currentPrompt = promptList[currentPromptIndex];
-            const answer = currentPrompt.a * currentPrompt.b;
+            const answer = this.gameSession.getCurrentPrompt().answer;
             const info = informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
             nextQuestion();
         });
@@ -39,7 +38,7 @@ export class UIController {
                 promptTypeClass = PromptTypes[selectedValue];
             }
             if(promptTypeClass) {
-                this.gameSession = new GameSession(promptTypeClass);
+                this.gameSession = new GameSession(this.appController, promptTypeClass);
             }
         }.bind(this));
 
@@ -47,28 +46,12 @@ export class UIController {
     }
 
     onUserPressedEnter() {
-        if(globals.currentPromptIndex == 0)
-            whenLastStarted = Date.now();
+        if(this.gameSession.currentPromptIndex == 0)
+            this.gameSession.whenLastStarted = Date.now();
         this.latestPrompt.textContent = this.latestPrompt.textContent + this.editBox.value;
         
-        const currentPrompt = this.gameSession.promptList[this.gameSession.currentPromptIndex];
-        if(parseInt(this.editBox.value) == currentPrompt.answer) {
-            this.informUser("Точно така!", "green");
-            if(this.gameSession.isFirstTry) {
-                this.gameSession.numCorrectAtFirstTry++;
-            }
-            if(this.gameSession.currentPromptIndex == this.gameSession.promptList.length - 1) {
-                win();
-            } else {
-                this.gameSession.nextQuestion();
-            }
-        } else {
-            this.gameSession.errorCount++;
-            this.updateErrorCountIndicator();
-            this.informUser("Пробвай пак.", "black");
-            this.showPrompt();
-            this.gameSession.isFirstTry = false;
-        }
+        const userAnswer = parseInt(this.editBox.value);
+        this.gameSession.onUserAnswered(userAnswer);
         this.editBox.value = "";
     }
 
@@ -104,6 +87,6 @@ export class UIController {
     }
     showPrompt() {
         const currentPrompt = this.gameSession.promptList[this.gameSession.currentPromptIndex];
-        this.informUser(currentPrompt.a+"×"+currentPrompt.b+" = ", "black");
+        this.informUser(currentPrompt.text + " = ", "black");
     }
 }

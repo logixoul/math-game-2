@@ -7,7 +7,7 @@ class Prompt {
 
 export class MultiplicationPrompt extends Prompt {
     constructor(a, b) {
-        super(`${a} x ${b} = ?`, a * b);
+        super(`${a} × ${b}`, a * b);
         this.a = a;
         this.b = b;
     }
@@ -15,7 +15,7 @@ export class MultiplicationPrompt extends Prompt {
 
 export class DivisionPrompt extends Prompt {
     constructor(a, b) {
-        super(`${a} : ${b} = ?`, a / b);
+        super(`${a} : ${b}`, a / b);
         this.a = a;
         this.b = b;
     }
