@@ -110,7 +110,7 @@
 			}
 
 			function win() {
-				informUser("КЪРТИШ, АЛЕКС! ПОБЕДА!", "green", true);
+				informUser("КЪРТИШ! ПОБЕДА!", "green", true);
 				var timeElapsed = Date.now() - whenLastStarted;
 				const minutes = Math.floor(timeElapsed/60000);
 				const seconds = Math.floor(timeElapsed/1000) % 60;
@@ -136,16 +136,7 @@
 				progressIndicator.textContent = errorCount + " грешки";
 			}
 			function scrollToBottom() {
-				//const scrollingElement = (document.scrollingElement || document.body);
-				//scrollingElement.scrollTop = scrollingElement.scrollHeight;
 				btnSeeAnswer.scrollIntoView({behavior: "smooth", block: "end" });
-				//scrollingElement.scrollTop = document.documentElement.scrollHeight;
-
-				/*window.scrollTo({
-					top: Math.max(document.clientHeight, document.documentElement.scrollHeight),
-					behavior: "smooth"
-				});*/
-				console.log(Math.max(document.body.clientHeight, document.documentElement.scrollHeight))
 			}
 			function informUser(message, color, isBold) {
 				const newElement = document.createElement("p");
@@ -156,9 +147,6 @@
 				latestPrompt = newElement;
 				container.append(newElement);
 				scrollToBottom();
-//				window.scrollTo(0, document.body.scrollHeight);
-
-				//latestPrompt.scrollIntoView({behavior: "smooth" });
 				return latestPrompt;
 			}
 			function showPrompt() {
@@ -175,7 +163,6 @@
 				const currentPrompt = promptList[currentPromptIndex];
 				const answer = currentPrompt.a * currentPrompt.b;
 				const info = informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
-				//info.scrollIntoView({behavior: "smooth" });
 				nextQuestion();
 			});
 			editBox.focus();
