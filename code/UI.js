@@ -46,8 +46,6 @@ export class UIController {
     }
 
     onUserPressedEnter() {
-        if(this.gameSession.currentPromptIndex == 0)
-            this.gameSession.whenLastStarted = Date.now();
         this.latestPrompt.textContent = this.latestPrompt.textContent + this.editBox.value;
         
         const userAnswer = parseInt(this.editBox.value);

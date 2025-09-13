@@ -31,8 +31,8 @@ export class GameSession {
 
     _initMultiplicationPromptList() {
         this.promptList = [];
-        for (var a = 0; a <= 10; a++) {
-            for (var b = 0; b <= 10; b++) {
+        for (var a = 0; a <= 1; a++) {
+            for (var b = 0; b <= 1; b++) {
                 this.promptList.push(new MultiplicationPrompt(a, b));
             }
         }
@@ -41,8 +41,8 @@ export class GameSession {
 
     _initDivisionPromptList() {
         this.promptList = [];  
-        for (var b = 1; b <= 10; b++) {
-            for (var a = 0; a <= 10; a++) {
+        for (var b = 1; b <= 1; b++) {
+            for (var a = 0; a <= 1; a++) {
                 this.promptList.push(new DivisionPrompt(a * b, b));
             }
         }
@@ -50,11 +50,11 @@ export class GameSession {
     }
 
     win() {
-        this.uiController.informUser("КЪРТИШ! ПОБЕДА!", "green", true);
-        var timeElapsed = Date.now() - whenLastStarted;
+        this.uiController.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
+        var timeElapsed = Date.now() - this.whenLastStarted;
         const minutes = Math.floor(timeElapsed / 60000);
         const seconds = Math.floor(timeElapsed / 1000) % 60;
-        const percentCorrectOnFirstTry = Math.round(100 * numCorrectAtFirstTry / promptList.length);
+        const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptList.length);
         this.uiController.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
         this.uiController.editBox.style.display = "none";
         this.uiController.btnStartOver.style.display = "inline";
@@ -72,6 +72,9 @@ export class GameSession {
     }
 
     onUserAnswered(userAnswer) {
+        if(this.currentPromptIndex == 0)
+            this.whenLastStarted = Date.now();
+
         const currentPrompt = this.getCurrentPrompt();
         if(userAnswer == currentPrompt.answer) {
             this.uiController.informUser("✅ Точно така!", "#00c000");
@@ -79,6 +82,8 @@ export class GameSession {
                 this.numCorrectAtFirstTry++;
             }
             if(this.currentPromptIndex == this.promptList.length - 1) {
+                this.currentPromptIndex++;
+                this.uiController.updateProgressIndicator();
                 this.win();
             } else {
                 this.nextQuestion();
