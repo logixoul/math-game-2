@@ -110,7 +110,10 @@ export class UIController {
 
     relocateIndicators() {
         // hack: unbreak on mobile when soft keyboard is open. Would normally just use `position: fixed`
-        this.indicators.style.top = (5 + window.visualViewport.offsetTop) + 'px';
+        const offsetTop = (window.visualViewport && typeof window.visualViewport.offsetTop === 'number')
+            ? window.visualViewport.offsetTop
+            : 0;
+        this.indicators.style.top = (5 + offsetTop) + 'px';
     }
 
     onUserPressedEnter() {
