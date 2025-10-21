@@ -140,8 +140,27 @@ export class UIController {
         const progressIndicator = document.getElementById("errorCountIndicator");
         progressIndicator.textContent = "Не знаеш: " + this.gameSession.errorCount;
     }
-    scrollToBottom() {
-        this.btnSeeAnswer.scrollIntoView({behavior: "smooth", block: "end" });
+    // from GPT
+    scrollToBottom(padding = 8) {
+        const el = this.btnSeeAnswer;
+        if (!el) return;
+
+        const vv = window.visualViewport;
+        const rect = el.getBoundingClientRect();
+        const viewportHeight = vv ? vv.height : window.innerHeight;
+
+        // how many pixels the element's bottom extends past the visible viewport
+        const over = rect.bottom - viewportHeight + padding;
+
+        if (over > 0) {
+            // scroll by the amount necessary so the element sits above the overlay (add small extra)
+            // (needed because on iPhone we have a bottom toolbar which makes it
+            // insufficient to simply call scrollIntoView)
+            window.scrollBy({ top: over + 16, behavior: 'smooth' });
+        } else {
+            // fallback: center the element to avoid being under toolbars
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
     informUser(message, color, isBold) {
         const newMessageElement = document.createElement("p");
