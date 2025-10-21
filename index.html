@@ -32,10 +32,17 @@
 
 		<div id="container">
 		</div>
-		<input id="userAnswerBox" type="number" name="userAnswer" placeholder="Твоят отговор"></input>
-		<button id="btnSeeAnswer" style="display:block;">Виж подсказка🤔</input>
-		<button id="btnStartOver" style="display:none;">ОТНАЧАЛО :)</input>
+		<!-- https://stackoverflow.com/a/63712152/122687 -->
+		<form id="mainForm" action="#" method="get">
+		<!--<input id="userAnswerBox" type="text" inputmode="decimal" enterkeyhint="Да" name="userAnswer" placeholder="Твоят отговор"></input>
+		<button id="btnSubmit" type="submit">OK</button>-->
+		<button id="btnStartOver" style="display:none;">ОТНАЧАЛО :)</button>
+		</form>
+		<div></div>
+		<div id="keypad">
 
+		</div>
+		<button id="btnSeeAnswer" style="display:block;">Виж подсказка🤔</button>
 		<script src="code/main.js" type="module"></script>
 	</body>
 </html>
