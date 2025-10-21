@@ -1,6 +1,6 @@
-import * as PromptTypes from 'PromptTypes';
-import { AppController } from 'AppController';
-import { GameSession } from 'GameSession';
+import * as PromptTypes from './PromptTypes.js';
+//import { AppController } from 'AppController';
+//import { GameSession } from 'GameSession';
 
 export class UIController {
     constructor(appController) {
@@ -45,15 +45,20 @@ export class UIController {
                 promptTypeClass = PromptTypes[selectedValue];
             }
             if(promptTypeClass) {
-                this.gameSession = new GameSession(this.appController, promptTypeClass);
+                this.appController.startNewSession(promptTypeClass);
             }
         }.bind(this));
 
         this.latestPrompt = null;
 
         this.relocateIndicators();
-        window.visualViewport.addEventListener('scroll', this.relocateIndicators.bind(this));
-        window.visualViewport.addEventListener('resize', this.relocateIndicators.bind(this));
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('scroll', this.relocateIndicators.bind(this));
+            window.visualViewport.addEventListener('resize', this.relocateIndicators.bind(this));
+        } else {
+            window.addEventListener('scroll', this.relocateIndicators.bind(this));
+            window.addEventListener('resize', this.relocateIndicators.bind(this));
+        }
 
         this.buildKeypad();
     }

@@ -1,6 +1,6 @@
-import { GameSession } from 'GameSession';
-import { UIController } from 'UI';
-import * as PromptTypes from 'PromptTypes';
+import { GameSession } from './GameSession.js';
+import { UIController } from './UI.js';
+import * as PromptTypes from './PromptTypes.js';
 
 export class AppController {
     constructor() {

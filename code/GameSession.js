@@ -1,5 +1,5 @@
-import * as util from 'util';
-import { MultiplicationPrompt, DivisionPrompt } from 'PromptTypes';
+import * as util from './util.js';
+import { MultiplicationPrompt, DivisionPrompt } from './PromptTypes.js';
 
 export class GameSession {
     constructor(appController, promptType) {
