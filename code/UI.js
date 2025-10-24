@@ -45,7 +45,7 @@ export class UIController {
                 promptTypeClass = PromptTypes[selectedValue];
             }
             if(promptTypeClass) {
-                this.appController.startNewSession(promptTypeClass);
+                this.appController.startNewGame(promptTypeClass);
             }
         }.bind(this));
 
