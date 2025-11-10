@@ -76,6 +76,15 @@ input, button {
 
     padding: 0.5em;
 }
+#keypad .keypadButton, #btnSeeAnswer {
+    background-color: #e8e9ea;
+    border-radius: 10px;
+    border-width: 0px;
+}
+
+#btnSeeAnswer {
+    padding: 0.5em;
+}
 
 #keypad .keypadButton {
     aspect-ratio: 1.2;
@@ -90,7 +99,6 @@ input, button {
     border-radius: 10px;
     sfont-weight: bold;
     font-stretch: ultra-expanded !important;
-    background-color: #e8e9ea;
 }
 
 #keypad .keypadButton:active {
