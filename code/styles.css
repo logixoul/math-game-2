@@ -90,12 +90,14 @@ input, button {
     border-radius: 10px;
     sfont-weight: bold;
     font-stretch: ultra-expanded !important;
+    background-color: #e8e9ea;
 }
 
 #keypad .keypadButton:active {
     background-color: #e0e1e3;
     border: 1px solid #aaa;
-    transform: scale(1.5);
+    transform: scale(1.5) translate(0, -1em);
+    transition:transform 0.06s;
 }
 
 #keypad .keypadButtonOk {
@@ -110,6 +112,7 @@ input, button {
 
 #logContainer {
     margin: 5px 5px;
+    margin-top: 0px;
     flex: 1 1 auto;          /* take remaining space */
     overflow-y: auto;        /* scroll within itself */
     padding: 0.5em;
@@ -129,4 +132,8 @@ input, button {
 
 #header{
     flex: 0 0 auto;
+    background-color: #444;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    padding: 0.5em;
 }
