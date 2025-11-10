@@ -63,6 +63,25 @@ export class UIController {
         this.buildKeypad();
     }
 
+    arrowInlineSvg = `<svg fill="#000000" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+<polygon points="437.3,30 202.7,339.3 64,200.7 0,264.7 213.3,478 512,94 "/>
+</svg>`
+    backspaceInlineSvg = `
+
+<svg height="20px" width="20px" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 512 512"  xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#000000;}
+</style>
+<g>
+	<path class="st0" d="M459.279,63.989H193.251c-20.346,0-39.7,8.82-53.054,24.186L4.314,244.473c-5.752,6.61-5.752,16.443,0,23.06
+		l135.883,156.306c13.354,15.359,32.708,24.172,53.054,24.172h266.028c29.116,0,52.721-23.605,52.721-52.721V116.716
+		C512,87.593,488.395,63.989,459.279,63.989z M360.581,338.701l-51.687-51.672l-51.672,51.658l-31.03-31.015l51.673-51.687
+		L226.2,204.32l31.022-31.022l51.672,51.673l51.679-51.687l31.022,31.036l-51.687,51.679l51.701,51.673L360.581,338.701z"/>
+</g>
+</svg>`
+
     buildKeypad() {
         const btnArray = new Array();
         for(let col = 0; col < 4; col++) {
@@ -89,23 +108,27 @@ export class UIController {
         this.setupKeypadButton(btnArray, 1, 2, "8");
         this.setupKeypadButton(btnArray, 2, 2, "9");
         this.setupKeypadButton(btnArray, 1, 3, "0");
-        this.setupKeypadButton(btnArray, 3, 2, "⌫", function() {
+        this.setupKeypadButton(btnArray, 3, 2, this.backspaceInlineSvg, function() {
             //this.editBox.value = this.editBox.value.slice(0, -1);
             this.latestAnswerField.textContent = this.latestAnswerField.textContent.slice(0, -1);
         }.bind(this));
-        this.setupKeypadButton(btnArray, 3, 3, "OK", function() {
+        const btnOk = this.setupKeypadButton(btnArray, 3, 3, this.arrowInlineSvg, function() {
             this.onUserPressedEnter();
         }.bind(this));
+
+        btnOk.classList.add("keypadButtonOk");
     }
 
     setupKeypadButton(btnArray, col, row, text, onClick) {
         const btn = btnArray[col][row];
-        btn.textContent = text;
+        //btn.textContent = text;
+        btn.innerHTML = text;
         if(!onClick)
             onClick = function() {
                     this.latestAnswerField.append(text);
                 }.bind(this);
         btn.addEventListener("click", onClick);
+        return btn;
     }
 
     relocateIndicators() {

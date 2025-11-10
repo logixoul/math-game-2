@@ -1,9 +1,10 @@
 h1 {
     font-size: 1.5em;
+    font-family: Andada Pro, serif;
 }
 body {
     font-size: 1.0em !important;
-    font-family: sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
 }
 #container {
     font-size: 1.5em !important;
@@ -52,8 +53,13 @@ input, button {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1em;
+    font-size: 1.2em;
     background-color: #cdf;
     box-sizing: border-box;
     border-radius: 10px;
+    sfont-weight: bold;
+}
+
+#keypad .keypadButtonOk {
+    background-color: #ccffc8;
 }
