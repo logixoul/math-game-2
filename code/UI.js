@@ -6,7 +6,10 @@ export class UIController {
     constructor(appController) {
         this.appController = appController;
 
-        this.container = document.getElementById("container");
+        this.logElement = document.getElementById("log");
+        this.logContainer = document.getElementById("logContainer");
+        this.bottomPane = document.getElementById("bottomPane");
+
         this.btnStartOver = document.getElementById("btnStartOver");
         //this.editBox = document.getElementById("userAnswerBox");
         this.btnSeeAnswer = document.getElementById("btnSeeAnswer");
@@ -61,6 +64,10 @@ export class UIController {
         }
 
         this.buildKeypad();
+
+        this.adjustMiddlePanePadding();
+        window.addEventListener('resize', this.adjustMiddlePanePadding.bind(this));
+        window.addEventListener('orientationchange', this.adjustMiddlePanePadding.bind(this));
     }
 
     arrowInlineSvg = `<svg fill="#000000" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -148,7 +155,7 @@ export class UIController {
     }
 
     onNewSession() {
-        this.container.textContent = "";
+        this.logElement.textContent = "";
         //this.editBox.style.display = "inline";
         this.updateProgressIndicator();
         this.updateErrorCountIndicator();
@@ -157,13 +164,14 @@ export class UIController {
     }
     updateProgressIndicator() {
         const progressIndicator = document.getElementById("progressIndicator");
-        progressIndicator.textContent = "Прогрес: " + Math.floor(100* this.gameSession.currentPromptIndex / this.gameSession.promptList.length) + "%";
+        progressIndicator.textContent = "Прогрес: " + this.gameSession.currentPromptIndex + '/' + this.gameSession.promptList.length;
     }
     updateErrorCountIndicator() {
         const progressIndicator = document.getElementById("errorCountIndicator");
-        progressIndicator.textContent = "Не знаеш: " + this.gameSession.errorCount;
+        progressIndicator.textContent = "Грешки: " + this.gameSession.errorCount;
     }
     // from GPT
+    /*
     scrollToBottom(padding = 8) {
         const el = this.btnSeeAnswer;
         if (!el) return;
@@ -184,6 +192,16 @@ export class UIController {
             // fallback: center the element to avoid being under toolbars
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+    }*/
+    scrollToBottom() {
+        this.logContainer.scrollTo({
+            top: this.logContainer.scrollHeight,
+            left: 0,
+            behavior: 'smooth'
+        });
+    }
+    adjustMiddlePanePadding() {
+        this.logContainer.style.paddingBottom = `${this.bottomPane.offsetHeight}px`;
     }
     informUser(message, color, isBold) {
         const newMessageElement = document.createElement("p");
@@ -192,7 +210,7 @@ export class UIController {
         if(isBold)
             newMessageElement.style.fontWeight = "bold";
         this.latestPrompt = newMessageElement;
-        this.container.append(newMessageElement);
+        this.logElement.append(newMessageElement);
         this.scrollToBottom();
 
         const answerField = document.createElement("span");

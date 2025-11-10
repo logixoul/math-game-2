@@ -1,3 +1,19 @@
+:root {
+    --bottom-pane-height: 20rem;
+}
+
+/* gpt */
+html {
+    height: 100%;
+}
+body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+
 h1 {
     font-size: 1.5em;
     font-family: Andada Pro, serif;
@@ -5,61 +21,112 @@ h1 {
 body {
     font-size: 1.0em !important;
     font-family: 'Roboto Condensed', sans-serif;
+    margin: 0px 0px !important;
 }
-#container {
+#log {
     font-size: 1.5em !important;
 }
 input, button {
     font-size: 1.2em !important;
 }
 #indicators {
-    position: fixed;
-    right: 5px;
-    /* top: 5px;  hack: unbreak on mobile when soft keyboard is open. */
+    width: 100%;
+    max-width: 100%;
+    display:grid;
+    grid-template-columns: auto auto auto;
+    grid-template-columns: repeat(2, 1fr);
+    box-sizing: border-box;
+    margin: 0.5em auto;
+    margin-bottom: 0em;
+
+    align-items: stretch;
+    justify-items: stretch;
+    gap: 0.25em;
+
+    padding: 0.5em;
     font-size: 1.2em !important;
+    text-align: center;
+    
+    sborder-radius: 10px;
+
+    background-color: #e0e1e3;
 }
 #progressIndicator {
-    background-color: green;
+    color: green;
     border-radius: 6px;
-    color: white;
     padding: 3px;
-    margin-bottom: 5px;
 }
 #errorCountIndicator {
-    background-color: #c00;
+    color: #c00;
     border-radius: 6px;
-    color: white;
     padding: 3px;
 }
 #keypad {
     width: 70%;
     max-width: 70%;
-    height: 10em;
     display:grid;
     grid-template-columns: auto auto auto;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
     box-sizing: border-box;
-    margin: 0.5em auto;
+    margin: 0 auto;
 
     align-items: stretch;
     justify-items: stretch;
     gap: 0.25em;
+
+    padding: 0.5em;
 }
 
 #keypad .keypadButton {
+    aspect-ratio: 1.2;
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2em;
-    background-color: #cdf;
+    font-size: 1.4em;
+    background-colosr: #bdf;
     box-sizing: border-box;
     border-radius: 10px;
     sfont-weight: bold;
+    font-stretch: ultra-expanded !important;
+}
+
+#keypad .keypadButton:active {
+    background-color: #e0e1e3;
+    border: 1px solid #aaa;
+    transform: scale(1.5);
 }
 
 #keypad .keypadButtonOk {
-    background-color: #ccffc8;
+    background-color: lightgreen;
+}
+
+#btnSeeAnswer {
+    margin: 1em auto;
+    display: block;
+    width: 30%;
+}
+
+#logContainer {
+    margin: 5px 5px;
+    flex: 1 1 auto;          /* take remaining space */
+    overflow-y: auto;        /* scroll within itself */
+    padding: 0.5em;
+    box-sizing: border-box;
+
+    padding-bottom: calc(var(--bottom-pane-height) + env(safe-area-inset-bottom, 0.5rem));
+}
+
+#bottomPane {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    background-color: #f0f1f3;
+    padding: 0 0 !important;
+    margin: 0 0;
+}
+
+#header{
+    flex: 0 0 auto;
 }
