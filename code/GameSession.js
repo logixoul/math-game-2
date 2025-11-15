@@ -1,5 +1,5 @@
 import * as util from './util.js';
-import { MultiplicationPrompt, DivisionPrompt } from './PromptTypes.js';
+import { MultiplicationPrompt, DivisionPrompt, SubtractionPrompt } from './PromptTypes.js';
 
 export class GameSession {
     constructor(appController, promptType) {
@@ -26,6 +26,8 @@ export class GameSession {
             this._initMultiplicationPromptList();
         } else if (this.promptType == DivisionPrompt) {
             this._initDivisionPromptList();
+        } else if (this.promptType == SubtractionPrompt) {
+            this._initSubtractionPromptList();
         }
     }
 
@@ -47,6 +49,17 @@ export class GameSession {
             }
         }
         this.promptList = util.shuffleList(this.promptList);
+    }
+
+    _initSubtractionPromptList() {
+        this.promptList = [];  
+        for (var a = 0; a <= 100; a++) {
+            for (var b = 0; b <= a; b++) {
+                this.promptList.push(new SubtractionPrompt(a, b));
+            }
+        }
+        this.promptList = util.shuffleList(this.promptList);
+        this.promptList = this.promptList.slice(0, 100); // limit to 200 questions
     }
 
     win() {

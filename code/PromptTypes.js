@@ -20,3 +20,11 @@ export class DivisionPrompt extends Prompt {
         this.b = b;
     }
 }
+
+export class SubtractionPrompt extends Prompt {
+    constructor(a, b) {
+        super(`${a} - ${b}`, a - b);
+        this.a = a;
+        this.b = b;
+    }
+}
