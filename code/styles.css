@@ -13,13 +13,25 @@ body {
   flex-direction: column;
 }
 
-
+#header{
+    flex: 0 0 auto;
+    background-color: #444;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    padding: 0.5em 0.5em;
+}
 h1 {
     font-size: 1.5em;
     font-family: Andada Pro, serif;
     display: flex;
     align-items: center;
+    spadding: 0.5em 0.5em !important;
 }
+
+#logo {
+    padding-right: 0.25em !important;
+}
+
 body {
     font-size: 1.0em !important;
     font-family: 'Roboto Condensed', sans-serif;
@@ -149,16 +161,6 @@ input, button {
     background-color: #f0f1f3;
     padding: 0 0 !important;
     margin: 0 0;
-}
-
-#header{
-    flex: 0 0 auto;
-    background-color: #444;
-    color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    padding: 0.5em;
-    
-    vertical-align: middle;
 }
 
 #btnMenu {

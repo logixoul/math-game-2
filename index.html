@@ -14,15 +14,14 @@
 	</head>
 	<body>
 		<div id="header">
-			<h1><img src="assets/play-logo.png" width="40" height="40"/>play</h1>
-			<button id="loginBtn">Sign in with Google</button>
+			<h1><img id="logo" src="assets/play-logo.png" width="40" height="40"/>play</h1>
 			<div id="menuContents" style="display: none;">
 				<p id="userInfo"></p>
 				<button id="saveScoreBtn" disabled>Save Test Score</button>
 				
 				<!-- Disabled for now -->
 				<pre id="result" style="display: none"></pre>
-				
+				<button id="loginBtn" style="display: none;">Sign in with Google</button>
 				<button id="logoutBtn">Logout</button>
 				<select name="dropdownPromptType" id="dropdownPromptType">
 					<option value="MultiplicationPrompt">Умножение</option>
@@ -30,7 +29,7 @@
 					<option value="SubtractionPrompt">Изваждане (5 клас)</option>
 				</select>
 			</div>
-			<img src="assets/menu.svg" width="40" height="40" id="btnMenu"/>
+			<img src="assets/menu.svg" width="30" height="30" id="btnMenu"/>
 		</div>
 		<div id="logContainer">
 			<div id="log">
