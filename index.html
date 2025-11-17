@@ -14,13 +14,23 @@
 	</head>
 	<body>
 		<div id="header">
-			<h1>Epic Math Adventure ⚔️</h1>
-			<select name="dropdownPromptType" id="dropdownPromptType">
-				<option value="MultiplicationPrompt">Умножение</option>
-				<option value="DivisionPrompt">Деление</option>
-				<option value="SubtractionPrompt">Изваждане (5 клас)</option>
-			</select>
-			<i>Стефан Монов</i>
+			<h1><img src="assets/play-logo.png" width="40" height="40"/>play</h1>
+			<button id="loginBtn">Sign in with Google</button>
+			<div id="menuContents" style="display: none;">
+				<p id="userInfo"></p>
+				<button id="saveScoreBtn" disabled>Save Test Score</button>
+				
+				<!-- Disabled for now -->
+				<pre id="result" style="display: none"></pre>
+				
+				<button id="logoutBtn">Logout</button>
+				<select name="dropdownPromptType" id="dropdownPromptType">
+					<option value="MultiplicationPrompt">Умножение</option>
+					<option value="DivisionPrompt">Деление</option>
+					<option value="SubtractionPrompt">Изваждане (5 клас)</option>
+				</select>
+			</div>
+			<img src="assets/menu.svg" width="40" height="40" id="btnMenu"/>
 		</div>
 		<div id="logContainer">
 			<div id="log">
@@ -43,6 +53,33 @@
 		</div>
 
 		</div>
+
+		<!-- BEGIN FIREBASE SNIPPET-->
+		<script type="module">
+		// Import the functions you need from the SDKs you need
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+		import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+		// TODO: Add SDKs for Firebase products that you want to use
+		// https://firebase.google.com/docs/web/setup#available-libraries
+
+		// Your web app's Firebase configuration
+		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+			apiKey: "AIzaSyCehCZKaxW-_qYW5-Vvk9JHJ8nBoLSNIm0",
+			authDomain: "play-stefanteaches.firebaseapp.com",
+			projectId: "play-stefanteaches",
+			storageBucket: "play-stefanteaches.firebasestorage.app",
+			messagingSenderId: "930663810506",
+			appId: "1:930663810506:web:9312fb860a3477a5acfb33",
+			measurementId: "G-X632E2E31S"
+		};
+
+		// Initialize Firebase
+		const app = initializeApp(firebaseConfig);
+		const analytics = getAnalytics(app);
+		</script>
+		<!-- END FIREBASE SNIPPET-->
+
 		<script src="code/main.js" type="module"></script>
 	</body>
 </html>

@@ -17,6 +17,8 @@ export class UIController {
         this.indicators = document.getElementById("indicators");
         this.mainForm = document.getElementById("mainForm");
         this.keypad = document.getElementById("keypad");
+        this.btnMenu = document.getElementById("btnMenu");
+        this.menuContents = document.getElementById("menuContents");
 
         this.btnStartOver.addEventListener("click", function() {
             this.btnStartOver.style.display = "none";
@@ -49,6 +51,14 @@ export class UIController {
             }
             if(promptTypeClass) {
                 this.appController.startNewGame(promptTypeClass);
+            }
+        }.bind(this));
+
+        this.btnMenu.addEventListener("click", function() {
+            if(this.menuContents.style.display === "block") {
+                this.menuContents.style.display = "none";
+            } else {
+                this.menuContents.style.display = "block";
             }
         }.bind(this));
 
