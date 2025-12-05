@@ -1,16 +1,13 @@
-import * as util from './util.js';
-import { MultiplicationPrompt, DivisionPrompt, SubtractionPrompt } from './PromptTypes.js';
-
 export class GameSession {
-    constructor(appController, promptType) {
+    constructor(appController, gameTypeClass) {
         this.appController = appController;
         this.uiController = appController.uiController;
         
-        this.promptType = promptType;
         this.errorCount = 0;
         this.whenLastStarted = null;
         this.isFirstTry = true;
-        this._initPromptList();
+        this.gameType = new gameTypeClass();
+        this.promptList = this.gameType.generatePromptList();
 
         this.currentPromptIndex = 0;
         this.numCorrectAtFirstTry = 0;
@@ -19,47 +16,6 @@ export class GameSession {
 
         this.errorCount = 0;
         this.isFirstTry = true;
-    }
-
-    _initPromptList() {
-        if(this.promptType == MultiplicationPrompt) {
-            this._initMultiplicationPromptList();
-        } else if (this.promptType == DivisionPrompt) {
-            this._initDivisionPromptList();
-        } else if (this.promptType == SubtractionPrompt) {
-            this._initSubtractionPromptList();
-        }
-    }
-
-    _initMultiplicationPromptList() {
-        this.promptList = [];
-        for (var a = 0; a <= 10; a++) {
-            for (var b = 0; b <= 10; b++) {
-                this.promptList.push(new MultiplicationPrompt(a, b));
-            }
-        }
-        this.promptList = util.shuffleList(this.promptList);
-    }
-
-    _initDivisionPromptList() {
-        this.promptList = [];  
-        for (var b = 1; b <= 10; b++) {
-            for (var a = 0; a <= 10; a++) {
-                this.promptList.push(new DivisionPrompt(a * b, b));
-            }
-        }
-        this.promptList = util.shuffleList(this.promptList);
-    }
-
-    _initSubtractionPromptList() {
-        this.promptList = [];  
-        for (var a = 0; a <= 100; a++) {
-            for (var b = 0; b <= a; b++) {
-                this.promptList.push(new SubtractionPrompt(a, b));
-            }
-        }
-        this.promptList = util.shuffleList(this.promptList);
-        this.promptList = this.promptList.slice(0, 100); // limit to 200 questions
     }
 
     win() {

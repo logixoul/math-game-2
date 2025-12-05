@@ -5,10 +5,19 @@ import * as PromptTypes from './PromptTypes.js';
 export class AppController {
     constructor() {
         this.uiController = new UIController(this);
-        this.startNewGame(PromptTypes.MultiplicationPrompt);
+        this.startNewGame(PromptTypes.MultiplicationGameType);
     }
 
-    startNewGame(promptType) {
-        this.gameSession = new GameSession(this, promptType);
+    startNewGame(gameType) {
+        this.gameSession = new GameSession(this, gameType);
+    }
+    
+    getAvailableGameTypes() {
+        return [
+            PromptTypes.MultiplicationGameType,
+            PromptTypes.DivisionGameType,
+            PromptTypes.SubtractionGameType,
+            PromptTypes.AdditionGameType,
+        ];
     }
 }

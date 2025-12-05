@@ -74,10 +74,24 @@ export class UIController {
         }
 
         this.buildKeypad();
+        this.initGameTypesInDropdown();
 
         this.adjustMiddlePanePadding();
         window.addEventListener('resize', this.adjustMiddlePanePadding.bind(this));
         window.addEventListener('orientationchange', this.adjustMiddlePanePadding.bind(this));
+    }
+
+    initGameTypesInDropdown() {
+        const gameTypes = this.appController.getAvailableGameTypes();
+        this.dropdownPromptType.innerHTML = "";
+        gameTypes.forEach(gameTypeClass => {
+            const option = document.createElement("option");
+            const gameTypeInstance = new gameTypeClass();
+            console.log(gameTypeClass, gameTypeClass.name);
+            option.value = gameTypeClass.name;
+            option.textContent = gameTypeInstance.localizedName;
+            this.dropdownPromptType.appendChild(option);
+        });
     }
 
     arrowInlineSvg = `<svg fill="#000000" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
