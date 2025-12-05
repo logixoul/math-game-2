@@ -96,7 +96,7 @@ input, button {
         display: grid !important;
     }
     #userAnswerBox {
-        display: none;
+        display: none !important;
     }
 }
 #keypad {
