@@ -76,9 +76,7 @@ input, button {
     padding: 3px;
 }
 /* hide keypad by default (desktop-first) */
-#keypad {
-    display: none !important;
-}
+
 #userAnswerBox {
     width: 70%;
     max-width: 70%;
@@ -90,15 +88,7 @@ input, button {
     border: 2px solid #ccc;
     box-sizing: border-box;
 }
-@media (pointer: coarse), (hover: none), (any-pointer: coarse) {
-    /* show keypad on touch devices */
-    #keypad {
-        display: grid !important;
-    }
-    #userAnswerBox {
-        display: none !important;
-    }
-}
+
 #keypad {
     width: 70%;
     max-width: 70%;

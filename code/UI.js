@@ -1,4 +1,5 @@
 import * as PromptTypes from './PromptTypes.js';
+import * as debug from './debug.js';
 //import { AppController } from 'AppController';
 //import { GameSession } from 'GameSession';
 
@@ -77,6 +78,18 @@ export class UIController {
         this.adjustMiddlePanePadding();
         window.addEventListener('resize', this.adjustMiddlePanePadding.bind(this));
         window.addEventListener('orientationchange', this.adjustMiddlePanePadding.bind(this));
+
+        if(this.isMobileDevice()) {
+            this.keypad.style.display = "grid";
+            this.userAnswerBox.style.display = "none";
+        } else {
+            this.keypad.style.display = "none";
+            this.userAnswerBox.style.display = "block";
+        }
+    }
+
+    isMobileDevice() {
+        return window.matchMedia("(pointer: coarse), (hover: none), (any-pointer: coarse)").matches;
     }
 
     initGameTypesInDropdown() {
@@ -168,17 +181,30 @@ export class UIController {
         this.indicators.style.top = (5 + offsetTop) + 'px';
     }
 
+    _getUserAnswerText() {
+        if(this.isMobileDevice()) {
+            return this.latestAnswerField.textContent;
+        } else {
+            return this.userAnswerBox.value;
+        }
+    }
+
     onUserPressedEnter() {
-        this.latestPrompt.textContent = this.latestPrompt.textContent + this.userAnswerBox.value;
+        let userAnswerText = this._getUserAnswerText();
+        if(!this.isMobileDevice()) {
+            this.latestAnswerField.textContent = userAnswerText;
+        }
         
-        const userAnswer = parseInt(this.userAnswerBox.value);
+        const userAnswer = parseInt(userAnswerText);
         this.gameSession.onUserAnswered(userAnswer);
         this.userAnswerBox.value = "";
     }
 
     onNewSession() {
         this.logElement.textContent = "";
-        this.userAnswerBox.style.display = "block";
+        if(!this.isMobileDevice()) {
+            this.userAnswerBox.style.display = "block";
+        }
         this.updateProgressIndicator();
         this.updateErrorCountIndicator();
         this.showPrompt();
