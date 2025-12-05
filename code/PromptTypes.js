@@ -4,6 +4,7 @@ export class Prompt {
     constructor(text, answer) {
         this.text = text;
         this.answer = answer;
+        this.failedAttempts = 0;
     }
 }
 
@@ -62,6 +63,7 @@ export class MultiplicationGameType extends GameType {
             }
         }
         prompts = util.shuffleList(prompts);
+        prompts = prompts.slice(0, 2); // for debugging
         return prompts;
     }
 }

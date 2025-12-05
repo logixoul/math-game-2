@@ -5,7 +5,6 @@ export class GameSession {
         
         this.errorCount = 0;
         this.whenLastStarted = null;
-        this.isFirstTry = true;
         this.gameType = new gameTypeClass();
         this.promptList = this.gameType.generatePromptList();
 
@@ -15,7 +14,6 @@ export class GameSession {
         this.uiController.onNewSession();
 
         this.errorCount = 0;
-        this.isFirstTry = true;
     }
 
     win() {
@@ -33,7 +31,6 @@ export class GameSession {
         this.currentPromptIndex++;
         this.uiController.updateProgressIndicator();
         this.uiController.showPrompt();
-        this.isFirstTry = true;
     }
 
     getCurrentPrompt() {
@@ -47,7 +44,7 @@ export class GameSession {
         const currentPrompt = this.getCurrentPrompt();
         if(userAnswer == currentPrompt.answer) {
             this.uiController.informUser("✅ Точно така!", "#00c000");
-            if(this.isFirstTry) {
+            if(currentPrompt.failedAttempts == 0) {
                 this.numCorrectAtFirstTry++;
             }
             if(this.currentPromptIndex == this.promptList.length - 1) {
@@ -62,7 +59,7 @@ export class GameSession {
             this.uiController.updateErrorCountIndicator();
             this.uiController.informUser("❌ Пробвай пак.", "black");
             this.uiController.showPrompt();
-            this.isFirstTry = false;
+            currentPrompt.failedAttempts++;
         }
     }
 
@@ -78,6 +75,6 @@ export class GameSession {
         this.uiController.updateErrorCountIndicator();
 
         this.uiController.showPrompt();
-        this.isFirstTry = true;
+        this.getCurrentPrompt().failedAttempts++;
     }
 }
