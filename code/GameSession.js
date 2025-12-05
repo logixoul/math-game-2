@@ -25,7 +25,7 @@ export class GameSession {
         const seconds = Math.floor(timeElapsed / 1000) % 60;
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptList.length);
         this.uiController.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
-        this.uiController.editBox.style.display = "none";
+        this.uiController.userAnswerBox.style.display = "none";
         this.uiController.btnStartOver.style.display = "inline";
     }
 
@@ -64,5 +64,20 @@ export class GameSession {
             this.uiController.showPrompt();
             this.isFirstTry = false;
         }
+    }
+
+    onUserRequestedAnswerReveal() {
+        const answer = this.getCurrentPrompt().answer;
+        this.uiController.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
+        
+        // push question back to the end of the queue
+        this.promptList.push(this.promptList[this.currentPromptIndex]);
+        this.promptList.splice(this.currentPromptIndex, 1);
+
+        this.errorCount++;
+        this.uiController.updateErrorCountIndicator();
+
+        this.uiController.showPrompt();
+        this.isFirstTry = true;
     }
 }

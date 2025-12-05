@@ -79,10 +79,24 @@ input, button {
 #keypad {
     display: none !important;
 }
+#userAnswerBox {
+    width: 70%;
+    max-width: 70%;
+    font-size: 1.4em !important;
+    padding: 0.5em;
+    margin: 0.5em auto;
+    display: block;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    box-sizing: border-box;
+}
 @media (pointer: coarse), (hover: none), (any-pointer: coarse) {
     /* show keypad on touch devices */
     #keypad {
         display: grid !important;
+    }
+    #userAnswerBox {
+        display: none;
     }
 }
 #keypad {

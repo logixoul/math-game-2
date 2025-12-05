@@ -11,7 +11,8 @@ export class UIController {
         this.bottomPane = document.getElementById("bottomPane");
 
         this.btnStartOver = document.getElementById("btnStartOver");
-        //this.editBox = document.getElementById("userAnswerBox");
+        this.userAnswerBox = document.getElementById("userAnswerBox");
+
         this.btnSeeAnswer = document.getElementById("btnSeeAnswer");
         this.dropdownPromptType = document.getElementById("dropdownPromptType");
         this.indicators = document.getElementById("indicators");
@@ -23,22 +24,19 @@ export class UIController {
         this.btnStartOver.addEventListener("click", function() {
             this.btnStartOver.style.display = "none";
             this.appController.startNewGame(PromptTypes[this.dropdownPromptType.value]);
+            this.userAnswerBox.focus();
         }.bind(this));
         this.btnSeeAnswer.addEventListener("click", function() {
-            const answer = this.gameSession.getCurrentPrompt().answer;
-            this.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
-            this.gameSession.nextQuestion();
-            this.gameSession.errorCount++;
-            this.updateErrorCountIndicator();
+            this.gameSession.onUserRequestedAnswerReveal();
         }.bind(this));
         
-        //this.editBox.focus();
+        this.userAnswerBox.focus();
         
         this.mainForm.addEventListener("submit", function(e) {
             e.preventDefault();
             this.onUserPressedEnter();
             /*window.setTimeout(0, function() {
-                this.editBox.focus(); // don't let the softkeyboard disappear
+                this.userAnswerBox.focus(); // don't let the softkeyboard disappear
             }.bind(this));*/
             return false;
         }.bind(this));
@@ -140,7 +138,7 @@ export class UIController {
         this.setupKeypadButton(btnArray, 2, 2, "9");
         this.setupKeypadButton(btnArray, 1, 3, "0");
         this.setupKeypadButton(btnArray, 3, 2, this.backspaceInlineSvg, function() {
-            //this.editBox.value = this.editBox.value.slice(0, -1);
+            //this.userAnswerBox.value = this.userAnswerBox.value.slice(0, -1);
             this.latestAnswerField.textContent = this.latestAnswerField.textContent.slice(0, -1);
         }.bind(this));
         const btnOk = this.setupKeypadButton(btnArray, 3, 3, this.arrowInlineSvg, function() {
@@ -171,16 +169,16 @@ export class UIController {
     }
 
     onUserPressedEnter() {
-        //this.latestPrompt.textContent = this.latestPrompt.textContent + this.editBox.value;
+        this.latestPrompt.textContent = this.latestPrompt.textContent + this.userAnswerBox.value;
         
-        const userAnswer = parseInt(this.latestAnswerField.textContent);
+        const userAnswer = parseInt(this.userAnswerBox.value);
         this.gameSession.onUserAnswered(userAnswer);
-        //this.editBox.value = "";
+        this.userAnswerBox.value = "";
     }
 
     onNewSession() {
         this.logElement.textContent = "";
-        //this.editBox.style.display = "inline";
+        this.userAnswerBox.style.display = "block";
         this.updateProgressIndicator();
         this.updateErrorCountIndicator();
         this.showPrompt();
