@@ -63,7 +63,7 @@ export class MultiplicationGameType extends GameType {
             }
         }
         prompts = util.shuffleList(prompts);
-        prompts = prompts.slice(0, 2); // for debugging
+        //prompts = prompts.slice(0, 2); // for debugging
         return prompts;
     }
 }
