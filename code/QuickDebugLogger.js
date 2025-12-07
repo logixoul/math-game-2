@@ -1,13 +1,14 @@
 // quick error reporter so runtime errors show up on the page
 export class QuickDebugLogger {
-    static #_instance = null;
+    static #instance = null;
 
     static get instance() {
-        if (QuickDebugLogger.#_instance === null) {
-            QuickDebugLogger.#_instance = new QuickDebugLogger();
+        if (QuickDebugLogger.#instance === null) {
+            QuickDebugLogger.#instance = new QuickDebugLogger();
         }
-        return QuickDebugLogger.#_instance;
+        return QuickDebugLogger.#instance;
     }
+    
     log(msg, level = 'error') {
         const pre = document.createElement('pre');
         pre.style.position = 'fixed';

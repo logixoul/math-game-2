@@ -1,7 +1,6 @@
 import * as PromptTypes from './PromptTypes.js';
 import { QuickDebugLogger } from './QuickDebugLogger.js';
-//import { AppController } from 'AppController';
-//import { GameSession } from 'GameSession';
+import { inlineJsAssets } from './InlineJsAssets.js';
 
 export class UIController {
     constructor(appController) {
@@ -72,14 +71,14 @@ export class UIController {
             window.addEventListener('resize', this.relocateIndicators.bind(this));
         }
 
-        this.buildKeypad();
-        this.initGameTypesInDropdown();
+        this.#buildKeypad();
+        this.#initGameTypesInDropdown();
 
         this.adjustMiddlePanePadding();
         window.addEventListener('resize', this.adjustMiddlePanePadding.bind(this));
         window.addEventListener('orientationchange', this.adjustMiddlePanePadding.bind(this));
 
-        if(this.isMobileDevice()) {
+        if(this.#isMobileDevice()) {
             this.keypad.style.display = "grid";
             this.userAnswerBox.style.display = "none";
         } else {
@@ -88,11 +87,11 @@ export class UIController {
         }
     }
 
-    isMobileDevice() {
+    #isMobileDevice() {
         return window.matchMedia("(pointer: coarse), (hover: none), (any-pointer: coarse)").matches;
     }
 
-    initGameTypesInDropdown() {
+    #initGameTypesInDropdown() {
         const gameTypes = this.appController.getAvailableGameTypes();
         this.dropdownPromptType.innerHTML = "";
         gameTypes.forEach(gameTypeClass => {
@@ -105,26 +104,7 @@ export class UIController {
         });
     }
 
-    arrowInlineSvg = `<svg fill="#000000" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-<polygon points="437.3,30 202.7,339.3 64,200.7 0,264.7 213.3,478 512,94 "/>
-</svg>`
-    backspaceInlineSvg = `
-
-<svg height="20px" width="20px" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 512 512"  xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#000000;}
-</style>
-<g>
-	<path class="st0" d="M459.279,63.989H193.251c-20.346,0-39.7,8.82-53.054,24.186L4.314,244.473c-5.752,6.61-5.752,16.443,0,23.06
-		l135.883,156.306c13.354,15.359,32.708,24.172,53.054,24.172h266.028c29.116,0,52.721-23.605,52.721-52.721V116.716
-		C512,87.593,488.395,63.989,459.279,63.989z M360.581,338.701l-51.687-51.672l-51.672,51.658l-31.03-31.015l51.673-51.687
-		L226.2,204.32l31.022-31.022l51.672,51.673l51.679-51.687l31.022,31.036l-51.687,51.679l51.701,51.673L360.581,338.701z"/>
-</g>
-</svg>`
-
-    buildKeypad() {
+    #buildKeypad() {
         const btnArray = new Array();
         for(let col = 0; col < 4; col++) {
             btnArray.push(new Array(4));
@@ -140,28 +120,28 @@ export class UIController {
             }
         }
 
-        this.setupKeypadButton(btnArray, 0, 0, "1");
-        this.setupKeypadButton(btnArray, 1, 0, "2");
-        this.setupKeypadButton(btnArray, 2, 0, "3");
-        this.setupKeypadButton(btnArray, 0, 1, "4");
-        this.setupKeypadButton(btnArray, 1, 1, "5");
-        this.setupKeypadButton(btnArray, 2, 1, "6");
-        this.setupKeypadButton(btnArray, 0, 2, "7");
-        this.setupKeypadButton(btnArray, 1, 2, "8");
-        this.setupKeypadButton(btnArray, 2, 2, "9");
-        this.setupKeypadButton(btnArray, 1, 3, "0");
-        this.setupKeypadButton(btnArray, 3, 2, this.backspaceInlineSvg, function() {
+        this.#setupKeypadButton(btnArray, 0, 0, "1");
+        this.#setupKeypadButton(btnArray, 1, 0, "2");
+        this.#setupKeypadButton(btnArray, 2, 0, "3");
+        this.#setupKeypadButton(btnArray, 0, 1, "4");
+        this.#setupKeypadButton(btnArray, 1, 1, "5");
+        this.#setupKeypadButton(btnArray, 2, 1, "6");
+        this.#setupKeypadButton(btnArray, 0, 2, "7");
+        this.#setupKeypadButton(btnArray, 1, 2, "8");
+        this.#setupKeypadButton(btnArray, 2, 2, "9");
+        this.#setupKeypadButton(btnArray, 1, 3, "0");
+        this.#setupKeypadButton(btnArray, 3, 2, inlineJsAssets.backspace, function() {
             //this.userAnswerBox.value = this.userAnswerBox.value.slice(0, -1);
             this.latestAnswerField.textContent = this.latestAnswerField.textContent.slice(0, -1);
         }.bind(this));
-        const btnOk = this.setupKeypadButton(btnArray, 3, 3, this.arrowInlineSvg, function() {
+        const btnOk = this.#setupKeypadButton(btnArray, 3, 3, inlineJsAssets.arrow, function() {
             this.onUserPressedEnter();
         }.bind(this));
 
         btnOk.classList.add("keypadButtonOk");
     }
 
-    setupKeypadButton(btnArray, col, row, text, onClick) {
+    #setupKeypadButton(btnArray, col, row, text, onClick) {
         const btn = btnArray[col][row];
         //btn.textContent = text;
         btn.innerHTML = text;
@@ -182,7 +162,7 @@ export class UIController {
     }
 
     _getUserAnswerText() {
-        if(this.isMobileDevice()) {
+        if(this.#isMobileDevice()) {
             return this.latestAnswerField.textContent;
         } else {
             return this.userAnswerBox.value;
@@ -191,7 +171,7 @@ export class UIController {
 
     onUserPressedEnter() {
         let userAnswerText = this._getUserAnswerText();
-        if(!this.isMobileDevice()) {
+        if(!this.#isMobileDevice()) {
             this.latestAnswerField.textContent = userAnswerText;
         }
         
@@ -202,7 +182,7 @@ export class UIController {
 
     onNewSession() {
         this.logElement.textContent = "";
-        if(!this.isMobileDevice()) {
+        if(!this.#isMobileDevice()) {
             this.userAnswerBox.style.display = "block";
         }
         this.updateProgressIndicator();

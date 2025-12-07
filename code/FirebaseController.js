@@ -8,19 +8,19 @@ import * as FirebaseStore from "https://www.gstatic.com/firebasejs/10.12.2/fireb
 export class FirebaseController {
     FirebaseController() {
     }
+    static #firebaseConfig = {
+        apiKey: "AIzaSyCehCZKaxW-_qYW5-Vvk9JHJ8nBoLSNIm0",
+        authDomain: "play-stefanteaches.firebaseapp.com",
+        projectId: "play-stefanteaches",
+        storageBucket: "play-stefanteaches.firebasestorage.app",
+        messagingSenderId: "930663810506",
+        appId: "1:930663810506:web:9312fb860a3477a5acfb33",
+        measurementId: "G-X632E2E31S"
+    };
     async init() {
-        const firebaseConfig = {
-            apiKey: "AIzaSyCehCZKaxW-_qYW5-Vvk9JHJ8nBoLSNIm0",
-            authDomain: "play-stefanteaches.firebaseapp.com",
-            projectId: "play-stefanteaches",
-            storageBucket: "play-stefanteaches.firebasestorage.app",
-            messagingSenderId: "930663810506",
-            appId: "1:930663810506:web:9312fb860a3477a5acfb33",
-            measurementId: "G-X632E2E31S"
-        };
 
         // Initialize Firebase
-        const app = FirebaseApp.initializeApp(firebaseConfig);
+        const app = FirebaseApp.initializeApp(FirebaseController.#firebaseConfig);
         //const analytics = FirebaseAnalytics.getAnalytics(app);
         const auth = FirebaseAuth.getAuth(app);
         const db   = FirebaseStore.getFirestore(app);
