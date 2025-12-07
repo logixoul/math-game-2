@@ -98,7 +98,7 @@ export class UIController {
         gameTypes.forEach(gameTypeClass => {
             const option = document.createElement("option");
             const gameTypeInstance = new gameTypeClass();
-            console.log(gameTypeClass, gameTypeClass.name);
+            
             option.value = gameTypeClass.name;
             option.textContent = gameTypeInstance.localizedName;
             this.dropdownPromptType.appendChild(option);
