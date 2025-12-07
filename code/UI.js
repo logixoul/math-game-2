@@ -1,5 +1,5 @@
 import * as PromptTypes from './PromptTypes.js';
-import * as debug from './QuickDebugLogger.js';
+import { QuickDebugLogger } from './QuickDebugLogger.js';
 //import { AppController } from 'AppController';
 //import { GameSession } from 'GameSession';
 

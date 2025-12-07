@@ -34,4 +34,3 @@ export class QuickDebugLogger {
         }.bind(this));
     }
 }
-export let quickDebugLogger = new QuickDebugLogger();
