@@ -74,7 +74,7 @@ export class GameSession {
         this.errorCount++;
         this.uiController.updateErrorCountIndicator();
 
-        this.uiController.showPrompt();
+        this.uiController.sshowPrompt();
         this.getCurrentPrompt().failedAttempts++;
     }
 }

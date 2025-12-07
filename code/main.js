@@ -1,10 +1,9 @@
-
 import { AppController } from "./AppController.js";
-import { installErrorReporter } from "./debug.js";
+import { QuickDebugLogger } from "./QuickDebugLogger.js";
 import { FirebaseController } from "./FirebaseController.js";
 
-// install error reporter to show runtime errors on the page
-installErrorReporter();
+QuickDebugLogger.instance.beginListeningForErrors();
+
 let firebaseController = new FirebaseController();
 firebaseController.init();
 
