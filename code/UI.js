@@ -2,24 +2,34 @@ import * as PromptTypes from './PromptTypes.js';
 import { QuickDebugLogger } from './QuickDebugLogger.js';
 import { inlineJsAssets } from './InlineJsAssets.js';
 
+const elementNames = [
+    "log",
+    "logContainer",
+    "bottomPane",
+    "btnStartOver",
+    "userAnswerBox",
+    "btnSeeAnswer",
+    "dropdownPromptType",
+    "indicators",
+    "mainForm",
+    "keypad",
+    "btnMenu",
+    "menuContents",
+    "loginBtn",
+    "userInfo",
+    "logoutBtn",
+    "saveScoreBtn"
+];
+
 export class UIController {
     constructor(appController) {
         this.appController = appController;
 
-        this.logElement = document.getElementById("log");
-        this.logContainer = document.getElementById("logContainer");
-        this.bottomPane = document.getElementById("bottomPane");
+        this.el = {};
 
-        this.btnStartOver = document.getElementById("btnStartOver");
-        this.userAnswerBox = document.getElementById("userAnswerBox");
-
-        this.btnSeeAnswer = document.getElementById("btnSeeAnswer");
-        this.dropdownPromptType = document.getElementById("dropdownPromptType");
-        this.indicators = document.getElementById("indicators");
-        this.mainForm = document.getElementById("mainForm");
-        this.keypad = document.getElementById("keypad");
-        this.btnMenu = document.getElementById("btnMenu");
-        this.menuContents = document.getElementById("menuContents");
+        for(const name of elementNames) {
+            this[name] = document.getElementById(name);
+        }
 
         this.btnStartOver.addEventListener("click", function() {
             this.btnStartOver.style.display = "none";
@@ -181,7 +191,7 @@ export class UIController {
     }
 
     onNewSession() {
-        this.logElement.textContent = "";
+        this.log.textContent = "";
         if(!this.#isMobileDevice()) {
             this.userAnswerBox.style.display = "block";
         }
@@ -238,7 +248,7 @@ export class UIController {
         if(isBold)
             newMessageElement.style.fontWeight = "bold";
         this.latestPrompt = newMessageElement;
-        this.logElement.append(newMessageElement);
+        this.log.append(newMessageElement);
         this.scrollToBottom();
 
         const answerField = document.createElement("span");

@@ -6,7 +6,8 @@ import * as FirebaseAuth from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import * as FirebaseStore from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 export class FirebaseController {
-    FirebaseController() {
+    FirebaseController(uiController) {
+        this.uiController = uiController;
     }
     static #firebaseConfig = {
         apiKey: "AIzaSyCehCZKaxW-_qYW5-Vvk9JHJ8nBoLSNIm0",
@@ -22,60 +23,20 @@ export class FirebaseController {
         // Initialize Firebase
         const app = FirebaseApp.initializeApp(FirebaseController.#firebaseConfig);
         //const analytics = FirebaseAnalytics.getAnalytics(app);
-        const auth = FirebaseAuth.getAuth(app);
-        const db   = FirebaseStore.getFirestore(app);
+        this.auth = FirebaseAuth.getAuth(app);
+        this.db   = FirebaseStore.getFirestore(app);
 
         // --- GOOGLE LOGIN ---
-        const loginBtn = document.getElementById("loginBtn");
-        const userInfo = document.getElementById("userInfo");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const saveScoreBtn = document.getElementById("saveScoreBtn");
 
-        await FirebaseAuth.setPersistence(auth, FirebaseAuth.browserLocalPersistence);
+        await FirebaseAuth.setPersistence(this.auth, FirebaseAuth.browserLocalPersistence);
 
+        loginBtn.onclick = this.login.bind(this);
 
-        loginBtn.onclick = async () => {
-            const provider = new FirebaseAuth.GoogleAuthProvider();
-            try {
-                const result = await FirebaseAuth.signInWithPopup(auth, provider);
-                const user = result.user;
+        logoutBtn.onclick = this.logout.bind(this);
 
-                userInfo.innerText = "Здравей, " + user.email;
-                saveScoreBtn.disabled = false;
-            } catch (err) {
-            console.error(err);
-            }
-        };
+        saveScoreBtn.onclick = this.saveScore.bind(this, Math.floor(Math.random() * 100));
 
-        logoutBtn.onclick = async () => {
-            try {
-                await FirebaseAuth.signOut(auth);
-                // UI updates happen automatically in onAuthStateChanged
-            } catch (err) {
-                console.error(err);
-            }
-    };
-
-        // --- SAVE SCORE TO FIRESTORE ---
-        saveScoreBtn.onclick = async () => {
-            const user = auth.currentUser;
-            if (!user) return alert("Login first!");
-
-            const score = Math.floor(Math.random() * 100); // test score
-
-            const ref = FirebaseStore.doc(db, "scores", user.uid);
-
-            await FirebaseStore.setDoc(ref, {
-                email: user.email,
-                lastScore: score,
-                timestamp: Date.now()
-            });
-
-            document.getElementById("result").innerText =
-            "Saved score: " + score;
-        };
-
-        FirebaseAuth.onAuthStateChanged(auth, (user) => {
+        FirebaseAuth.onAuthStateChanged(this.auth, (user) => {
             if (user) {
                 // User is signed in
                 userInfo.innerText = "Signed in as: " + user.email;
@@ -91,5 +52,35 @@ export class FirebaseController {
                 logoutBtn.style.display = "none";
             }
         });
+    }
+
+    async login() {
+        const provider = new FirebaseAuth.GoogleAuthProvider();
+        const result = await FirebaseAuth.signInWithPopup(this.auth, provider);
+        const user = result.user;
+
+        userInfo.innerText = "Здравей, " + user.email;
+        saveScoreBtn.disabled = false;
+    }
+
+    async logout() {
+        await FirebaseAuth.signOut(this.auth);
+        // UI updates happen automatically in onAuthStateChanged
+    }
+
+    async saveScore(score) {
+        const user = this.auth.currentUser;
+        if (!user) return alert("Login first!");
+
+        const ref = FirebaseStore.doc(this.db, "scores", user.uid);
+
+        await FirebaseStore.setDoc(ref, {
+            email: user.email,
+            lastScore: score,
+            timestamp: Date.now()
+        });
+
+        document.getElementById("result").innerText =
+        "Saved score: " + score;
     }
 }
