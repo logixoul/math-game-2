@@ -8,38 +8,6 @@ export class Prompt {
     }
 }
 
-export class MultiplicationPrompt extends Prompt {
-    constructor(a, b) {
-        super(`${a} × ${b}`, a * b);
-        this.a = a;
-        this.b = b;
-    }
-}
-
-export class DivisionPrompt extends Prompt {
-    constructor(a, b) {
-        super(`${a} : ${b}`, a / b);
-        this.a = a;
-        this.b = b;
-    }
-}
-
-export class SubtractionPrompt extends Prompt {
-    constructor(a, b) {
-        super(`${a} - ${b}`, a - b);
-        this.a = a;
-        this.b = b;
-    }
-}
-
-export class AdditionPrompt extends Prompt {
-    constructor(a, b) {
-        super(`${a} + ${b}`, a + b);
-        this.a = a;
-        this.b = b;
-    }
-}
-
 export class GameType {
     constructor(localizedName) {
         this.localizedName = localizedName;
@@ -59,7 +27,7 @@ export class MultiplicationGameType extends GameType {
         let prompts = [];
         for (var a = 0; a <= 10; a++) {
             for (var b = 0; b <= 10; b++) {
-                prompts.push(new MultiplicationPrompt(a, b));
+                prompts.push(new Prompt(`${a} × ${b}`, a * b));
             }
         }
         prompts = util.shuffleList(prompts);
@@ -77,7 +45,9 @@ export class DivisionGameType extends GameType {
         let prompts = [];
         for (var b = 1; b <= 10; b++) {
             for (var a = 0; a <= 10; a++) {
-                prompts.push(new DivisionPrompt(a * b, b));
+                const divisee = a * b;
+                const divisor = b;
+                prompts.push(new Prompt(`${divisee} : ${divisor}`, a));
             }
         }
         prompts = util.shuffleList(prompts);
@@ -93,7 +63,7 @@ export class SubtractionGameType extends GameType {
         let prompts = [];
         for (var a = 0; a <= 100; a++) {
             for (var b = 0; b <= a; b++) {
-                prompts.push(new SubtractionPrompt(a, b));
+                prompts.push(new Prompt(`${a} - ${b}`, a - b));
             }
         }
         prompts = util.shuffleList(prompts);
@@ -110,7 +80,7 @@ export class AdditionGameType extends GameType {
         let prompts = [];
         for (var a = 0; a <= 100; a++) {
             for (var b = 0; b <= 100; b++) {
-                prompts.push(new AdditionPrompt(a, b));
+                prompts.push(new Prompt(`${a} + ${b}`, a + b));
             }
         }
         prompts = util.shuffleList(prompts);
