@@ -257,7 +257,7 @@ export class UIController {
         });
     }
     adjustMiddlePanePadding(): void {
-        this.logContainer.style.paddingBottom = `${this.bottomPane.offsetHeight}px`;
+        //this.logContainer.style.paddingBottom = `${this.bottomPane.offsetHeight}px`;
     }
     informUser(message: string, color: string, isBold?: boolean): HTMLElement {
         const newMessageElement = document.createElement("p");
