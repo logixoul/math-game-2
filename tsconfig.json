@@ -1,16 +1,16 @@
 {
 	"compilerOptions": {
-	  "outDir": "./built",
 	  "allowJs": true,
 	  "target": "es2017",
+	  "module": "ESNext",
+	  "moduleResolution": "Bundler",
 	  "types": [],
-	  "noEmitOnError": true,
+	  "noEmit": true,
 	  /*"noImplicitAny": true,
 	  "strictNullChecks": true,
 	  "noImplicitReturns": true,
 	  "noFallthroughCasesInSwitch": true*/
 	  "strict": true,
-	  "moduleResolution": "node",
 	},
 	"include": ["./src/**/*"]
   }
