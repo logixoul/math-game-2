@@ -75,7 +75,7 @@ export class FirebaseController {
         const result = await FirebaseAuth.signInWithPopup(this.auth, provider);
         const user = result.user;
 
-        this.userInfo.innerText = "Ð—Ð´Ñ€Ð°Ð²ÐµÐ¹, " + user.email;
+        this.userInfo.innerText = "Здравей, " + user.email;
         this.saveScoreBtn.disabled = false;
     }
 

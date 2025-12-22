@@ -6,47 +6,27 @@ import type { GameTypeCtor } from './PromptTypes';
 import type { GameSession } from './GameSession';
 
 export class UIController {
-    appController: AppController;
     gameSession!: GameSession;
-    log: HTMLElement;
-    logContainer: HTMLElement;
-    bottomPane: HTMLElement;
-    btnStartOver: HTMLButtonElement;
-    userAnswerBox: HTMLInputElement;
-    btnSeeAnswer: HTMLButtonElement;
-    dropdownPromptType: HTMLSelectElement;
-    indicators: HTMLElement;
-    mainForm: HTMLFormElement;
-    keypad: HTMLElement;
-    btnMenu: HTMLButtonElement;
-    menuContents: HTMLElement;
-    loginBtn: HTMLButtonElement;
-    userInfo: HTMLElement;
-    logoutBtn: HTMLButtonElement;
-    saveScoreBtn: HTMLButtonElement;
-    latestPrompt: HTMLElement | null;
+    log: HTMLElement = document.getElementById("log") as HTMLElement;
+    logContainer: HTMLElement = document.getElementById("logContainer") as HTMLElement;
+    bottomPane: HTMLElement = document.getElementById("bottomPane") as HTMLElement;
+    btnStartOver: HTMLButtonElement = document.getElementById("btnStartOver") as HTMLButtonElement;
+    userAnswerBox: HTMLInputElement = document.getElementById("userAnswerBox") as HTMLInputElement;
+    btnSeeAnswer: HTMLButtonElement = document.getElementById("btnSeeAnswer") as HTMLButtonElement;
+    dropdownPromptType: HTMLSelectElement = document.getElementById("dropdownPromptType") as HTMLSelectElement;
+    indicators: HTMLElement = document.getElementById("indicators") as HTMLElement;
+    mainForm: HTMLFormElement = document.getElementById("mainForm") as HTMLFormElement;
+    keypad: HTMLElement = document.getElementById("keypad") as HTMLElement;
+    btnMenu: HTMLButtonElement = document.getElementById("btnMenu") as HTMLButtonElement;
+    menuContents: HTMLElement = document.getElementById("menuContents") as HTMLElement;
+    loginBtn: HTMLButtonElement = document.getElementById("loginBtn") as HTMLButtonElement;
+    userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
+    logoutBtn: HTMLButtonElement = document.getElementById("logoutBtn") as HTMLButtonElement;
+    saveScoreBtn: HTMLButtonElement = document.getElementById("saveScoreBtn") as HTMLButtonElement;
+    latestPrompt: HTMLElement | null = null;
     latestAnswerField!: HTMLSpanElement;
 
-    constructor(appController: AppController) {
-        this.appController = appController;
-
-        this.log = document.getElementById("log") as HTMLElement;
-        this.logContainer = document.getElementById("logContainer") as HTMLElement;
-        this.bottomPane = document.getElementById("bottomPane") as HTMLElement;
-        this.btnStartOver = document.getElementById("btnStartOver") as HTMLButtonElement;
-        this.userAnswerBox = document.getElementById("userAnswerBox") as HTMLInputElement;
-        this.btnSeeAnswer = document.getElementById("btnSeeAnswer") as HTMLButtonElement;
-        this.dropdownPromptType = document.getElementById("dropdownPromptType") as HTMLSelectElement;
-        this.indicators = document.getElementById("indicators") as HTMLElement;
-        this.mainForm = document.getElementById("mainForm") as HTMLFormElement;
-        this.keypad = document.getElementById("keypad") as HTMLElement;
-        this.btnMenu = document.getElementById("btnMenu") as HTMLButtonElement;
-        this.menuContents = document.getElementById("menuContents") as HTMLElement;
-        this.loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
-        this.userInfo = document.getElementById("userInfo") as HTMLElement;
-        this.logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
-        this.saveScoreBtn = document.getElementById("saveScoreBtn") as HTMLButtonElement;
-
+    constructor(public appController: AppController) {
         this.btnStartOver.addEventListener("click", () => {
             this.btnStartOver.style.display = "none";
             const selectedValue = this.dropdownPromptType.value as keyof typeof PromptTypes;
@@ -65,9 +45,6 @@ export class UIController {
         this.mainForm.addEventListener("submit", (e: Event) => {
             e.preventDefault();
             this.onUserPressedEnter();
-            /*window.setTimeout(0, function() {
-                this.userAnswerBox.focus(); // don't let the softkeyboard disappear
-            }.bind(this));*/
             return false;
         });
 
@@ -86,8 +63,6 @@ export class UIController {
                 this.menuContents.style.display = "block";
             }
         });
-
-        this.latestPrompt = null;
 
         this.relocateIndicators();
         if (window.visualViewport) {
