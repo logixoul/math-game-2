@@ -1,7 +1,11 @@
-import * as util from './util.js';
+import * as util from './util';
 
 export class Prompt {
-    constructor(text, answer) {
+    text: string;
+    answer: number;
+    failedAttempts: number;
+
+    constructor(text: string, answer: number) {
         this.text = text;
         this.answer = answer;
         this.failedAttempts = 0;
@@ -9,11 +13,13 @@ export class Prompt {
 }
 
 export class GameType {
-    constructor(localizedName) {
+    localizedName: string;
+
+    constructor(localizedName: string) {
         this.localizedName = localizedName;
     }
 
-    generatePromptList() {
+    generatePromptList(): Prompt[] {
         throw new Error("generatePromptList() must be implemented in subclasses");
     }
 }
@@ -23,11 +29,11 @@ export class MultiplicationGameType extends GameType {
         super("Умножение");
     }
 
-    generatePromptList() {
-        let prompts = [];
-        for (var a = 0; a <= 10; a++) {
-            for (var b = 0; b <= 10; b++) {
-                prompts.push(new Prompt(`${a} × ${b}`, a * b));
+    generatePromptList(): Prompt[] {
+        let prompts: Prompt[] = [];
+        for (let a = 0; a <= 10; a++) {
+            for (let b = 0; b <= 10; b++) {
+                prompts.push(new Prompt(`${a} A- ${b}`, a * b));
             }
         }
         prompts = util.shuffleList(prompts);
@@ -41,10 +47,10 @@ export class DivisionGameType extends GameType {
         super("Деление");
     }
 
-    generatePromptList() {
-        let prompts = [];
-        for (var b = 1; b <= 10; b++) {
-            for (var a = 0; a <= 10; a++) {
+    generatePromptList(): Prompt[] {
+        let prompts: Prompt[] = [];
+        for (let b = 1; b <= 10; b++) {
+            for (let a = 0; a <= 10; a++) {
                 const divisee = a * b;
                 const divisor = b;
                 prompts.push(new Prompt(`${divisee} : ${divisor}`, a));
@@ -59,10 +65,10 @@ export class SubtractionGameType extends GameType {
     constructor() {
         super("Изваждане (5 клас)");
     }
-    generatePromptList() {
-        let prompts = [];
-        for (var a = 0; a <= 100; a++) {
-            for (var b = 0; b <= a; b++) {
+    generatePromptList(): Prompt[] {
+        let prompts: Prompt[] = [];
+        for (let a = 0; a <= 100; a++) {
+            for (let b = 0; b <= a; b++) {
                 prompts.push(new Prompt(`${a} - ${b}`, a - b));
             }
         }
@@ -76,10 +82,10 @@ export class AdditionGameType extends GameType {
     constructor() {
         super("Събиране (5 клас)");
     }
-    generatePromptList() {
-        let prompts = [];
-        for (var a = 0; a <= 100; a++) {
-            for (var b = 0; b <= 100; b++) {
+    generatePromptList(): Prompt[] {
+        let prompts: Prompt[] = [];
+        for (let a = 0; a <= 100; a++) {
+            for (let b = 0; b <= 100; b++) {
                 prompts.push(new Prompt(`${a} + ${b}`, a + b));
             }
         }
@@ -88,3 +94,5 @@ export class AdditionGameType extends GameType {
         return prompts;
     }
 }
+
+export type GameTypeCtor = new () => GameType;

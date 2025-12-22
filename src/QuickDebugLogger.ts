@@ -1,6 +1,6 @@
 // quick error reporter so runtime errors show up on the page
 export class QuickDebugLogger {
-    static #instance = null;
+    static #instance: QuickDebugLogger | null = null;
 
     static get instance() {
         if (QuickDebugLogger.#instance === null) {
@@ -9,7 +9,7 @@ export class QuickDebugLogger {
         return QuickDebugLogger.#instance;
     }
     
-    log(msg, level = 'error') {
+    log(msg: string, level: 'error' | 'warn' | 'info' | 'log' = 'error') {
         const pre = document.createElement('pre');
         pre.style.position = 'fixed';
         pre.style.left = '0';
@@ -25,7 +25,7 @@ export class QuickDebugLogger {
         document.body.appendChild(pre);
     }
 
-    beginListeningForErrors() {
+    beginListeningForErrors(): void {
         window.addEventListener('error', function (evt) {
             this.log(`ERROR: ${evt.message} at ${evt.filename}:${evt.lineno}:${evt.colno}`);
         }.bind(this));

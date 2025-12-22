@@ -1,5 +1,18 @@
+import type { AppController } from './AppController';
+import type { GameType, GameTypeCtor, Prompt } from './PromptTypes';
+import type { UIController } from './UI';
+
 export class GameSession {
-    constructor(appController, gameTypeClass) {
+    appController: AppController;
+    uiController: UIController;
+    errorCount: number;
+    whenLastStarted: number | null;
+    gameType: GameType;
+    promptList: Prompt[];
+    currentPromptIndex: number;
+    numCorrectAtFirstTry: number;
+
+    constructor(appController: AppController, gameTypeClass: GameTypeCtor) {
         this.appController = appController;
         this.uiController = appController.uiController;
         
@@ -16,9 +29,9 @@ export class GameSession {
         this.errorCount = 0;
     }
 
-    win() {
+    win(): void {
         this.uiController.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
-        var timeElapsed = Date.now() - this.whenLastStarted;
+        const timeElapsed = Date.now() - (this.whenLastStarted ?? 0);
         const minutes = Math.floor(timeElapsed / 60000);
         const seconds = Math.floor(timeElapsed / 1000) % 60;
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptList.length);
@@ -27,17 +40,17 @@ export class GameSession {
         this.uiController.btnStartOver.style.display = "inline";
     }
 
-    nextQuestion() {
+    nextQuestion(): void {
         this.currentPromptIndex++;
         this.uiController.updateProgressIndicator();
         this.uiController.showPrompt();
     }
 
-    getCurrentPrompt() {
+    getCurrentPrompt(): Prompt {
         return this.promptList[this.currentPromptIndex];
     }
 
-    onUserAnswered(userAnswer) {
+    onUserAnswered(userAnswer: number): void {
         if(this.currentPromptIndex == 0)
             this.whenLastStarted = Date.now();
 
@@ -63,7 +76,7 @@ export class GameSession {
         }
     }
 
-    onUserRequestedAnswerReveal() {
+    onUserRequestedAnswerReveal(): void {
         const answer = this.getCurrentPrompt().answer;
         this.uiController.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
         
@@ -74,7 +87,7 @@ export class GameSession {
         this.errorCount++;
         this.uiController.updateErrorCountIndicator();
 
-        this.uiController.sshowPrompt();
+        this.uiController.showPrompt();
         this.getCurrentPrompt().failedAttempts++;
     }
 }

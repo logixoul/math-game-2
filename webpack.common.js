@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/main.js',
+    entry: './src/main.ts',
     module: {
         rules: [
             {
@@ -13,7 +13,6 @@ module.exports = {
     },
     resolve: {
         alias: {
-            three: path.resolve('./node_modules/three')
         },
         extensions: ['.tsx', '.ts', '.js'],
     },

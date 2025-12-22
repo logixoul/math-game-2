@@ -1,9 +1,14 @@
-import { GameSession } from './GameSession.js';
-import { UIController } from './UI.js';
-import { FirebaseController } from "./FirebaseController.js";
-import * as PromptTypes from './PromptTypes.js';
+import { GameSession } from './GameSession';
+import { UIController } from './UI';
+import { FirebaseController } from "./FirebaseController";
+import * as PromptTypes from './PromptTypes';
+import type { GameTypeCtor } from './PromptTypes';
 
 export class AppController {
+    uiController: UIController;
+    firebaseController: FirebaseController;
+    gameSession!: GameSession;
+
     constructor() {
         this.uiController = new UIController(this);
         this.firebaseController = new FirebaseController();
@@ -12,11 +17,11 @@ export class AppController {
         this.startNewGame(PromptTypes.MultiplicationGameType);
     }
 
-    startNewGame(gameType) {
+    startNewGame(gameType: GameTypeCtor): void {
         this.gameSession = new GameSession(this, gameType);
     }
     
-    getAvailableGameTypes() {
+    getAvailableGameTypes(): GameTypeCtor[] {
         return [
             PromptTypes.MultiplicationGameType,
             PromptTypes.DivisionGameType,
