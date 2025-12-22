@@ -157,14 +157,14 @@ export class UIController {
         this.#setupKeypadButton(btnArray, 1, 2, "8");
         this.#setupKeypadButton(btnArray, 2, 2, "9");
         this.#setupKeypadButton(btnArray, 1, 3, "0");
-        this.#setupKeypadButton(btnArray, 3, 2, inlineJsAssets.backspace, function() {
+        this.#setupKeypadButton(btnArray, 3, 2, inlineJsAssets.backspace, () => {
             //this.userAnswerBox.value = this.userAnswerBox.value.slice(0, -1);
             const currentText = this.latestAnswerField.textContent ?? "";
             this.latestAnswerField.textContent = currentText.slice(0, -1);
-        }.bind(this));
-        const btnOk = this.#setupKeypadButton(btnArray, 3, 3, inlineJsAssets.arrow, function() {
+        });
+        const btnOk = this.#setupKeypadButton(btnArray, 3, 3, inlineJsAssets.arrow, () => {
             this.onUserPressedEnter();
-        }.bind(this));
+        });
 
         btnOk.classList.add("keypadButtonOk");
     }
@@ -174,9 +174,9 @@ export class UIController {
         //btn.textContent = text;
         btn.innerHTML = text;
         if(!onClick)
-            onClick = function() {
+            onClick = () => {
                     this.latestAnswerField.append(text);
-                }.bind(this);
+                };
         btn.addEventListener("click", onClick);
         return btn;
     }

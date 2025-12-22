@@ -33,7 +33,7 @@ export class MultiplicationGameType extends GameType {
         let prompts: Prompt[] = [];
         for (let a = 0; a <= 10; a++) {
             for (let b = 0; b <= 10; b++) {
-                prompts.push(new Prompt(`${a} A- ${b}`, a * b));
+                prompts.push(new Prompt(`${a} × ${b}`, a * b));
             }
         }
         prompts = util.shuffleList(prompts);

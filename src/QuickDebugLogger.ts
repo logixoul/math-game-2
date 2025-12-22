@@ -17,7 +17,7 @@ export class QuickDebugLogger {
         pre.style.right = '0';
         pre.style.background = level === 'error' ? 'rgba(255,200,200,0.95)' : 'rgba(255,255,200,0.95)';
         pre.style.color = '#000';
-        pre.style.zIndex = 99999;
+        pre.style.zIndex = '99999';
         pre.style.padding = '8px';
         pre.style.margin = '0';
         pre.style.fontSize = '12px';
@@ -26,12 +26,12 @@ export class QuickDebugLogger {
     }
 
     beginListeningForErrors(): void {
-        window.addEventListener('error', function (evt) {
+        window.addEventListener('error', (evt) => {
             this.log(`ERROR: ${evt.message} at ${evt.filename}:${evt.lineno}:${evt.colno}`);
-        }.bind(this));
+        });
 
-        window.addEventListener('unhandledrejection', function (evt) {
+        window.addEventListener('unhandledrejection', (evt) => {
             this.log(`UNHANDLED PROMISE REJECTION: ${String(evt.reason)}`);
-        }.bind(this));
+        });
     }
 }
