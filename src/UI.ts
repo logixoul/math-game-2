@@ -1,8 +1,8 @@
-import * as PromptTypes from './PromptTypes';
+import * as PromptTypes from './GameTypes';
 import { QuickDebugLogger } from './QuickDebugLogger';
 import { inlineJsAssets } from './InlineJsAssets';
 import type { AppController } from './AppController';
-import type { GameTypeCtor } from './PromptTypes';
+import type { GameTypeCtor } from './GameTypes';
 import type { GameSession } from './GameSession';
 
 export class UIController {

@@ -12,21 +12,25 @@ export class Prompt {
     }
 }
 
-export class GameType {
+export abstract class GameType {
     localizedName: string;
 
     constructor(localizedName: string) {
         this.localizedName = localizedName;
     }
 
-    generatePromptList(): Prompt[] {
-        throw new Error("generatePromptList() must be implemented in subclasses");
-    }
+    abstract generatePromptList(): Prompt[];
+
+    abstract get persistencyKey(): string;
 }
 
 export class MultiplicationGameType extends GameType {
     constructor() {
         super("Умножение");
+    }
+
+    get persistencyKey(): string {
+        return "multiplication:v1";
     }
 
     generatePromptList(): Prompt[] {
@@ -37,7 +41,7 @@ export class MultiplicationGameType extends GameType {
             }
         }
         prompts = util.shuffleList(prompts);
-        //prompts = prompts.slice(0, 2); // for debugging
+        prompts = prompts.slice(0, 2); // for debugging
         return prompts;
     }
 }
@@ -45,6 +49,10 @@ export class MultiplicationGameType extends GameType {
 export class DivisionGameType extends GameType {
     constructor() {
         super("Деление");
+    }
+
+    get persistencyKey(): string {
+        return "division:v1";
     }
 
     generatePromptList(): Prompt[] {
@@ -65,6 +73,11 @@ export class SubtractionGameType extends GameType {
     constructor() {
         super("Изваждане (5 клас)");
     }
+
+    get persistencyKey(): string {
+        return "subtraction:v1";
+    }
+
     generatePromptList(): Prompt[] {
         let prompts: Prompt[] = [];
         for (let a = 0; a <= 100; a++) {
@@ -82,6 +95,11 @@ export class AdditionGameType extends GameType {
     constructor() {
         super("Събиране (5 клас)");
     }
+
+    get persistencyKey(): string {
+        return "addition:v1";
+    }
+
     generatePromptList(): Prompt[] {
         let prompts: Prompt[] = [];
         for (let a = 0; a <= 100; a++) {

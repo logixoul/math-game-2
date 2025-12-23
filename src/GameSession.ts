@@ -1,5 +1,6 @@
 import type { AppController } from './AppController';
-import type { GameType, GameTypeCtor, Prompt } from './PromptTypes';
+import type { GameType, GameTypeCtor, Prompt } from './GameTypes';
+import { ResultStats } from './ResultStats';
 import type { UIController } from './UI';
 
 export class GameSession {
@@ -38,6 +39,8 @@ export class GameSession {
         this.uiController.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
         this.uiController.userAnswerBox.style.display = "none";
         this.uiController.btnStartOver.style.display = "inline";
+
+        this.appController.firebaseController.onGameEnd(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
     }
 
     nextQuestion(): void {

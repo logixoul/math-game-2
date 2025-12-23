@@ -1,8 +1,8 @@
 import { GameSession } from './GameSession';
 import { UIController } from './UI';
 import { FirebaseController } from "./FirebaseController";
-import * as PromptTypes from './PromptTypes';
-import type { GameTypeCtor } from './PromptTypes';
+import * as PromptTypes from './GameTypes';
+import type { GameTypeCtor } from './GameTypes';
 
 export class AppController {
     uiController: UIController;
