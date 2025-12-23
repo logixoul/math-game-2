@@ -10,9 +10,9 @@ export class AppController {
     gameSession!: GameSession;
 
     constructor() {
-        this.uiController = new UIController(this);
         this.firebaseController = new FirebaseController();
         this.firebaseController.init();
+        this.uiController = new UIController(this);
 
         this.startNewGame(PromptTypes.MultiplicationGameType);
     }

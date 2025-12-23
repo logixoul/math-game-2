@@ -6,25 +6,27 @@ import type { GameTypeCtor } from './PromptTypes';
 import type { GameSession } from './GameSession';
 
 export class UIController {
-    gameSession!: GameSession;
-    log: HTMLElement = document.getElementById("log") as HTMLElement;
-    logContainer: HTMLElement = document.getElementById("logContainer") as HTMLElement;
-    bottomPane: HTMLElement = document.getElementById("bottomPane") as HTMLElement;
-    btnStartOver: HTMLButtonElement = document.getElementById("btnStartOver") as HTMLButtonElement;
-    userAnswerBox: HTMLInputElement = document.getElementById("userAnswerBox") as HTMLInputElement;
-    btnSeeAnswer: HTMLButtonElement = document.getElementById("btnSeeAnswer") as HTMLButtonElement;
-    dropdownPromptType: HTMLSelectElement = document.getElementById("dropdownPromptType") as HTMLSelectElement;
-    indicators: HTMLElement = document.getElementById("indicators") as HTMLElement;
-    mainForm: HTMLFormElement = document.getElementById("mainForm") as HTMLFormElement;
-    keypad: HTMLElement = document.getElementById("keypad") as HTMLElement;
-    btnMenu: HTMLButtonElement = document.getElementById("btnMenu") as HTMLButtonElement;
-    menuContents: HTMLElement = document.getElementById("menuContents") as HTMLElement;
-    loginBtn: HTMLButtonElement = document.getElementById("loginBtn") as HTMLButtonElement;
-    userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
-    logoutBtn: HTMLButtonElement = document.getElementById("logoutBtn") as HTMLButtonElement;
-    saveScoreBtn: HTMLButtonElement = document.getElementById("saveScoreBtn") as HTMLButtonElement;
-    latestPrompt: HTMLElement | null = null;
-    latestAnswerField!: HTMLSpanElement;
+    private gameSession!: GameSession;
+    private log: HTMLElement = document.getElementById("log") as HTMLElement;
+    private logContainer: HTMLElement = document.getElementById("logContainer") as HTMLElement;
+    private bottomPane: HTMLElement = document.getElementById("bottomPane") as HTMLElement;
+    private btnStartOver: HTMLButtonElement = document.getElementById("btnStartOver") as HTMLButtonElement;
+    private userAnswerBox: HTMLInputElement = document.getElementById("userAnswerBox") as HTMLInputElement;
+    private btnSeeAnswer: HTMLButtonElement = document.getElementById("btnSeeAnswer") as HTMLButtonElement;
+    private dropdownPromptType: HTMLSelectElement = document.getElementById("dropdownPromptType") as HTMLSelectElement;
+    private indicators: HTMLElement = document.getElementById("indicators") as HTMLElement;
+    private mainForm: HTMLFormElement = document.getElementById("mainForm") as HTMLFormElement;
+    private keypad: HTMLElement = document.getElementById("keypad") as HTMLElement;
+    private btnMenu: HTMLButtonElement = document.getElementById("btnMenu") as HTMLButtonElement;
+    private menuContents: HTMLElement = document.getElementById("menuContents") as HTMLElement;
+    private loginBtn: HTMLButtonElement = document.getElementById("loginBtn") as HTMLButtonElement;
+    private userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
+    private logoutBtn: HTMLButtonElement = document.getElementById("logoutBtn") as HTMLButtonElement;
+    private saveScoreBtn: HTMLButtonElement = document.getElementById("saveScoreBtn") as HTMLButtonElement;
+    private latestPrompt: HTMLElement | null = null;
+    private latestAnswerField!: HTMLSpanElement;
+    private resultEl: HTMLElement = document.getElementById("result") as HTMLElement;
+    
 
     constructor(public appController: AppController) {
         this.btnStartOver.addEventListener("click", () => {
@@ -62,6 +64,34 @@ export class UIController {
             } else {
                 this.menuContents.style.display = "block";
             }
+        });
+
+        this.loginBtn.addEventListener("click", () => {
+            this.appController.firebaseController.login();
+        });
+
+        this.logoutBtn.addEventListener("click", () => {
+            this.appController.firebaseController.logout();
+        });
+
+        this.saveScoreBtn.addEventListener("click", () => {
+            const score = Math.floor(Math.random() * 100);
+            this.appController.firebaseController.saveScore(score);
+            
+            this.resultEl.innerText = "Saved score: " + score;
+        });
+
+        this.appController.firebaseController.bus.on("loggedIn", ({ user }) => {
+                this.userInfo.innerText = "Здравей, " + user.email;
+                this.saveScoreBtn.disabled = false;
+                this.loginBtn.style.display = "none";
+                this.logoutBtn.style.display = "inline";
+        });
+        this.appController.firebaseController.bus.on("loggedOut", () => {
+                this.userInfo.innerText = "Не си влязъл в системата";
+                this.saveScoreBtn.disabled = true;
+                this.loginBtn.style.display = "inline";
+                this.logoutBtn.style.display = "none";
         });
 
         this.relocateIndicators();
@@ -156,6 +186,7 @@ export class UIController {
         return btn;
     }
 
+    // todo: am I even still using this? 
     relocateIndicators(): void {
         // hack: unbreak on mobile when soft keyboard is open. Would normally just use `position: fixed`
         const offsetTop = (window.visualViewport && typeof window.visualViewport.offsetTop === 'number')

@@ -3,18 +3,27 @@
 // --- IMPORT FIREBASE MODULES ---
 import * as FirebaseApp from "firebase/app";
 import * as FirebaseAuth from "firebase/auth";
-import * as FirebaseStore from "firebase/firestore";
+import * as Firestore from "firebase/firestore";
 import type { UIController } from "./UI";
+import { TypedEventEmitter } from "./TypedEventEmitter";
+
+type FirebaseEvents = {
+  loggedIn: { user: FirebaseAuth.User };
+  loggedOut: {};
+  scoreChanged: { score: number; delta: number };
+  levelUp: { level: number };
+};
 
 export class FirebaseController {
     private uiController?: UIController;
     private auth!: FirebaseAuth.Auth;
-    private db!: FirebaseStore.Firestore;
-    private loginBtn!: HTMLButtonElement;
-    private logoutBtn!: HTMLButtonElement;
-    private saveScoreBtn!: HTMLButtonElement;
-    private userInfo!: HTMLElement;
-    private resultEl!: HTMLElement;
+    private db!: Firestore.Firestore;
+
+    #bus = new TypedEventEmitter<FirebaseEvents>();
+
+    get bus() {
+        return this.#bus;
+    }
 
     constructor(uiController?: UIController) {
         this.uiController = uiController;
@@ -34,38 +43,17 @@ export class FirebaseController {
         const app = FirebaseApp.initializeApp(FirebaseController.#firebaseConfig);
         //const analytics = FirebaseAnalytics.getAnalytics(app);
         this.auth = FirebaseAuth.getAuth(app);
-        this.db   = FirebaseStore.getFirestore(app);
+        this.db   = Firestore.getFirestore(app);
 
         // --- GOOGLE LOGIN ---
 
         await FirebaseAuth.setPersistence(this.auth, FirebaseAuth.browserLocalPersistence);
 
-        this.loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
-        this.logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
-        this.saveScoreBtn = document.getElementById("saveScoreBtn") as HTMLButtonElement;
-        this.userInfo = document.getElementById("userInfo") as HTMLElement;
-        this.resultEl = document.getElementById("result") as HTMLElement;
-
-        this.loginBtn.onclick = this.login.bind(this);
-
-        this.logoutBtn.onclick = this.logout.bind(this);
-
-        this.saveScoreBtn.onclick = this.saveScore.bind(this, Math.floor(Math.random() * 100));
-
         FirebaseAuth.onAuthStateChanged(this.auth, (user) => {
             if (user) {
-                // User is signed in
-                this.userInfo.innerText = "Signed in as: " + user.email;
-                this.saveScoreBtn.disabled = false;
-                this.loginBtn.style.display = "none";
-                this.logoutBtn.style.display = "inline";
+                this.#bus.emit("loggedIn", { user });
             } else {
-                // User is signed out
-                this.userInfo.innerText = "Not signed in";
-                this.saveScoreBtn.disabled = true;
-
-                this.loginBtn.style.display = "inline";
-                this.logoutBtn.style.display = "none";
+                this.#bus.emit("loggedOut", {});
             }
         });
     }
@@ -73,10 +61,6 @@ export class FirebaseController {
     async login(): Promise<void> {
         const provider = new FirebaseAuth.GoogleAuthProvider();
         const result = await FirebaseAuth.signInWithPopup(this.auth, provider);
-        const user = result.user;
-
-        this.userInfo.innerText = "Здравей, " + user.email;
-        this.saveScoreBtn.disabled = false;
     }
 
     async logout(): Promise<void> {
@@ -88,16 +72,13 @@ export class FirebaseController {
         const user = this.auth.currentUser;
         if (!user) return alert("Login first!");
 
-        const ref = FirebaseStore.doc(this.db, "scores", user.uid);
+        const ref = Firestore.doc(this.db, "scores", user.uid);
 
-        await FirebaseStore.setDoc(ref, {
+        await Firestore.setDoc(ref, {
             email: user.email,
             lastScore: score,
             timestamp: Date.now()
         });
-
-        this.resultEl.innerText =
-        "Saved score: " + score;
     }
 }
 
