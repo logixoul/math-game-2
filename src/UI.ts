@@ -7,7 +7,7 @@ import type { GameSession } from './GameSession';
 export class UIController {
     private gameSession!: GameSession;
     private log: HTMLElement = document.getElementById("log") as HTMLElement;
-    private logContainer: HTMLElement = document.getElementById("logContainer") as HTMLElement;
+    private middlePane: HTMLElement = document.getElementById("middlePane") as HTMLElement;
     private bottomPane: HTMLElement = document.getElementById("bottomPane") as HTMLElement;
     private btnStartOver: HTMLButtonElement = document.getElementById("btnStartOver") as HTMLButtonElement;
     private userAnswerBox: HTMLInputElement = document.getElementById("userAnswerBox") as HTMLInputElement;
@@ -242,14 +242,14 @@ export class UIController {
         }
     }*/
     scrollToBottom(): void {
-        this.logContainer.scrollTo({
-            top: this.logContainer.scrollHeight,
+        this.middlePane.scrollTo({
+            top: this.middlePane.scrollHeight,
             left: 0,
             behavior: 'smooth'
         });
     }
     adjustMiddlePanePadding(): void {
-        //this.logContainer.style.paddingBottom = `${this.bottomPane.offsetHeight}px`;
+        //this.middlePane.style.paddingBottom = `${this.bottomPane.offsetHeight}px`;
     }
     informUser(message: string, color: string, isBold?: boolean): HTMLElement {
         const newMessageElement = document.createElement("p");

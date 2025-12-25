@@ -156,7 +156,7 @@ input, button {
     width: 30%;
 }
 
-#logContainer {
+#middlePane {
     margin: 5px 5px;
     margin-top: 0px;
     flex: 1 1 auto;          /* take remaining space */
