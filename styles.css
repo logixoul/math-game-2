@@ -7,10 +7,10 @@ html {
     height: 100%;
 }
 body {
-  height: 100%;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 #header{
@@ -92,7 +92,7 @@ input, button {
     font-size: 1.4em !important;
     padding: 0.5em;
     margin: 0.5em auto;
-    display: block;
+    display: none;
     border-radius: 10px;
     border: 2px solid #ccc;
     box-sizing: border-box;
@@ -118,10 +118,6 @@ input, button {
     background-color: #e8e9ea;
     border-radius: 10px;
     border-width: 0px;
-}
-
-#btnSeeAnswer {
-    padding: 0.5em;
 }
 
 #keypad .keypadButton {
@@ -151,6 +147,7 @@ input, button {
 }
 
 #btnSeeAnswer {
+    padding: 0.5em;
     margin: 1em auto;
     display: block;
     width: 30%;
