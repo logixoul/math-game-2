@@ -110,7 +110,7 @@ export class UIController {
         const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
         const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
         
-        this.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
+        this.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + resultStats.percentCorrectOnFirstTry + "% от първи опит.", "black");
         this.userAnswerBox.style.display = "none";
         this.btnStartOver.style.display = "inline";
         
