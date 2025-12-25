@@ -67,6 +67,12 @@ body {
     gap: 0.5em;
 }
 
+#menuContents {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
 #btnMenu {
     margin-right: 10px;
     cursor: pointer;
