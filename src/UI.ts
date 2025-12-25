@@ -22,7 +22,6 @@ export class UIController {
     private userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
     private logoutBtn: HTMLButtonElement = document.getElementById("logoutBtn") as HTMLButtonElement;
     private saveScoreBtn: HTMLButtonElement = document.getElementById("saveScoreBtn") as HTMLButtonElement;
-    private latestPrompt: HTMLElement | null = null;
     private latestAnswerField!: HTMLSpanElement;
     private resultEl: HTMLElement = document.getElementById("result") as HTMLElement;
     
@@ -270,7 +269,6 @@ export class UIController {
         newMessageElement.style.color = color;
         if(isBold)
             newMessageElement.style.fontWeight = "bold";
-        this.latestPrompt = newMessageElement;
         this.log.append(newMessageElement);
         this.scrollToBottom();
 

@@ -19,7 +19,16 @@ body {
     color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     padding: 0.5em 0.5em;
+    display:flex;
+    align-items:center;
 }
+
+#btnMenu {
+    margin-left: auto;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
 h1 {
     font-size: 1.5em;
     font-family: Andada Pro, serif;
@@ -165,11 +174,4 @@ input, button {
     background-color: #f0f1f3;
     padding: 0 0 !important;
     margin: 0 0;
-}
-
-#btnMenu {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
 }
