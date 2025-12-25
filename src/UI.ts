@@ -55,10 +55,10 @@ export class UIController {
         });
 
         this.btnMenu.addEventListener("click", () => {
-            if(this.menuContents.style.display === "block") {
+            if(this.menuContents.style.display === "flex") {
                 this.menuContents.style.display = "none";
             } else {
-                this.menuContents.style.display = "block";
+                this.menuContents.style.display = "flex";
             }
         });
 

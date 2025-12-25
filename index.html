@@ -15,15 +15,17 @@
 	<body>
 		<div id="header">
 			<h1><img id="logo" src="assets/play-logo.png" width="40" height="40"/>stefan play</h1>
-			<div id="menuContents" style="display: none;">
-				<p id="userInfo"></p>
-				
-				<button id="loginBtn" style="display: none;">Влез</button>
-				<button id="logoutBtn">Излез</button>
-				<select name="dropdownPromptType" id="dropdownPromptType">
-				</select>
+			<div id="rightAlignedPart"">
+				<div id="menuContents" style="display: none;">
+					<button id="loginBtn" style="display: none;">Влез</button>
+					<button id="logoutBtn">Излез</button>
+					<!-- hidden for now -->
+					<select name="dropdownPromptType" id="dropdownPromptType" hidden>
+					</select>
+					<span id="userInfo"></span>
+				</div>
+				<img src="assets/menu.svg" width="30" height="30" id="btnMenu"/>
 			</div>
-			<img src="assets/menu.svg" width="30" height="30" id="btnMenu"/>
 		</div>
 		<div id="middlePane">
 			<div id="log">
