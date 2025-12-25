@@ -64,9 +64,9 @@ export class FirebaseController {
         const user = this.auth.currentUser;
         if (!user) return alert("Login first!");
 
-        const ref = Firestore.doc(this.db, "users", user.uid, "personalBests", "summary");
+        const personalBestsRef = Firestore.doc(this.db, "users", user.uid, "personalBests", "summary");
 
-        await Firestore.setDoc(ref, {
+        await Firestore.setDoc(personalBestsRef, {
             stats: resultStats.toPlainObject(),
             timestamp: Date.now()
         });
