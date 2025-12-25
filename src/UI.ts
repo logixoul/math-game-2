@@ -21,10 +21,7 @@ export class UIController {
     private loginBtn: HTMLButtonElement = document.getElementById("loginBtn") as HTMLButtonElement;
     private userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
     private logoutBtn: HTMLButtonElement = document.getElementById("logoutBtn") as HTMLButtonElement;
-    private saveScoreBtn: HTMLButtonElement = document.getElementById("saveScoreBtn") as HTMLButtonElement;
     private latestAnswerField!: HTMLSpanElement;
-    private resultEl: HTMLElement = document.getElementById("result") as HTMLElement;
-    
 
     constructor(public appController: AppController) {
         this.btnStartOver.addEventListener("click", () => {
@@ -72,22 +69,13 @@ export class UIController {
             this.appController.firebaseController.logout();
         });
 
-        this.saveScoreBtn.addEventListener("click", () => {
-            const score = Math.floor(Math.random() * 100);
-            this.appController.firebaseController.saveScore(score);
-            
-            this.resultEl.innerText = "Saved score: " + score;
-        });
-
         this.appController.firebaseController.bus.on("loggedIn", ({ user }) => {
                 this.userInfo.innerText = "Здравей, " + user.email;
-                this.saveScoreBtn.disabled = false;
                 this.loginBtn.style.display = "none";
                 this.logoutBtn.style.display = "inline";
         });
         this.appController.firebaseController.bus.on("loggedOut", () => {
                 this.userInfo.innerText = "Не си влязъл в системата";
-                this.saveScoreBtn.disabled = true;
                 this.loginBtn.style.display = "inline";
                 this.logoutBtn.style.display = "none";
         });
