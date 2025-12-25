@@ -1,6 +1,5 @@
 import * as PromptTypes from './GameTypes';
 import { QuickDebugLogger } from './QuickDebugLogger';
-import { inlineJsAssets } from './InlineJsAssets';
 import type { AppController } from './AppController';
 import type { GameTypeCtor } from './GameTypes';
 import type { GameSession } from './GameSession';
@@ -162,12 +161,12 @@ export class UIController {
         this.#setupKeypadButton(btnArray, 1, 2, "8");
         this.#setupKeypadButton(btnArray, 2, 2, "9");
         this.#setupKeypadButton(btnArray, 1, 3, "0");
-        this.#setupKeypadButton(btnArray, 3, 2, inlineJsAssets.backspace, () => {
+        this.#setupKeypadButton(btnArray, 3, 2, "<img src='assets/backspace.svg'>", () => {
             //this.userAnswerBox.value = this.userAnswerBox.value.slice(0, -1);
             const currentText = this.latestAnswerField.textContent ?? "";
             this.latestAnswerField.textContent = currentText.slice(0, -1);
         });
-        const btnOk = this.#setupKeypadButton(btnArray, 3, 3, inlineJsAssets.arrow, () => {
+        const btnOk = this.#setupKeypadButton(btnArray, 3, 3, "<img src='assets/enter.svg'>", () => {
             this.onUserPressedEnter();
         });
 
