@@ -21,6 +21,7 @@ export class UIController {
     private loginBtn: HTMLButtonElement = document.getElementById("loginBtn") as HTMLButtonElement;
     private userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
     private logoutBtn: HTMLButtonElement = document.getElementById("logoutBtn") as HTMLButtonElement;
+    private btnStartGame: HTMLButtonElement = document.getElementById("btnStartGame") as HTMLButtonElement;
     private latestAnswerField!: HTMLSpanElement;
 
     constructor(public appController: AppController) {
@@ -31,6 +32,10 @@ export class UIController {
             if (promptTypeClass) {
                 this.appController.startNewGame(promptTypeClass as GameTypeCtor);
             }
+            this.userAnswerBox.focus();
+        });
+        this.btnStartGame.addEventListener("click", () => {
+            window.location.hash = "#game";
             this.userAnswerBox.focus();
         });
         this.btnSeeAnswer.addEventListener("click", () => {

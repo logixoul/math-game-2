@@ -10,7 +10,7 @@ export class QuickDebugLogger {
     }
     
     log(msg: string, level: 'error' | 'warn' | 'info' | 'log' = 'error') {
-        const pre = document.createElement('pre');
+        const pre = document.createElement('p');
         pre.style.position = 'fixed';
         pre.style.left = '0';
         pre.style.bottom = '0';
