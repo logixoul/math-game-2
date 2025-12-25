@@ -33,12 +33,8 @@ export class GameSession {
     win(): void {
         this.uiController.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
         const timeElapsed = Date.now() - (this.whenLastStarted ?? 0);
-        const minutes = Math.floor(timeElapsed / 60000);
-        const seconds = Math.floor(timeElapsed / 1000) % 60;
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptList.length);
-        this.uiController.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
-        this.uiController.userAnswerBox.style.display = "none";
-        this.uiController.btnStartOver.style.display = "inline";
+        this.uiController.onWin(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
 
         this.appController.firebaseController.onGameEnd(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
     }

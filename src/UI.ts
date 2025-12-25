@@ -3,6 +3,7 @@ import { QuickDebugLogger } from './QuickDebugLogger';
 import type { AppController } from './AppController';
 import type { GameTypeCtor } from './GameTypes';
 import type { GameSession } from './GameSession';
+import { ResultStats } from './ResultStats';
 
 export class UIController {
     private gameSession!: GameSession;
@@ -103,6 +104,16 @@ export class UIController {
             this.keypad.style.display = "none";
             this.userAnswerBox.style.display = "block";
         }
+    }
+
+    onWin(resultStats: ResultStats): void {
+        const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
+        const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
+        
+        this.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + percentCorrectOnFirstTry + "% от първи опит.", "black");
+        this.userAnswerBox.style.display = "none";
+        this.btnStartOver.style.display = "inline";
+        
     }
 
     #isMobileDevice(): boolean {
