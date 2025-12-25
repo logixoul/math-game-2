@@ -3,6 +3,7 @@
 
 :root {
     --bottom-pane-height: 20rem;
+    --header-text-color: white;
 }
 
 /* gpt */
@@ -16,15 +17,29 @@ body {
     flex-direction: column;
 }
 
-#header, #header a {
+#header {
     flex: 0 0 auto;
     background-color: #444;
-    color: white;
+    color: var(--header-text-color);
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     padding: 0.5em 0.5em;
     display:flex;
     align-items:center;
     text-decoration: none;
+}
+
+#header a {
+    color: var(--header-text-color);
+}
+
+#header button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #e0ff00;
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
 }
 
 #mainNav {
@@ -78,7 +93,7 @@ body {
     font-size: 1.5em !important;
 }
 input, button {
-    font-size: 1.2em !important;
+    /*font-size: 1.2em !important;*/
 }
 #indicators {
     width: 100%;
