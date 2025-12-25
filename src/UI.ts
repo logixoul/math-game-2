@@ -14,7 +14,6 @@ export class UIController {
     private btnSeeAnswer: HTMLButtonElement = document.getElementById("btnSeeAnswer") as HTMLButtonElement;
     private dropdownPromptType: HTMLSelectElement = document.getElementById("dropdownPromptType") as HTMLSelectElement;
     private indicators: HTMLElement = document.getElementById("indicators") as HTMLElement;
-    private mainForm: HTMLFormElement = document.getElementById("mainForm") as HTMLFormElement;
     private keypad: HTMLElement = document.getElementById("keypad") as HTMLElement;
     private btnMenu: HTMLButtonElement = document.getElementById("btnMenu") as HTMLButtonElement;
     private menuContents: HTMLElement = document.getElementById("menuContents") as HTMLElement;
@@ -39,9 +38,10 @@ export class UIController {
         
         this.userAnswerBox.focus();
         
-        this.mainForm.addEventListener("submit", (e: Event) => {
-            e.preventDefault();
-            this.onUserPressedEnter();
+        this.userAnswerBox.addEventListener("keydown", (e: KeyboardEvent) => {
+            if(e.key === "Enter") {
+                this.onUserPressedEnter();
+            }
             return false;
         });
 
