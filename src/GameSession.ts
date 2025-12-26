@@ -16,11 +16,11 @@ export class GameSession {
     
     // from gpt suggestions (for winconditions):
     pointsTowardWin: number = 0;
-    problemsAnswered: number = 0;
+    problemsCompleted: number = 0;
     gameStartTimestamp: number = Date.now();
     
     readonly pointsRequiredToWin: number = 20;
-    readonly minProblemsAnsweredToWin: number = 20;
+    readonly minproblemsCompletedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
 
@@ -62,7 +62,7 @@ export class GameSession {
     }
     winConditionsMet(): boolean {
         const enoughPoints: boolean = this.pointsTowardWin >= this.pointsRequiredToWin;
-        const enoughAnswered: boolean = this.problemsAnswered >= this.minProblemsAnsweredToWin;
+        const enoughAnswered: boolean = this.problemsCompleted >= this.minproblemsCompletedToWin;
         const withinTimeLimit: boolean = (Date.now() - this.gameStartTimestamp) <= this.maxSessionDurationMs;
         return enoughPoints && enoughAnswered && withinTimeLimit;
     }
@@ -70,6 +70,13 @@ export class GameSession {
         const currentPrompt = this.getCurrentPrompt();
         if(userAnswer == currentPrompt.answer) {
             this.pointsTowardWin++;
+            if(this.winConditionsMet()) {
+                this.problemsCompleted++;
+                this.uiController.updateProgressIndicator();
+                this.win();
+                return;
+            }
+            this.problemsCompleted++;
             this.uiController.updateProgressIndicator();
 
             this.uiController.informUser("✅ Точно така!", "#00c000");
@@ -88,7 +95,7 @@ export class GameSession {
             this.uiController.updateProgressIndicator();
 
             this.errorCount++;
-            this.uiController.updateErrorCountIndicator();
+            this.uiController.updateSessionTimeIndicator();
             this.uiController.informUser("❌ Пробвай пак.", "black");
             this.uiController.showPrompt();
             currentPrompt.failedAttempts++;
@@ -97,6 +104,7 @@ export class GameSession {
 
     onUserRequestedAnswerReveal(): void {
         this.pointsTowardWin-=2;
+        this.problemsCompleted++;
         this.uiController.updateProgressIndicator();
 
         const answer = this.getCurrentPrompt().answer;
@@ -107,7 +115,7 @@ export class GameSession {
         this.promptGenerator.splice(this.currentPromptIndex, 1);
 
         this.errorCount++;
-        this.uiController.updateErrorCountIndicator();
+        this.uiController.updateSessionTimeIndicator();
 
         this.uiController.showPrompt();
         this.getCurrentPrompt().failedAttempts++;

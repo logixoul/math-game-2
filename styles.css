@@ -145,8 +145,8 @@ input, button {
     border-radius: 6px;
     padding: 3px;
 }
-#errorCountIndicator {
-    color: #c00;
+#sessionTimeIndicator {
+    color: #00c;
     border-radius: 6px;
     padding: 3px;
 }

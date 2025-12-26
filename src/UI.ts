@@ -109,6 +109,10 @@ export class UIController {
             this.keypad.style.display = "none";
             this.userAnswerBox.style.display = "block";
         }
+
+        window.setInterval(() => {
+            this.updateSessionTimeIndicator();
+        }, 1000);
     }
 
     onWin(resultStats: ResultStats): void {
@@ -222,7 +226,7 @@ export class UIController {
             this.userAnswerBox.style.display = "block";
         }
         this.updateProgressIndicator();
-        this.updateErrorCountIndicator();
+        this.updateSessionTimeIndicator();
         this.showPrompt();
 
     }
@@ -233,13 +237,14 @@ export class UIController {
         const progressIndicator = document.getElementById("progressIndicator") as HTMLElement;
         progressIndicator.innerHTML = "<b>Точки: " +
             this.ensureTextContainsSign(this.gameSession.pointsTowardWin) +
-            '</b> (победа при ' +
-            this.ensureTextContainsSign(this.gameSession.pointsRequiredToWin) +
-            ")";
+            '</b>.<br>За победа ти трябват още ' +
+            (this.gameSession.pointsRequiredToWin - this.gameSession.pointsTowardWin) +
+            " точки и " + (this.gameSession.minproblemsCompletedToWin - this.gameSession.problemsCompleted) + " пробвани задачи";
     }
-    updateErrorCountIndicator(): void {
-        const progressIndicator = document.getElementById("errorCountIndicator") as HTMLElement;
-        progressIndicator.textContent = "Грешки: " + this.gameSession.errorCount;
+    updateSessionTimeIndicator(): void {
+        const progressIndicator = document.getElementById("sessionTimeIndicator") as HTMLElement;
+        const minutesLeft = Math.floor((this.gameSession.maxSessionDurationMs - (Date.now() - this.gameSession.gameStartTimestamp)) / 60000);
+        progressIndicator.textContent = "Имаш още " + minutesLeft + " минути";
     }
     scrollToBottom(): void {
         this.middlePane.scrollTo({
