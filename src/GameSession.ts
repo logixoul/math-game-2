@@ -76,19 +76,15 @@ export class GameSession {
                 this.win();
                 return;
             }
+            else {
+                this.nextQuestion();
+            }
             this.problemsCompleted++;
             this.uiController.updateProgressIndicator();
 
             this.uiController.informUser("✅ Точно така!", "#00c000");
             if(currentPrompt.failedAttempts == 0) {
                 this.numCorrectAtFirstTry++;
-            }
-            if(this.currentPromptIndex == this.promptGenerator.length - 1) {
-                this.currentPromptIndex++;
-                this.uiController.updateProgressIndicator();
-                this.win();
-            } else {
-                this.nextQuestion();
             }
         } else {
             this.pointsTowardWin--;
