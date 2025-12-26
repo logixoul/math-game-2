@@ -7,20 +7,32 @@ export class GameSession {
     appController: AppController;
     uiController: UIController;
     errorCount: number;
-    whenLastStarted: number | null;
     gameType: GameType;
-    promptList: Prompt[];
-    currentPromptIndex: number;
+    currentPromptIndex: number; // todo rm
     numCorrectAtFirstTry: number;
+
+    promptGenerator: Generator<Prompt, void, unknown>;
+    currentPrompt: Prompt;
+    
+    // from gpt suggestions (for winconditions):
+    pointsTowardWin: number = 0;
+    problemsAnswered: number = 0;
+    gameStartTimestamp: number = Date.now();
+    
+    readonly pointsRequiredToWin: number = 20;
+    readonly minProblemsAnsweredToWin: number = 20;
+    readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
+    
 
     constructor(appController: AppController, gameTypeClass: GameTypeCtor) {
         this.appController = appController;
         this.uiController = appController.uiController;
         
         this.errorCount = 0;
-        this.whenLastStarted = null;
         this.gameType = new gameTypeClass();
-        this.promptList = this.gameType.generatePromptList();
+
+        this.promptGenerator = this.gameType.createNextPrompt();
+        this.currentPrompt = this.promptGenerator.next().value!;
 
         this.currentPromptIndex = 0;
         this.numCorrectAtFirstTry = 0;
@@ -32,8 +44,8 @@ export class GameSession {
 
     win(): void {
         this.uiController.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
-        const timeElapsed = Date.now() - (this.whenLastStarted ?? 0);
-        const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptList.length);
+        const timeElapsed = Date.now() - (this.gameStartTimestamp ?? 0);
+        const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptGenerator.length);
         this.uiController.onWin(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
 
         this.appController.firebaseController.onGameEnd(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
@@ -46,20 +58,25 @@ export class GameSession {
     }
 
     getCurrentPrompt(): Prompt {
-        return this.promptList[this.currentPromptIndex];
+        return this.currentPrompt;
     }
-
+    winConditionsMet(): boolean {
+        const enoughPoints: boolean = this.pointsTowardWin >= this.pointsRequiredToWin;
+        const enoughAnswered: boolean = this.problemsAnswered >= this.minProblemsAnsweredToWin;
+        const withinTimeLimit: boolean = (Date.now() - this.gameStartTimestamp) <= this.maxSessionDurationMs;
+        return enoughPoints && enoughAnswered && withinTimeLimit;
+    }
     onUserAnswered(userAnswer: number): void {
-        if(this.currentPromptIndex == 0)
-            this.whenLastStarted = Date.now();
-
         const currentPrompt = this.getCurrentPrompt();
         if(userAnswer == currentPrompt.answer) {
+            this.pointsTowardWin++;
+            this.uiController.updateProgressIndicator();
+
             this.uiController.informUser("✅ Точно така!", "#00c000");
             if(currentPrompt.failedAttempts == 0) {
                 this.numCorrectAtFirstTry++;
             }
-            if(this.currentPromptIndex == this.promptList.length - 1) {
+            if(this.currentPromptIndex == this.promptGenerator.length - 1) {
                 this.currentPromptIndex++;
                 this.uiController.updateProgressIndicator();
                 this.win();
@@ -67,6 +84,9 @@ export class GameSession {
                 this.nextQuestion();
             }
         } else {
+            this.pointsTowardWin--;
+            this.uiController.updateProgressIndicator();
+
             this.errorCount++;
             this.uiController.updateErrorCountIndicator();
             this.uiController.informUser("❌ Пробвай пак.", "black");
@@ -76,12 +96,15 @@ export class GameSession {
     }
 
     onUserRequestedAnswerReveal(): void {
+        this.pointsTowardWin-=2;
+        this.uiController.updateProgressIndicator();
+
         const answer = this.getCurrentPrompt().answer;
         this.uiController.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
         
         // push question back to the end of the queue
-        this.promptList.push(this.promptList[this.currentPromptIndex]);
-        this.promptList.splice(this.currentPromptIndex, 1);
+        this.promptGenerator.push(this.promptGenerator[this.currentPromptIndex]);
+        this.promptGenerator.splice(this.currentPromptIndex, 1);
 
         this.errorCount++;
         this.uiController.updateErrorCountIndicator();

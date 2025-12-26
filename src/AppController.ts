@@ -24,9 +24,9 @@ export class AppController {
     getAvailableGameTypes(): GameTypeCtor[] {
         return [
             PromptTypes.MultiplicationGameType,
-            PromptTypes.DivisionGameType,
+            /*PromptTypes.DivisionGameType,
             PromptTypes.SubtractionGameType,
-            PromptTypes.AdditionGameType,
+            PromptTypes.AdditionGameType,*/
         ];
     }
 }

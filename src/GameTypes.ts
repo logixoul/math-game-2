@@ -19,7 +19,7 @@ export abstract class GameType {
         this.localizedName = localizedName;
     }
 
-    abstract generatePromptList(): Prompt[];
+    abstract createNextPrompt(): Generator<Prompt, void, unknown>
 
     abstract get persistencyKey(): string;
 }
@@ -33,20 +33,23 @@ export class MultiplicationGameType extends GameType {
         return "multiplication:v1";
     }
 
-    generatePromptList(): Prompt[] {
-        let prompts: Prompt[] = [];
-        for (let a = 0; a <= 10; a++) {
-            for (let b = 0; b <= 10; b++) {
-                prompts.push(new Prompt(`${a} × ${b}`, a * b));
+    *createNextPrompt(): Generator<Prompt, void, unknown> {
+        while(true) {
+            let prompts: Prompt[] = [];
+            for (let a = 0; a <= 10; a++) {
+                for (let b = 0; b <= 10; b++) {
+                    prompts.push(new Prompt(`${a} × ${b}`, a * b));
+                }
+            }
+            prompts = util.shuffleList(prompts);
+            for (const prompt of prompts) {
+                yield prompt;
             }
         }
-        prompts = util.shuffleList(prompts);
-        prompts = prompts.slice(0, 2); // for debugging
-        return prompts;
     }
 }
 
-export class DivisionGameType extends GameType {
+/*export class DivisionGameType extends GameType {
     constructor() {
         super("Деление");
     }
@@ -111,6 +114,6 @@ export class AdditionGameType extends GameType {
         prompts = prompts.slice(0, 40); // limit to 100 questions
         return prompts;
     }
-}
+}*/
 
 export type GameTypeCtor = new () => GameType;

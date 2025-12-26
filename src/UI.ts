@@ -226,37 +226,21 @@ export class UIController {
         this.showPrompt();
 
     }
+    private ensureTextContainsSign(n: number): string {
+        return (n >= 0 ? "+" : "") + n.toString();
+    }
     updateProgressIndicator(): void {
         const progressIndicator = document.getElementById("progressIndicator") as HTMLElement;
-        progressIndicator.textContent = "Прогрес: " + this.gameSession.currentPromptIndex + '/' + this.gameSession.promptList.length;
+        progressIndicator.innerHTML = "<b>Точки: " +
+            this.ensureTextContainsSign(this.gameSession.pointsTowardWin) +
+            '</b> (победа при ' +
+            this.ensureTextContainsSign(this.gameSession.pointsRequiredToWin) +
+            ")";
     }
     updateErrorCountIndicator(): void {
         const progressIndicator = document.getElementById("errorCountIndicator") as HTMLElement;
         progressIndicator.textContent = "Грешки: " + this.gameSession.errorCount;
     }
-    // from GPT
-    /*
-    scrollToBottom(padding = 8) {
-        const el = this.btnSeeAnswer;
-        if (!el) return;
-
-        const vv = window.visualViewport;
-        const rect = el.getBoundingClientRect();
-        const viewportHeight = vv ? vv.height : window.innerHeight;
-
-        // how many pixels the element's bottom extends past the visible viewport
-        const over = rect.bottom - viewportHeight + padding;
-
-        if (over > 0) {
-            // scroll by the amount necessary so the element sits above the overlay (add small extra)
-            // (needed because on iPhone we have a bottom toolbar which makes it
-            // insufficient to simply call scrollIntoView)
-            window.scrollBy({ top: over + 16, behavior: 'smooth' });
-        } else {
-            // fallback: center the element to avoid being under toolbars
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }*/
     scrollToBottom(): void {
         this.middlePane.scrollTo({
             top: this.middlePane.scrollHeight,
@@ -283,7 +267,6 @@ export class UIController {
         return newMessageElement;
     }
     showPrompt(): void {
-        const currentPrompt = this.gameSession.promptList[this.gameSession.currentPromptIndex];
-        this.informUser(currentPrompt.text + " = ", "black");
+        this.informUser(this.gameSession.currentPrompt.text + " = ", "black");
     }
 }
