@@ -9,7 +9,7 @@ export class UIController {
     private gameSession!: GameSession;
     private log: HTMLElement = document.getElementById("log") as HTMLElement;
     private middlePane: HTMLElement = document.getElementById("middlePane") as HTMLElement;
-    private bottomPane: HTMLElement = document.getElementById("bottomPane") as HTMLElement;
+    private keypadAndIndicators: HTMLElement = document.getElementById("keypadAndIndicators") as HTMLElement;
     private btnStartOver: HTMLButtonElement = document.getElementById("btnStartOver") as HTMLButtonElement;
     private userAnswerBox: HTMLInputElement = document.getElementById("userAnswerBox") as HTMLInputElement;
     private dropdownPromptType: HTMLSelectElement = document.getElementById("dropdownPromptType") as HTMLSelectElement;
@@ -254,7 +254,7 @@ export class UIController {
         });
     }
     adjustMiddlePanePadding(): void {
-        //this.middlePane.style.paddingBottom = `${this.bottomPane.offsetHeight}px`;
+        //this.middlePane.style.paddingBottom = `${this.keypadAndIndicators.offsetHeight}px`;
     }
     informUser(message: string, color: string, isBold?: boolean): HTMLElement {
         const newMessageElement = document.createElement("p");

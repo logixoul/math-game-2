@@ -236,7 +236,7 @@ input, button {
     padding: 0.5em;
 }
 
-#bottomPane {
+#keypadAndIndicators {
     width: 100%;
     position: sticky;
     bottom: 0;
