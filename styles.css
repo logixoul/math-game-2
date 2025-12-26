@@ -1,5 +1,5 @@
 .page { display:none; }
-.page.isActive { display:block; }
+.page.isActive { display:flex; }
 
 :root {
     --bottom-pane-height: 20rem;
@@ -13,19 +13,23 @@ html {
 body {
     height: 100%;
     margin: 0;
-    display: flex;
-    flex-direction: column;
+    /*display: flex;
+    flex-direction: column;*/
 }
 
 #header {
-    flex: 0 0 auto;
-    background-color: #444;
+    sflex: 0 0 auto;
+    background-color: rgba(0,0,0,0.76);
+    backdrop-filter: blur(4px);
     color: var(--header-text-color);
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     padding: 1.5em 1.5em;
+    box-sizing: border-box;
     display:flex;
     align-items:center;
     text-decoration: none;
+    position: absolute;
+    width: 100%;
 }
 
 #header a {
@@ -100,7 +104,6 @@ body {
     font-family: Andada Pro, serif;
     display: flex;
     align-items: center;
-    smargin: 0.5em 0.5em !important;
 }
 
 #logo {
@@ -136,8 +139,6 @@ input, button {
     font-size: 1.2em !important;
     text-align: center;
     
-    sborder-radius: 10px;
-
     background-color: #e0e1e3;
 }
 #progressIndicator {
@@ -194,10 +195,8 @@ input, button {
     align-items: center;
     justify-content: center;
     font-size: 1.4em;
-    background-colosr: #bdf;
     box-sizing: border-box;
     border-radius: 10px;
-    sfont-weight: bold;
     font-stretch: ultra-expanded !important;
 }
 
@@ -213,19 +212,21 @@ input, button {
 }
 
 #keypad .keypadButtonRequestReveal {
-    background-color: #ffff90;
+    /*background-color: #ffff90;*/
     font-size: 80%;
 }
 
 #middlePane {
     margin: 0;
-    flex: 1 1 auto;          /* take remaining space */
+    sflex: 1 1 auto;          /* take remaining space */
     overflow-y: auto;        /* scroll within itself */
     box-sizing: border-box;
+    padding-top: 6em;
+    width: 100%;
+    height: 100%;
 }
 
 #gameSessionPage {
-    display: flex;
     flex-direction: column;
     min-height: 100%;
 }
