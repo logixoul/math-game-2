@@ -22,7 +22,7 @@ body {
     /*background-image: url('assets/backgroundBio.jpg');
     background-size: cover;
     mix-blend-mode: multiply;*/
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(4px);
     color: var(--header-text-color);
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     padding: 1.5em 1.5em;
