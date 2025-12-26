@@ -12,7 +12,6 @@ export class UIController {
     private bottomPane: HTMLElement = document.getElementById("bottomPane") as HTMLElement;
     private btnStartOver: HTMLButtonElement = document.getElementById("btnStartOver") as HTMLButtonElement;
     private userAnswerBox: HTMLInputElement = document.getElementById("userAnswerBox") as HTMLInputElement;
-    private btnSeeAnswer: HTMLButtonElement = document.getElementById("btnSeeAnswer") as HTMLButtonElement;
     private dropdownPromptType: HTMLSelectElement = document.getElementById("dropdownPromptType") as HTMLSelectElement;
     private indicators: HTMLElement = document.getElementById("indicators") as HTMLElement;
     private keypad: HTMLElement = document.getElementById("keypad") as HTMLElement;
@@ -37,9 +36,6 @@ export class UIController {
         this.btnStartGame.addEventListener("click", () => {
             window.location.hash = "#game";
             this.userAnswerBox.focus();
-        });
-        this.btnSeeAnswer.addEventListener("click", () => {
-            this.gameSession.onUserRequestedAnswerReveal();
         });
         
         this.userAnswerBox.focus();
@@ -164,6 +160,9 @@ export class UIController {
         this.#setupKeypadButton(btnArray, 0, 1, "4");
         this.#setupKeypadButton(btnArray, 1, 1, "5");
         this.#setupKeypadButton(btnArray, 2, 1, "6");
+        const btnRequestReveal = this.#setupKeypadButton(btnArray, 3, 1, "Не знам", () => {
+            this.gameSession.onUserRequestedAnswerReveal();
+        });
         this.#setupKeypadButton(btnArray, 0, 2, "7");
         this.#setupKeypadButton(btnArray, 1, 2, "8");
         this.#setupKeypadButton(btnArray, 2, 2, "9");
@@ -178,6 +177,7 @@ export class UIController {
         });
 
         btnOk.classList.add("keypadButtonOk");
+        btnRequestReveal.classList.add("keypadButtonRequestReveal")
     }
 
     #setupKeypadButton(btnArray: HTMLDivElement[][], col: number, row: number, text: string, onClick?: () => void): HTMLDivElement {

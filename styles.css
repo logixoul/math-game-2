@@ -180,7 +180,7 @@ input, button {
 
     padding: 0.5em;
 }
-#keypad .keypadButton, #btnSeeAnswer {
+#keypad .keypadButton {
     background-color: #e8e9ea;
     border-radius: 10px;
     border-width: 0px;
@@ -212,27 +212,32 @@ input, button {
     background-color: lightgreen;
 }
 
-#btnSeeAnswer {
-    padding: 0.5em;
-    margin: 1em auto;
-    display: block;
-    width: 30%;
+#keypad .keypadButtonRequestReveal {
+    background-color: #ffff90;
+    font-size: 80%;
 }
 
 #middlePane {
-    margin: 5px 5px;
-    margin-top: 0px;
+    margin: 0;
     flex: 1 1 auto;          /* take remaining space */
     overflow-y: auto;        /* scroll within itself */
-    padding: 0.5em;
     box-sizing: border-box;
+}
 
-    padding-bottom: calc(var(--bottom-pane-height) + env(safe-area-inset-bottom, 0.5rem));
+#gameSessionPage {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+#log {
+    flex: 1 1 auto;
+    padding: 0.5em;
 }
 
 #bottomPane {
     width: 100%;
-    position: fixed;
+    position: sticky;
     bottom: 0;
     left: 0;
     background-color: #f0f1f3;
