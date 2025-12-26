@@ -68,7 +68,7 @@ export class GameSession {
     }
     onUserAnswered(userAnswer: number): void {
         const currentPrompt = this.getCurrentPrompt();
-        if(userAnswer == currentPrompt.answer) {
+        if(userAnswer === currentPrompt.answer) {
             this.pointsTowardWin++;
             if(this.winConditionsMet()) {
                 this.problemsCompleted++;
@@ -83,7 +83,7 @@ export class GameSession {
             this.uiController.updateProgressIndicator();
 
             this.uiController.informUser("✅ Точно така!", "#00c000");
-            if(currentPrompt.failedAttempts == 0) {
+            if(currentPrompt.failedAttempts === 0) {
                 this.numCorrectAtFirstTry++;
             }
         } else {
