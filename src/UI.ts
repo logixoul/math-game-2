@@ -16,6 +16,7 @@ export class UIController {
     private indicators: HTMLElement = document.getElementById("indicators") as HTMLElement;
     private keypad: HTMLElement = document.getElementById("keypad") as HTMLElement;
     private btnMenu: HTMLButtonElement = document.getElementById("btnMenu") as HTMLButtonElement;
+    private header: HTMLElement = document.getElementById("header") as HTMLElement;
     private menuContents: HTMLElement = document.getElementById("menuContents") as HTMLElement;
     private loginBtn: HTMLButtonElement = document.getElementById("loginBtn") as HTMLButtonElement;
     private userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
@@ -95,6 +96,17 @@ export class UIController {
         this.#initGameTypesInDropdown();
 
         this.adjustMiddlePanePadding();
+        if ("fonts" in document && document.fonts) {
+            document.fonts.ready.then(() => {
+                this.adjustMiddlePanePadding();
+            });
+        }
+        if ("ResizeObserver" in window) {
+            const headerResizeObserver = new ResizeObserver(() => {
+                this.adjustMiddlePanePadding();
+            });
+            headerResizeObserver.observe(this.header);
+        }
         window.addEventListener('resize', this.adjustMiddlePanePadding.bind(this));
         window.addEventListener('orientationchange', this.adjustMiddlePanePadding.bind(this));
 
@@ -254,7 +266,8 @@ export class UIController {
         });
     }
     adjustMiddlePanePadding(): void {
-        //this.middlePane.style.paddingBottom = `${this.keypadAndIndicators.offsetHeight}px`;
+        document.documentElement.style.setProperty("--header-width", `${this.header.offsetWidth}px`);
+        document.documentElement.style.setProperty("--header-height", `${this.header.offsetHeight}px`);
     }
     informUser(message: string, color: string, isBold?: boolean): HTMLElement {
         const newMessageElement = document.createElement("p");
