@@ -17,7 +17,6 @@ export class UIController {
     private loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
     private userInfo = document.getElementById("userInfo") as HTMLElement;
     private logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
-    private freePlayGameTypeList = document.getElementById("freePlayGameTypeList") as HTMLUListElement;
     private helloNameContainer = document.getElementById("helloNameContainer") as HTMLSpanElement;
     private pageRouter = new PageRouter("dashboard");
     private currentPage! : Page;
@@ -41,7 +40,7 @@ export class UIController {
                 return;
             }
             if (e.newPage === "dashboard") {
-                this.currentPage = new Pages.DashboardPage();
+                this.currentPage = new Pages.DashboardPage(this.appController);
             }
         })
         this.pageRouter.start();
@@ -75,8 +74,6 @@ export class UIController {
                 this.helloNameContainer.innerText = "страннико";
         });
 
-        this.#initGameTypeList();
-
         this.adjustMiddlePanePadding();
         if ("fonts" in document && document.fonts) {
             document.fonts.ready.then(() => {
@@ -93,19 +90,6 @@ export class UIController {
         window.addEventListener('orientationchange', this.adjustMiddlePanePadding.bind(this));
     }
 
-    #initGameTypeList(): void {
-        const gameTypes = this.appController.getAvailableGameTypes();
-        gameTypes.forEach((gameType: PromptTypes.GameType) => {
-            const gameTypeLink = document.createElement("li") as HTMLLIElement;
-            gameTypeLink.addEventListener("click", () => {
-                window.location.hash = `game?type=${encodeURIComponent(gameType.persistencyKey)}`;
-            });
-            gameTypeLink.innerText = gameType.localizedName;
-            this.freePlayGameTypeList.appendChild(gameTypeLink);
-        });
-    }
-
-    
     adjustMiddlePanePadding(): void {
         document.documentElement.style.setProperty("--header-width", `${this.header.offsetWidth}px`);
         document.documentElement.style.setProperty("--header-height", `${this.header.offsetHeight}px`);

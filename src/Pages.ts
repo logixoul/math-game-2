@@ -3,11 +3,41 @@ import { GameSession } from "./GameSession";
 import { AppController } from "./AppController";
 import { ResultStats } from "./ResultStats";
 import * as util from "./util"
-import { GameType } from "./GameTypes";
+import * as PromptTypes from "./GameTypes";
 
 export class DashboardPage extends PageRouter.Page {
-    constructor() {
+    private freePlayGameTypeList : HTMLUListElement;
+
+    private readonly initialHtml = `
+        <h2>Привет, <span id="helloNameContainer"></span>!</h2>
+        <section id="currentHomeworkDashboardSection">
+            <h3>Сегашно домашно</h3>
+        </section>
+        <section id="freePlayDashboardSection">
+            <h3>Игра по избор</h3>
+            <ul id="freePlayGameTypeList">
+            </ul>
+        </section>
+    `;
+
+    constructor(private appController : AppController) {
         super();
+
+        document.getElementById("dashboardPage")!.innerHTML = this.initialHtml;
+        this.freePlayGameTypeList = document.getElementById("freePlayGameTypeList") as HTMLUListElement;
+        this.initGameTypeList();
+    }
+
+    private initGameTypeList(): void {
+        const gameTypes = this.appController.getAvailableGameTypes();
+        gameTypes.forEach((gameType: PromptTypes.GameType) => {
+            const gameTypeLink = document.createElement("li") as HTMLLIElement;
+            gameTypeLink.addEventListener("click", () => {
+                window.location.hash = `game?type=${encodeURIComponent(gameType.persistencyKey)}`;
+            });
+            gameTypeLink.innerText = gameType.localizedName;
+            this.freePlayGameTypeList.appendChild(gameTypeLink);
+        });
     }
 }
 
@@ -45,7 +75,7 @@ export class GamePage extends PageRouter.Page {
         
         document.getElementById("gameSessionPage")!.innerHTML = this.initialHtml;
         this.log = document.getElementById("log") as HTMLElement;
-        console.log("this.log=", this.log);
+        
         this.keypadAndIndicators = document.getElementById("keypadAndIndicators") as HTMLElement;
         this.userAnswerBox = document.getElementById("userAnswerBox") as HTMLInputElement;
         this.btnStartOver = document.getElementById("btnStartOver") as HTMLButtonElement;
