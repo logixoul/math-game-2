@@ -44,7 +44,7 @@ export class PageRouter {
         this.showRoute(this.pages.has(route) ? route : this.defaultRoute);
     }
 
-    public showRoute(route: string): void {
+    private showRoute(route: string): void {
         this.pages.forEach((page, key) => {
             page.classList.toggle("isActive", key === route);
         });

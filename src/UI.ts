@@ -140,7 +140,7 @@ export class UIController {
             const gameTypeLink = document.createElement("li") as HTMLLIElement;
             gameTypeLink.addEventListener("click", () => {
                 this.appController.startNewGame(new gameTypeCtor());
-                this.pageRouter.showRoute("game");
+                window.location.hash = "game";
             });
             gameTypeLink.innerText = new gameTypeCtor().localizedName;
             this.freePlayGameTypeList.appendChild(gameTypeLink);
