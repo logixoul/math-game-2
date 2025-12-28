@@ -1,5 +1,5 @@
 import type { AppController } from './AppController';
-import type { GameType, GameTypeCtor, Prompt } from './GameTypes';
+import { GameType, GameTypeCtor, Prompt, PromptScheduler } from './GameTypes';
 import { ResultStats } from './ResultStats';
 import type { UIController } from './UI';
 
@@ -11,6 +11,7 @@ export class GameSession {
     currentPromptIndex: number; // todo rm
     numCorrectAtFirstTry: number;
 
+    promptScheduler: PromptScheduler;
     promptGenerator: Generator<Prompt, void, unknown>;
     currentPrompt: Prompt;
     
@@ -30,8 +31,9 @@ export class GameSession {
         
         this.errorCount = 0;
         this.gameType = new gameTypeClass();
+        this.promptScheduler = new PromptScheduler(this.gameType);
 
-        this.promptGenerator = this.gameType.createNextPrompt();
+        this.promptGenerator = this.promptScheduler.generatePrompts();
         this.currentPrompt = this.promptGenerator.next().value!;
 
         this.currentPromptIndex = 0;
@@ -67,8 +69,7 @@ export class GameSession {
         return enoughPoints && enoughAnswered && withinTimeLimit;
     }
     onUserAnswered(userAnswer: number): void {
-        const currentPrompt = this.getCurrentPrompt();
-        if(userAnswer === currentPrompt.answer) {
+        if(userAnswer === this.currentPrompt.answer) {
             this.pointsTowardWin++;
             if(this.winConditionsMet()) {
                 this.problemsCompleted++;
@@ -83,7 +84,7 @@ export class GameSession {
             this.uiController.updateProgressIndicator();
 
             this.uiController.informUser("✅ Точно така!", "#00c000");
-            if(currentPrompt.failedAttempts === 0) {
+            if(this.currentPrompt.failedAttempts === 0) {
                 this.numCorrectAtFirstTry++;
             }
         } else {
@@ -94,7 +95,7 @@ export class GameSession {
             this.uiController.updateSessionTimeIndicator();
             this.uiController.informUser("❌ Пробвай пак.", "black");
             this.uiController.showPrompt();
-            currentPrompt.failedAttempts++;
+            this.currentPrompt.failedAttempts++;
         }
     }
 
@@ -106,9 +107,7 @@ export class GameSession {
         const answer = this.getCurrentPrompt().answer;
         this.uiController.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
         
-        // push question back to the end of the queue
-        this.promptGenerator.push(this.promptGenerator[this.currentPromptIndex]);
-        this.promptGenerator.splice(this.currentPromptIndex, 1);
+        this.promptScheduler.postponePrompt(this.currentPrompt);
 
         this.errorCount++;
         this.uiController.updateSessionTimeIndicator();
