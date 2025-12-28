@@ -26,6 +26,25 @@ export class UIController {
         this.currentPage = new Pages.DashboardPage();
 
         this.pageRouter.bus.on("pageChanged", (e) => {
+            if (e.newPage === "game") {
+                const gameTypeKey = e.query.get("type");
+                if (!gameTypeKey) {
+                    window.location.hash = "dashboard";
+                    return;
+                }
+                const gameType = this.appController
+                    .getAvailableGameTypes()
+                    .find((type) => type.persistencyKey === gameTypeKey);
+                if (!gameType) {
+                    window.location.hash = "dashboard";
+                    return;
+                }
+                this.currentPage = new Pages.GamePage(this.appController, gameType);
+                return;
+            }
+            if (e.newPage === "dashboard") {
+                this.currentPage = new Pages.DashboardPage();
+            }
         })
 
         this.btnMenu.addEventListener("click", () => {
@@ -82,8 +101,7 @@ export class UIController {
         gameTypes.forEach((gameType: PromptTypes.GameType) => {
             const gameTypeLink = document.createElement("li") as HTMLLIElement;
             gameTypeLink.addEventListener("click", () => {
-                this.currentPage = new Pages.GamePage(this.appController, gameType);
-                window.location.hash = "game";
+                window.location.hash = `game?type=${encodeURIComponent(gameType.persistencyKey)}`;
             });
             gameTypeLink.innerText = gameType.localizedName;
             this.freePlayGameTypeList.appendChild(gameTypeLink);

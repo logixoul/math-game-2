@@ -94,7 +94,7 @@ export class MultiplicationGameType extends GameType {
     }
 
     get persistencyKey(): string {
-        return "multiplication:v1";
+        return "multiplication.v1";
     }
 
     createRandomPrompt(): Prompt {
@@ -110,7 +110,7 @@ export class DivisionGameType extends GameType {
     }
 
     get persistencyKey(): string {
-        return "division:v1";
+        return "division.v1";
     }
 
     createRandomPrompt(): Prompt {
@@ -128,7 +128,7 @@ export class SubtractionGameType extends GameType {
     }
 
     get persistencyKey(): string {
-        return "subtraction:v1";
+        return "subtraction.v1";
     }
 
     createRandomPrompt(): Prompt {
@@ -149,7 +149,7 @@ export class AdditionGameType extends GameType {
     }
 
     get persistencyKey(): string {
-        return "addition:v1";
+        return "addition.v1";
     }
 }
 
@@ -166,7 +166,7 @@ export class KaloyanHomework_28_12_2025_GameType extends GameType {
     }
 
     get persistencyKey(): string {
-        return "KaloyanHomework_28_12_2025_GameType:v1";
+        return "KaloyanHomework_28_12_2025_GameType.v1";
     }
 }
 

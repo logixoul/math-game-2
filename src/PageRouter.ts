@@ -7,7 +7,7 @@ export class Page {
 type PageMap = Map<string, HTMLElement>;
 
 type PageRouterEvents = {
-  pageChanged: { oldPage : string, newPage : string };
+  pageChanged: { oldPage: string; newPage: string; query: URLSearchParams };
 };
 
 export class PageRouter {
@@ -15,6 +15,7 @@ export class PageRouter {
     private navLinks: HTMLAnchorElement[];
     #bus = new TypedEventEmitter<PageRouterEvents>();
     private currentRoute : string;
+    private currentQuery: URLSearchParams;
 
     get bus() {
         return this.#bus;
@@ -22,6 +23,7 @@ export class PageRouter {
 
     constructor(private defaultRoute: string) {
         this.currentRoute = defaultRoute;
+        this.currentQuery = new URLSearchParams();
         this.pages = this.collectPages();
         this.navLinks = Array.from(document.querySelectorAll("#mainNav a"));
 
@@ -30,6 +32,13 @@ export class PageRouter {
         });
 
         this.handleHashChange();
+    }
+
+    private parseHash(): { route: string; query: URLSearchParams } {
+        const rawHash = window.location.hash.replace(/^#/, "");
+        const [path, queryString = ""] = rawHash.split("?", 2);
+        const route = path || this.defaultRoute;
+        return { route, query: new URLSearchParams(queryString) };
     }
 
     private collectPages(): PageMap {
@@ -45,12 +54,11 @@ export class PageRouter {
     }
 
     private handleHashChange(): void {
-        const rawHash = window.location.hash.replace(/^#/, "");
-        const route = rawHash || this.defaultRoute;
-        this.showRoute(this.pages.has(route) ? route : this.defaultRoute);
+        const { route, query } = this.parseHash();
+        this.showRoute(this.pages.has(route) ? route : this.defaultRoute, query);
     }
 
-    private showRoute(route: string): void {
+    private showRoute(route: string, query: URLSearchParams): void {
 
         this.pages.forEach((page, key) => {
             page.classList.toggle("isActive", key === route);
@@ -61,8 +69,9 @@ export class PageRouter {
             link.classList.toggle("isActive", linkRoute === route);
         });
 
-        this.#bus.emit("pageChanged", { oldPage: this.currentRoute, newPage: route });
+        this.#bus.emit("pageChanged", { oldPage: this.currentRoute, newPage: route, query });
 
         this.currentRoute = route;
+        this.currentQuery = query;
     }
 }
