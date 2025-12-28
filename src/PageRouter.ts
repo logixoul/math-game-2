@@ -30,7 +30,9 @@ export class PageRouter {
         window.addEventListener("hashchange", () => {
             this.handleHashChange();
         });
+    }
 
+    start(): void {
         this.handleHashChange();
     }
 

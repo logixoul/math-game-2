@@ -20,11 +20,9 @@ export class UIController {
     private freePlayGameTypeList = document.getElementById("freePlayGameTypeList") as HTMLUListElement;
     private helloNameContainer = document.getElementById("helloNameContainer") as HTMLSpanElement;
     private pageRouter = new PageRouter("dashboard");
-    private currentPage : Page;
+    private currentPage! : Page;
     
     constructor(public appController: AppController) {
-        this.currentPage = new Pages.DashboardPage();
-
         this.pageRouter.bus.on("pageChanged", (e) => {
             if (e.newPage === "game") {
                 const gameTypeKey = e.query.get("type");
@@ -46,6 +44,7 @@ export class UIController {
                 this.currentPage = new Pages.DashboardPage();
             }
         })
+        this.pageRouter.start();
 
         this.btnMenu.addEventListener("click", () => {
             if(this.menuContents.style.display === "flex") {
