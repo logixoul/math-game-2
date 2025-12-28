@@ -93,8 +93,6 @@ export class UIController {
         window.addEventListener('orientationchange', this.adjustMiddlePanePadding.bind(this));
     }
 
-    
-
     #initGameTypeList(): void {
         const gameTypes = this.appController.getAvailableGameTypes();
         gameTypes.forEach((gameType: PromptTypes.GameType) => {
