@@ -4,6 +4,7 @@ import type { AppController } from './AppController';
 import type { GameTypeCtor } from './GameTypes';
 import type { GameSession } from './GameSession';
 import { ResultStats } from './ResultStats';
+import { PageRouter } from './PageRouter';
 
 export class UIController {
     private gameSession!: GameSession;
@@ -12,7 +13,6 @@ export class UIController {
     private keypadAndIndicators = document.getElementById("keypadAndIndicators") as HTMLElement;
     private btnStartOver = document.getElementById("btnStartOver") as HTMLButtonElement;
     private userAnswerBox = document.getElementById("userAnswerBox") as HTMLInputElement;
-    private dropdownPromptType = document.getElementById("dropdownPromptType") as HTMLSelectElement;
     private indicators = document.getElementById("indicators") as HTMLElement;
     private keypad = document.getElementById("keypad") as HTMLElement;
     private btnMenu = document.getElementById("btnMenu") as HTMLButtonElement;
@@ -21,40 +21,34 @@ export class UIController {
     private loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
     private userInfo = document.getElementById("userInfo") as HTMLElement;
     private logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
-    private btnStartGame = document.getElementById("btnStartGame") as HTMLButtonElement;
     private latestAnswerField!: HTMLSpanElement;
     private freePlayGameTypeList = document.getElementById("freePlayGameTypeList") as HTMLUListElement;
+    private helloNameContainer = document.getElementById("helloNameContainer") as HTMLSpanElement;
+    private pageRouter = new PageRouter("dashboard");
+    
 
     constructor(public appController: AppController) {
+        this.pageRouter.bus.on("pageChanged", (e) => {
+            if(e.newPage === "game") {
+                this.userAnswerBox.focus();
+            }
+        })
+
         this.btnStartOver.addEventListener("click", () => {
             this.btnStartOver.style.display = "none";
             const selectedValue = this.dropdownPromptType.value as keyof typeof PromptTypes;
             const promptTypeClass = PromptTypes[selectedValue];
             if (promptTypeClass) {
-                this.appController.startNewGame(promptTypeClass as GameTypeCtor);
+                this.appController.startNewGame(new (promptTypeClass as GameTypeCtor));
             }
             this.userAnswerBox.focus();
         });
-        this.btnStartGame.addEventListener("click", () => {
-            window.location.hash = "#game";
-            this.userAnswerBox.focus();
-        });
-        
-        this.userAnswerBox.focus();
         
         this.userAnswerBox.addEventListener("keydown", (e: KeyboardEvent) => {
             if(e.key === "Enter") {
                 this.onUserPressedEnter();
             }
             return false;
-        });
-
-        this.dropdownPromptType.addEventListener("change", () => {
-            const selectedValue = this.dropdownPromptType.value as keyof typeof PromptTypes;
-            const promptTypeClass = PromptTypes[selectedValue];
-            if(promptTypeClass) {
-                this.appController.startNewGame(promptTypeClass as GameTypeCtor);
-            }
         });
 
         this.btnMenu.addEventListener("click", () => {
@@ -77,11 +71,13 @@ export class UIController {
                 this.userInfo.innerText = "Здравей, " + user.email;
                 this.loginBtn.style.display = "none";
                 this.logoutBtn.style.display = "inline";
+                this.helloNameContainer.innerText = user.email!;
         });
         this.appController.firebaseController.bus.on("loggedOut", () => {
                 this.userInfo.innerText = "Не си влязъл в системата";
                 this.loginBtn.style.display = "inline";
                 this.logoutBtn.style.display = "none";
+                this.helloNameContainer.innerText = "страннико";
         });
 
         this.relocateIndicators();
@@ -140,12 +136,11 @@ export class UIController {
 
     #initGameTypeList(): void {
         const gameTypeCtors = this.appController.getAvailableGameTypes();
-        this.dropdownPromptType.innerHTML = "";
         gameTypeCtors.forEach((gameTypeCtor: GameTypeCtor) => {
             const gameTypeLink = document.createElement("li") as HTMLLIElement;
             gameTypeLink.addEventListener("click", () => {
                 this.appController.startNewGame(new gameTypeCtor());
-                window.location.hash = "#game";
+                this.pageRouter.showRoute("game");
             });
             gameTypeLink.innerText = new gameTypeCtor().localizedName;
             this.freePlayGameTypeList.appendChild(gameTypeLink);

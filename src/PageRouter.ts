@@ -1,8 +1,19 @@
+import { TypedEventEmitter } from "./TypedEventEmitter";
+
 type PageMap = Map<string, HTMLElement>;
+
+type PageRouterEvents = {
+  pageChanged: { newPage : string };
+};
 
 export class PageRouter {
     private pages: PageMap;
     private navLinks: HTMLAnchorElement[];
+    #bus = new TypedEventEmitter<PageRouterEvents>();
+
+    get bus() {
+        return this.#bus;
+    }
 
     constructor(private defaultRoute: string) {
         this.pages = this.collectPages();
@@ -33,7 +44,7 @@ export class PageRouter {
         this.showRoute(this.pages.has(route) ? route : this.defaultRoute);
     }
 
-    private showRoute(route: string): void {
+    public showRoute(route: string): void {
         this.pages.forEach((page, key) => {
             page.classList.toggle("isActive", key === route);
         });
@@ -42,5 +53,7 @@ export class PageRouter {
             const linkRoute = link.getAttribute("href")?.replace(/^#/, "");
             link.classList.toggle("isActive", linkRoute === route);
         });
+
+        this.#bus.emit("pageChanged", { newPage: route });
     }
 }
