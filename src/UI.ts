@@ -7,22 +7,23 @@ import { ResultStats } from './ResultStats';
 
 export class UIController {
     private gameSession!: GameSession;
-    private log: HTMLElement = document.getElementById("log") as HTMLElement;
-    private middlePane: HTMLElement = document.getElementById("middlePane") as HTMLElement;
-    private keypadAndIndicators: HTMLElement = document.getElementById("keypadAndIndicators") as HTMLElement;
-    private btnStartOver: HTMLButtonElement = document.getElementById("btnStartOver") as HTMLButtonElement;
-    private userAnswerBox: HTMLInputElement = document.getElementById("userAnswerBox") as HTMLInputElement;
-    private dropdownPromptType: HTMLSelectElement = document.getElementById("dropdownPromptType") as HTMLSelectElement;
-    private indicators: HTMLElement = document.getElementById("indicators") as HTMLElement;
-    private keypad: HTMLElement = document.getElementById("keypad") as HTMLElement;
-    private btnMenu: HTMLButtonElement = document.getElementById("btnMenu") as HTMLButtonElement;
-    private header: HTMLElement = document.getElementById("header") as HTMLElement;
-    private menuContents: HTMLElement = document.getElementById("menuContents") as HTMLElement;
-    private loginBtn: HTMLButtonElement = document.getElementById("loginBtn") as HTMLButtonElement;
-    private userInfo: HTMLElement = document.getElementById("userInfo") as HTMLElement;
-    private logoutBtn: HTMLButtonElement = document.getElementById("logoutBtn") as HTMLButtonElement;
-    private btnStartGame: HTMLButtonElement = document.getElementById("btnStartGame") as HTMLButtonElement;
+    private log = document.getElementById("log") as HTMLElement;
+    private middlePane = document.getElementById("middlePane") as HTMLElement;
+    private keypadAndIndicators = document.getElementById("keypadAndIndicators") as HTMLElement;
+    private btnStartOver = document.getElementById("btnStartOver") as HTMLButtonElement;
+    private userAnswerBox = document.getElementById("userAnswerBox") as HTMLInputElement;
+    private dropdownPromptType = document.getElementById("dropdownPromptType") as HTMLSelectElement;
+    private indicators = document.getElementById("indicators") as HTMLElement;
+    private keypad = document.getElementById("keypad") as HTMLElement;
+    private btnMenu = document.getElementById("btnMenu") as HTMLButtonElement;
+    private header = document.getElementById("header") as HTMLElement;
+    private menuContents = document.getElementById("menuContents") as HTMLElement;
+    private loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
+    private userInfo = document.getElementById("userInfo") as HTMLElement;
+    private logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
+    private btnStartGame = document.getElementById("btnStartGame") as HTMLButtonElement;
     private latestAnswerField!: HTMLSpanElement;
+    private freePlayGameTypeList = document.getElementById("freePlayGameTypeList") as HTMLUListElement;
 
     constructor(public appController: AppController) {
         this.btnStartOver.addEventListener("click", () => {
@@ -93,7 +94,7 @@ export class UIController {
         }
 
         this.#buildKeypad();
-        this.#initGameTypesInDropdown();
+        this.#initGameTypeList();
 
         this.adjustMiddlePanePadding();
         if ("fonts" in document && document.fonts) {
@@ -137,16 +138,17 @@ export class UIController {
         return window.matchMedia("(pointer: coarse), (hover: none), (any-pointer: coarse)").matches;
     }
 
-    #initGameTypesInDropdown(): void {
-        const gameTypes = this.appController.getAvailableGameTypes();
+    #initGameTypeList(): void {
+        const gameTypeCtors = this.appController.getAvailableGameTypes();
         this.dropdownPromptType.innerHTML = "";
-        gameTypes.forEach((gameTypeClass: GameTypeCtor) => {
-            const option = document.createElement("option");
-            const gameTypeInstance = new gameTypeClass();
-            
-            option.value = gameTypeClass.name;
-            option.textContent = gameTypeInstance.localizedName;
-            this.dropdownPromptType.appendChild(option);
+        gameTypeCtors.forEach((gameTypeCtor: GameTypeCtor) => {
+            const gameTypeLink = document.createElement("li") as HTMLLIElement;
+            gameTypeLink.addEventListener("click", () => {
+                this.appController.startNewGame(new gameTypeCtor());
+                window.location.hash = "#game";
+            });
+            gameTypeLink.innerText = new gameTypeCtor().localizedName;
+            this.freePlayGameTypeList.appendChild(gameTypeLink);
         });
     }
 

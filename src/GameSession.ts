@@ -25,12 +25,12 @@ export class GameSession {
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
 
-    constructor(appController: AppController, gameTypeClass: GameTypeCtor) {
+    constructor(appController: AppController, gameType: GameType) {
         this.appController = appController;
         this.uiController = appController.uiController;
         
         this.errorCount = 0;
-        this.gameType = new gameTypeClass();
+        this.gameType = gameType;
         this.promptScheduler = new PromptScheduler(this.gameType);
 
         this.promptGenerator = this.promptScheduler.generatePrompts();

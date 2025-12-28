@@ -1,5 +1,8 @@
 .page { display:none; }
 .page.isActive { display:flex; }
+.page {
+    flex-direction: column;
+}
 
 :root {
     --bottom-pane-height: 20rem;
