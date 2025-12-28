@@ -17,7 +17,6 @@ export class UIController {
     private loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
     private userInfo = document.getElementById("userInfo") as HTMLElement;
     private logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
-    private helloNameContainer = document.getElementById("helloNameContainer") as HTMLSpanElement;
     private pageRouter = new PageRouter("dashboard");
     private currentPage! : Page;
     
@@ -62,16 +61,16 @@ export class UIController {
         });
 
         this.appController.firebaseController.bus.on("loggedIn", ({ user }) => {
+                this.appController.userEmail = user.email;
                 this.userInfo.innerText = "Здравей, " + user.email;
                 this.loginBtn.style.display = "none";
                 this.logoutBtn.style.display = "inline";
-                this.helloNameContainer.innerText = user.email!;
         });
         this.appController.firebaseController.bus.on("loggedOut", () => {
+                this.appController.userEmail = null;
                 this.userInfo.innerText = "Не си влязъл в системата";
                 this.loginBtn.style.display = "inline";
                 this.logoutBtn.style.display = "none";
-                this.helloNameContainer.innerText = "страннико";
         });
 
         this.adjustMiddlePanePadding();

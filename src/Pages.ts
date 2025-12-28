@@ -7,7 +7,8 @@ import * as PromptTypes from "./GameTypes";
 
 export class DashboardPage extends PageRouter.Page {
     private freePlayGameTypeList : HTMLUListElement;
-
+    private helloNameContainer : HTMLSpanElement;
+    
     private readonly initialHtml = `
         <h2>Привет, <span id="helloNameContainer"></span>!</h2>
         <section id="currentHomeworkDashboardSection">
@@ -25,7 +26,20 @@ export class DashboardPage extends PageRouter.Page {
 
         document.getElementById("dashboardPage")!.innerHTML = this.initialHtml;
         this.freePlayGameTypeList = document.getElementById("freePlayGameTypeList") as HTMLUListElement;
+        this.helloNameContainer = document.getElementById("helloNameContainer") as HTMLSpanElement;
         this.initGameTypeList();
+
+        if(this.appController.userEmail !== null) {
+            this.helloNameContainer.innerText = this.appController.userEmail;
+        }
+
+        // todo: unsubscribe on navigating-away?
+        this.appController.firebaseController.bus.on("loggedIn", ({ user }) => {
+            this.helloNameContainer.innerText = user.email!;
+        });
+        this.appController.firebaseController.bus.on("loggedOut", () => {
+            this.helloNameContainer.innerText = "страннико";
+        });
     }
 
     private initGameTypeList(): void {

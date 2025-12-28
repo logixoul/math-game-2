@@ -6,6 +6,7 @@ import * as PromptTypes from './GameTypes';
 export class AppController {
     uiController: UIController;
     firebaseController: FirebaseController;
+    userEmail: string | null = null; // null when not logged in
     
     constructor() {
         this.firebaseController = new FirebaseController();
