@@ -6,8 +6,7 @@ import * as PromptTypes from './GameTypes';
 export class AppController {
     uiController: UIController;
     firebaseController: FirebaseController;
-    //gameSession!: GameSession;
-
+    
     constructor() {
         this.firebaseController = new FirebaseController();
         this.firebaseController.init();
@@ -22,9 +21,4 @@ export class AppController {
             new PromptTypes.AdditionGameType(),
         ];
     }
-
-    // todo rm
-    /*get currentGameType() : PromptTypes.GameType {
-        return this.gameSession.gameType;
-    }*/
 }

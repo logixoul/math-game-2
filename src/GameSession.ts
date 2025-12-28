@@ -9,7 +9,6 @@ export class GameSession {
     gamePage: GamePage;
     errorCount: number;
     gameType: GameType;
-    currentPromptIndex: number; // todo rm
     numCorrectAtFirstTry: number;
 
     promptScheduler: PromptScheduler;
@@ -36,10 +35,8 @@ export class GameSession {
         this.promptGenerator = this.promptScheduler.generatePrompts();
         this.currentPrompt = this.promptGenerator.next().value!;
 
-        this.currentPromptIndex = 0;
         this.numCorrectAtFirstTry = 0;
-        this.gamePage.onNewSession();
-
+        
         this.errorCount = 0;
     }
 
@@ -70,6 +67,7 @@ export class GameSession {
     onUserAnswered(userAnswer: number): void {
         if(userAnswer === this.currentPrompt.answer) {
             this.pointsTowardWin++;
+            this.gamePage.informUser("✅ Точно така!", "#00c000");
             if(this.winConditionsMet()) {
                 this.problemsCompleted++;
                 this.gamePage.updateProgressIndicator();
@@ -82,7 +80,6 @@ export class GameSession {
             this.problemsCompleted++;
             this.gamePage.updateProgressIndicator();
 
-            this.gamePage.informUser("✅ Точно така!", "#00c000");
             if(this.currentPrompt.failedAttempts === 0) {
                 this.numCorrectAtFirstTry++;
             }

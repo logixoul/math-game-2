@@ -42,6 +42,7 @@ export class GamePage extends PageRouter.Page {
         super();
 
         this.gameSession = new GameSession(appController, this, gameType);
+        this.onNewSession();
 
         document.getElementById("gameSessionPage")!.innerHTML = this.initialHtml;
         this.log = document.getElementById("log") as HTMLElement;
@@ -56,7 +57,7 @@ export class GamePage extends PageRouter.Page {
         this.btnStartOver.addEventListener("click", () => {
             this.btnStartOver.style.display = "none";
             this.gameSession = new GameSession(this.appController, this, this.gameType);
-    
+            this.onNewSession();
             this.userAnswerBox.focus();
         });
         
