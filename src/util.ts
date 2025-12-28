@@ -13,3 +13,7 @@ export function shuffleList<T>(inputList: T[]): T[] {
     }
     return shuffled;
 }
+
+export function isMobileDevice(): boolean {
+    return window.matchMedia("(pointer: coarse), (hover: none), (any-pointer: coarse)").matches;
+}

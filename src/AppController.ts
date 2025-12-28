@@ -6,30 +6,25 @@ import * as PromptTypes from './GameTypes';
 export class AppController {
     uiController: UIController;
     firebaseController: FirebaseController;
-    gameSession!: GameSession;
+    //gameSession!: GameSession;
 
     constructor() {
         this.firebaseController = new FirebaseController();
         this.firebaseController.init();
         this.uiController = new UIController(this);
-
-        this.startNewGame(new PromptTypes.MultiplicationGameType());
     }
 
-    startNewGame(gameType: PromptTypes.GameType): void {
-        this.gameSession = new GameSession(this, gameType);
-    }
-    
-    getAvailableGameTypes(): PromptTypes.GameTypeCtor[] {
+    getAvailableGameTypes(): PromptTypes.GameType[] {
         return [
-            PromptTypes.MultiplicationGameType,
-            PromptTypes.DivisionGameType,
-            PromptTypes.SubtractionGameType,
-            PromptTypes.AdditionGameType,
+            new PromptTypes.MultiplicationGameType(new PromptTypes.Range(0, 10), new PromptTypes.Range(0, 10)),
+            new PromptTypes.DivisionGameType(),
+            new PromptTypes.SubtractionGameType(),
+            new PromptTypes.AdditionGameType(),
         ];
     }
 
-    get currentGameType() : PromptTypes.GameType {
+    // todo rm
+    /*get currentGameType() : PromptTypes.GameType {
         return this.gameSession.gameType;
-    }
+    }*/
 }

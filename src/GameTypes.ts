@@ -1,15 +1,9 @@
 import * as util from './util';
 
 export class Prompt {
-    readonly text: string;
-    readonly answer: number;
     failedAttempts: number;
-    readonly id: string;
 
-    constructor(text: string, answer: number, id : string) {
-        this.text = text;
-        this.answer = answer;
-        this.id = id;
+    constructor(public readonly text: string, public readonly answer: number, public readonly id : string) {
         this.failedAttempts = 0;
     }
 }
@@ -18,21 +12,15 @@ const MAX_RECENT_PROMPTS_LENGTH = 10;
 const NUM_POSTPONEMENT_TURNS = 10;
 
 class PromptPostponement {
-    public readonly prompt : Prompt;
-    public turnsRemaining : number;
-    constructor(prompt : Prompt, turnsRemaining : number) {
-        this.prompt = prompt;
-        this.turnsRemaining = turnsRemaining;
+    constructor(public readonly prompt : Prompt, public turnsRemaining : number) {
     }
 }
 
 export class PromptScheduler {
-    private readonly gameType : GameType;
     private recentPrompts : Prompt[] = []; // queue
     private postponedPrompts : PromptPostponement[] = [];
 
-    constructor(gameType : GameType) {
-        this.gameType = gameType;
+    constructor(private readonly gameType : GameType) {
     }
 
     postponePrompt(promptToPostpone: Prompt): void {
@@ -87,10 +75,7 @@ export class PromptScheduler {
 }
 
 export abstract class GameType {
-    readonly localizedName: string;
-
-    constructor(localizedName: string) {
-        this.localizedName = localizedName;
+    constructor(public readonly localizedName: string) {
     }
 
     abstract createRandomPrompt() : Prompt;
@@ -98,8 +83,13 @@ export abstract class GameType {
     abstract get persistencyKey(): string;
 }
 
+export class Range { // inclusive (includes both ends of the range)
+    constructor(public min: number, public max: number) {
+    }
+}
+
 export class MultiplicationGameType extends GameType {
-    constructor() {
+    constructor(private aRange : Range, private bRange : Range) {
         super("Умножение");
     }
 
@@ -160,6 +150,23 @@ export class AdditionGameType extends GameType {
 
     get persistencyKey(): string {
         return "addition:v1";
+    }
+}
+
+export class KaloyanHomework_28_12_2025_GameType extends GameType {
+    createRandomPrompt(): Prompt {
+
+
+        const a = util.randomInt(0, 100);
+        const b = util.randomInt(0, 100);
+        return new Prompt(`${a} + ${b}`, a + b, `${this.persistencyKey}:${a}+${b}`);
+    }
+    constructor() {
+        super("KaloyanHomework_28_12_2025");
+    }
+
+    get persistencyKey(): string {
+        return "KaloyanHomework_28_12_2025_GameType:v1";
     }
 }
 

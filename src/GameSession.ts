@@ -2,10 +2,11 @@ import type { AppController } from './AppController';
 import { GameType, GameTypeCtor, Prompt, PromptScheduler } from './GameTypes';
 import { ResultStats } from './ResultStats';
 import type { UIController } from './UI';
+import { GamePage } from './Pages';
 
 export class GameSession {
     appController: AppController;
-    uiController: UIController;
+    gamePage: GamePage;
     errorCount: number;
     gameType: GameType;
     currentPromptIndex: number; // todo rm
@@ -24,10 +25,9 @@ export class GameSession {
     readonly minproblemsCompletedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
-
-    constructor(appController: AppController, gameType: GameType) {
+    constructor(appController: AppController, gamePage : GamePage, gameType: GameType) {
         this.appController = appController;
-        this.uiController = appController.uiController;
+        this.gamePage = gamePage;
         
         this.errorCount = 0;
         this.gameType = gameType;
@@ -38,25 +38,24 @@ export class GameSession {
 
         this.currentPromptIndex = 0;
         this.numCorrectAtFirstTry = 0;
-        this.uiController.gameSession = this;
-        this.uiController.onNewSession();
+        this.gamePage.onNewSession();
 
         this.errorCount = 0;
     }
 
     win(): void {
-        this.uiController.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
+        this.gamePage.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
         const timeElapsed = Date.now() - (this.gameStartTimestamp ?? 0);
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptGenerator.length);
-        this.uiController.onWin(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
+        this.gamePage.onWin(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
 
         this.appController.firebaseController.onGameEnd(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
     }
 
     nextQuestion(): void {
-        this.currentPromptIndex++;
-        this.uiController.updateProgressIndicator();
-        this.uiController.showPrompt();
+        this.currentPrompt = this.gameType.createRandomPrompt();
+        this.gamePage.updateProgressIndicator();
+        this.gamePage.showPrompt();
     }
 
     getCurrentPrompt(): Prompt {
@@ -73,7 +72,7 @@ export class GameSession {
             this.pointsTowardWin++;
             if(this.winConditionsMet()) {
                 this.problemsCompleted++;
-                this.uiController.updateProgressIndicator();
+                this.gamePage.updateProgressIndicator();
                 this.win();
                 return;
             }
@@ -81,20 +80,20 @@ export class GameSession {
                 this.nextQuestion();
             }
             this.problemsCompleted++;
-            this.uiController.updateProgressIndicator();
+            this.gamePage.updateProgressIndicator();
 
-            this.uiController.informUser("✅ Точно така!", "#00c000");
+            this.gamePage.informUser("✅ Точно така!", "#00c000");
             if(this.currentPrompt.failedAttempts === 0) {
                 this.numCorrectAtFirstTry++;
             }
         } else {
             this.pointsTowardWin--;
-            this.uiController.updateProgressIndicator();
+            this.gamePage.updateProgressIndicator();
 
             this.errorCount++;
-            this.uiController.updateSessionTimeIndicator();
-            this.uiController.informUser("❌ Пробвай пак.", "black");
-            this.uiController.showPrompt();
+            this.gamePage.updateSessionTimeIndicator();
+            this.gamePage.informUser("❌ Пробвай пак.", "black");
+            this.gamePage.showPrompt();
             this.currentPrompt.failedAttempts++;
         }
     }
@@ -102,17 +101,17 @@ export class GameSession {
     onUserRequestedAnswerReveal(): void {
         this.pointsTowardWin-=2;
         this.problemsCompleted++;
-        this.uiController.updateProgressIndicator();
+        this.gamePage.updateProgressIndicator();
 
         const answer = this.getCurrentPrompt().answer;
-        this.uiController.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
+        this.gamePage.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
         
         this.promptScheduler.postponePrompt(this.currentPrompt);
 
         this.errorCount++;
-        this.uiController.updateSessionTimeIndicator();
+        this.gamePage.updateSessionTimeIndicator();
 
-        this.uiController.showPrompt();
+        this.gamePage.showPrompt();
         this.getCurrentPrompt().failedAttempts++;
     }
 }
