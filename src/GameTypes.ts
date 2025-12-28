@@ -98,8 +98,8 @@ export class MultiplicationGameType extends GameType {
     }
 
     createRandomPrompt(): Prompt {
-        const a = util.randomInt(0, 10);
-        const b = util.randomInt(0, 10);
+        const a = util.randomInt(this.aRange.min, this.aRange.max);
+        const b = util.randomInt(this.bRange.min, this.bRange.max);
         return new Prompt(`${a} × ${b}`, a * b, `${this.persistencyKey}:${a}:${b}`);
     }
 }

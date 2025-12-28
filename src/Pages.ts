@@ -42,8 +42,7 @@ export class GamePage extends PageRouter.Page {
         super();
 
         this.gameSession = new GameSession(appController, this, gameType);
-        this.onNewSession();
-
+        
         document.getElementById("gameSessionPage")!.innerHTML = this.initialHtml;
         this.log = document.getElementById("log") as HTMLElement;
         console.log("this.log=", this.log);
@@ -83,7 +82,7 @@ export class GamePage extends PageRouter.Page {
             this.updateSessionTimeIndicator();
         }, 1000);
 
-        this.showPrompt();
+        this.onNewSession();
     }
 
     #buildKeypad(): void {
@@ -142,13 +141,13 @@ export class GamePage extends PageRouter.Page {
 
     onNewSession(): void {
         // todo
-        /*this.log.textContent = "";
+        this.log.textContent = "";
         if(!util.isMobileDevice()) {
             this.userAnswerBox.style.display = "block";
         }
         this.updateProgressIndicator();
         this.updateSessionTimeIndicator();
-        this.showPrompt();*/
+        this.showPrompt();
     }
 
     onUserPressedEnter(): void {
