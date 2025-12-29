@@ -258,9 +258,28 @@ input, button {
     width: 50%;
     margin-left: auto;
     margin-right: auto;
+    width: fit-content;
 }
 
 #dashboardPage ul {
     list-style-type: none;
     padding-inline-start: 0;
+}
+
+#dashboardPage li {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+#dashboardPage li:hover {
+    cursor: pointer;
+    background-color: #eee;
+    box-shadow: ;
+}
+
+#dashboardPage > section {
+    border-radius: 3px;
+    border: 2px solid lightgray;
+    margin: 1em;
 }

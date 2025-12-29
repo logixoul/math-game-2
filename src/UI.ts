@@ -84,13 +84,13 @@ export class UIController {
         });
 
         this.appController.firebaseController.bus.on("loggedIn", ({ user }) => {
-                this.appController.userEmail = user.email;
-                this.userInfo.innerText = "Здравей, " + user.email;
+                this.appController.user = user;
+                this.userInfo.innerText = "Здравей, " + user.displayName;
                 this.loginBtn.style.display = "none";
                 this.logoutBtn.style.display = "inline";
         });
         this.appController.firebaseController.bus.on("loggedOut", () => {
-                this.appController.userEmail = null;
+                this.appController.user = null;
                 this.userInfo.innerText = "Не си влязъл в системата";
                 this.loginBtn.style.display = "inline";
                 this.logoutBtn.style.display = "none";

@@ -2,11 +2,12 @@ import { GameSession } from './GameSession';
 import { UIController } from './UI';
 import { FirebaseController } from "./FirebaseController";
 import * as GameTypes from './GameTypes';
+import * as FirebaseAuth from "firebase/auth";
 
 export class AppController {
     uiController: UIController;
     firebaseController: FirebaseController;
-    userEmail: string | null = null; // null when not logged in
+    user: FirebaseAuth.User | null = null; // null when not logged in
     
     constructor() {
         this.firebaseController = new FirebaseController();

@@ -1,14 +1,19 @@
 import * as PageRouter from "../PageRouter"
 import { AppController } from "../AppController";
+import * as FirebaseAuth from "firebase/auth";
 
 export class DashboardPage extends PageRouter.Page {
     private freePlayGameTypeList : HTMLUListElement;
     private helloNameContainer : HTMLSpanElement;
     
     private readonly initialHtml = `
-        <h2>Привет, <span id="helloNameContainer"></span>!</h2>
+        <h2><span id="helloNameContainer"></span></h2>
         <section id="currentHomeworkDashboardSection">
-            <h3>Сегашно домашно</h3>
+            <h3>Сегашно домашно за теб</h3>
+            <ul>
+            <li>Домашно 1</li>
+            <li>Домашно 2</li>
+            </ul>
         </section>
         <section id="freePlayDashboardSection">
             <h3>Игра по избор</h3>
@@ -25,17 +30,20 @@ export class DashboardPage extends PageRouter.Page {
         this.helloNameContainer = document.getElementById("helloNameContainer") as HTMLSpanElement;
         this.initGameTypeList();
 
-        if(this.appController.userEmail !== null) {
-            this.helloNameContainer.innerText = this.appController.userEmail;
-        }
-
+        this.helloNameContainer.innerText = this.createGreeting();
+        
         // todo: unsubscribe on navigating-away?
         this.appController.firebaseController.bus.on("loggedIn", ({ user }) => {
-            this.helloNameContainer.innerText = user.email!;
+            this.helloNameContainer.innerText = this.createGreeting()
         });
         this.appController.firebaseController.bus.on("loggedOut", () => {
-            this.helloNameContainer.innerText = "страннико";
+            this.helloNameContainer.innerText = this.createGreeting()
         });
+    }
+
+    createGreeting() {
+        const displayName : string = this.appController.user?.displayName ?? "страннико";
+        return "Привет, " + displayName + "!";
     }
 
     private initGameTypeList(): void {
