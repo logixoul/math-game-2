@@ -52,6 +52,28 @@ export class UIController {
                 this.menuContents.style.display = "flex";
             }
         });
+        document.addEventListener("click", (event) => {
+            if (this.menuContents.style.display !== "flex") {
+                return;
+            }
+            const target = event.target as Node | null;
+            if (!target) {
+                return;
+            }
+            if (this.menuContents.contains(target) || this.btnMenu.contains(target)) {
+                return;
+            }
+            this.menuContents.style.display = "none";
+        });
+        this.menuContents.addEventListener("click", (event) => {
+            const target = event.target as HTMLElement | null;
+            if (!target) {
+                return;
+            }
+            if (target.closest("a")) {
+                this.menuContents.style.display = "none";
+            }
+        });
 
         this.loginBtn.addEventListener("click", () => {
             this.appController.firebaseController.login();
