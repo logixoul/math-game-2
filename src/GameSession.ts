@@ -10,6 +10,7 @@ export class GameSession {
     errorCount: number;
     gameType: GameType;
     numCorrectAtFirstTry: number;
+    numWrongAtFirstTry: number;
 
     promptScheduler: PromptScheduler;
     promptGenerator: Generator<Prompt, void, unknown>;
@@ -20,8 +21,8 @@ export class GameSession {
     problemsCompleted: number = 0;
     gameStartTimestamp: number = Date.now();
     
-    readonly pointsRequiredToWin: number = 20;
-    readonly minproblemsCompletedToWin: number = 20;
+    readonly pointsRequiredToWin: number = 1;
+    readonly minproblemsCompletedToWin: number = 2;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
     constructor(appController: AppController, gamePage : GameSessionPage, gameType: GameType) {
@@ -36,6 +37,7 @@ export class GameSession {
         this.currentPrompt = this.promptGenerator.next().value!;
 
         this.numCorrectAtFirstTry = 0;
+        this.numWrongAtFirstTry = 0;
         
         this.errorCount = 0;
     }
@@ -43,7 +45,8 @@ export class GameSession {
     win(): void {
         this.gamePage.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
         const timeElapsed = Date.now() - (this.gameStartTimestamp ?? 0);
-        const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / this.promptGenerator.length);
+        const total = this.numCorrectAtFirstTry + this.numWrongAtFirstTry;
+        const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / total);
         this.gamePage.onWin(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
 
         this.appController.firebaseController.onGameEnd(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
@@ -84,6 +87,7 @@ export class GameSession {
                 this.numCorrectAtFirstTry++;
             }
         } else {
+            this.numWrongAtFirstTry++;
             this.pointsTowardWin--;
             this.gamePage.updateProgressIndicator();
 
@@ -94,6 +98,7 @@ export class GameSession {
             this.currentPrompt.failedAttempts++;
         }
     }
+
 
     onUserRequestedAnswerReveal(): void {
         this.pointsTowardWin-=2;
