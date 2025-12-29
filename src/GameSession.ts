@@ -21,8 +21,8 @@ export class GameSession {
     problemsCompleted: number = 0;
     gameStartTimestamp: number = Date.now();
     
-    readonly pointsRequiredToWin: number = 1;
-    readonly minproblemsCompletedToWin: number = 2;
+    readonly pointsRequiredToWin: number = 20;
+    readonly minproblemsCompletedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
     constructor(appController: AppController, gamePage : GameSessionPage, gameType: GameType) {
