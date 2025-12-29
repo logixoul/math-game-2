@@ -1,4 +1,4 @@
-import * as PromptTypes from './GameTypes';
+import * as GameTypes from './GameTypes';
 import { QuickDebugLogger } from './QuickDebugLogger';
 import type { AppController } from './AppController';
 import type { GameTypeCtor } from './GameTypes';
@@ -6,7 +6,8 @@ import type { GameSession } from './GameSession';
 import { ResultStats } from './ResultStats';
 import { PageRouter, Page } from './PageRouter';
 import * as util from './util'
-import * as Pages from './Pages'
+import { GameSessionPage } from './Pages/GameSessionPage';
+import { DashboardPage } from './Pages/DashboardPage';
 
 export class UIController {
     private middlePane = document.getElementById("middlePane") as HTMLElement;
@@ -35,11 +36,11 @@ export class UIController {
                     window.location.hash = "dashboard";
                     return;
                 }
-                this.currentPage = new Pages.GamePage(this.appController, gameType);
+                this.currentPage = new GameSessionPage(this.appController, gameType);
                 return;
             }
             if (e.newPage === "dashboard") {
-                this.currentPage = new Pages.DashboardPage(this.appController);
+                this.currentPage = new DashboardPage(this.appController);
             }
         })
         this.pageRouter.start();

@@ -88,8 +88,10 @@ export class Range { // inclusive (includes both ends of the range)
     }
 }
 
+//function maybeAddSignAndOrParens
+
 export class MultiplicationGameType extends GameType {
-    constructor(private aRange : Range, private bRange : Range) {
+    constructor(private range : Range) {
         super("Умножение");
     }
 
@@ -98,14 +100,15 @@ export class MultiplicationGameType extends GameType {
     }
 
     createRandomPrompt(): Prompt {
-        const a = util.randomInt(this.aRange.min, this.aRange.max);
-        const b = util.randomInt(this.bRange.min, this.bRange.max);
-        return new Prompt(`${a} × ${b}`, a * b, `${this.persistencyKey}:${a}:${b}`);
+        const a = util.randomInt(this.range.min, this.range.max);
+        const b = util.randomInt(this.range.min, this.range.max);
+        const bStr = ensureNegativeNumbersHaveParens(b);
+        return new Prompt(`${a} × ${bStr}`, a * b, `${this.persistencyKey}:${a}:${b}`);
     }
 }
 
 export class DivisionGameType extends GameType {
-    constructor() {
+    constructor(private range : Range) {
         super("Деление");
     }
 
@@ -114,52 +117,92 @@ export class DivisionGameType extends GameType {
     }
 
     createRandomPrompt(): Prompt {
-        const a = util.randomInt(0, 10);
-        const b = util.randomInt(1, 10);
+        let a : number;
+        let b : number
+        do {
+            a = util.randomInt(this.range.min, this.range.max);
+            b = util.randomInt(this.range.min, this.range.max);
+        } while (b === 0);
         const divisee = a * b;
         const divisor = b;
-        return new Prompt(`${divisee} : ${divisor}`, a, `${this.persistencyKey}:${divisee}:${divisor}`);
+        const divisorStr = ensureNegativeNumbersHaveParens(divisor);
+        return new Prompt(`${divisee} : ${divisorStr}`, a, `${this.persistencyKey}:${divisee}:${divisor}`);
     }
 }
 
-export class SubtractionGameType extends GameType {
-    constructor() {
+export class SubtractionFifthGradeGameType extends GameType {
+    constructor(private rangeMax : number) {
         super("Изваждане (5 клас)");
     }
 
     get persistencyKey(): string {
-        return "subtraction.v1";
+        return "subtractionFifthGrade.v1";
     }
 
     createRandomPrompt(): Prompt {
-        const a = util.randomInt(0, 100);
+        const a = util.randomInt(0, this.rangeMax);
         const b = util.randomInt(0, a);
-        return new Prompt(`${a} - ${b}`, a - b,  `${this.persistencyKey}:${a}-${b}`);
+        return new Prompt(`${a} - ${b}`, a - b,  `${this.persistencyKey}:${a}:${b}`);
     }
 }
 
-export class AdditionGameType extends GameType {
-    createRandomPrompt(): Prompt {
-        const a = util.randomInt(0, 100);
-        const b = util.randomInt(0, 100);
-        return new Prompt(`${a} + ${b}`, a + b, `${this.persistencyKey}:${a}+${b}`);
+export class SubtractionSixthGradeGameType extends GameType {
+    constructor(private range : Range) {
+        super("Изваждане (6 клас)");
     }
-    constructor() {
+
+    get persistencyKey(): string {
+        return "subtractionSixthGrade.v1";
+    }
+
+    createRandomPrompt(): Prompt {
+        const a = util.randomInt(this.range.min, this.range.max);
+        const b = util.randomInt(this.range.min, this.range.max);
+        const bStr = ensureNegativeNumbersHaveParens(b)
+        return new Prompt(`${a} - ${bStr}`, a - b,  `${this.persistencyKey}:${a}:${b}`);
+    }
+}
+
+export class AdditionFifthGradeGameType extends GameType {
+    createRandomPrompt(): Prompt {
+        const a = util.randomInt(0, this.rangeMax);
+        const b = util.randomInt(0, this.rangeMax);
+        return new Prompt(`${a} + ${b}`, a + b, `${this.persistencyKey}:${a}:${b}`);
+    }
+    constructor(private rangeMax : number) {
         super("Събиране (5 клас)");
     }
 
     get persistencyKey(): string {
-        return "addition.v1";
+        return "additionFifthGrade.v1";
+    }
+}
+
+export class AdditionSixthGradeGameType extends GameType {
+    createRandomPrompt(): Prompt {
+        const a = util.randomInt(this.range.min, this.range.max);
+        const b = util.randomInt(this.range.min, this.range.max);
+        const bStr = ensureNegativeNumbersHaveParens(b);
+        return new Prompt(`${a} + ${bStr}`, a + b, `${this.persistencyKey}:${a}:${b}`);
+    }
+    constructor(private range : Range) {
+        super("Събиране (6 клас)");
+    }
+
+    get persistencyKey(): string {
+        return "additionSixthGrade.v1";
     }
 }
 
 export class KaloyanHomework_28_12_2025_GameType extends GameType {
+    readonly mul = new MultiplicationGameType(new Range(-12, 12))
+    readonly div = new DivisionGameType(new Range(-10, 10))
+    readonly add = new AdditionSixthGradeGameType(new Range(-40, 40));
+    readonly sub = new SubtractionSixthGradeGameType(new Range(-40, 40));
+
     createRandomPrompt(): Prompt {
-
-
-        const a = util.randomInt(0, 100);
-        const b = util.randomInt(0, 100);
-        return new Prompt(`${a} + ${b}`, a + b, `${this.persistencyKey}:${a}+${b}`);
+        const randomIndex : number = util.randomInt(0, 3);
+        return [this.mul,this.div,this.add,this.sub][randomIndex].createRandomPrompt();
     }
     constructor() {
         super("KaloyanHomework_28_12_2025");
@@ -168,6 +211,13 @@ export class KaloyanHomework_28_12_2025_GameType extends GameType {
     get persistencyKey(): string {
         return "KaloyanHomework_28_12_2025_GameType.v1";
     }
+}
+
+function ensureNegativeNumbersHaveParens(n : number) {
+    if(n < 0)
+        return `(${n})`
+    else
+        return `${n}`
 }
 
 export type GameTypeCtor = new () => GameType;

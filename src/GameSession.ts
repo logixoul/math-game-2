@@ -2,11 +2,11 @@ import type { AppController } from './AppController';
 import { GameType, GameTypeCtor, Prompt, PromptScheduler } from './GameTypes';
 import { ResultStats } from './ResultStats';
 import type { UIController } from './UI';
-import { GamePage } from './Pages';
+import { GameSessionPage } from './Pages/GameSessionPage';
 
 export class GameSession {
     appController: AppController;
-    gamePage: GamePage;
+    gamePage: GameSessionPage;
     errorCount: number;
     gameType: GameType;
     numCorrectAtFirstTry: number;
@@ -24,7 +24,7 @@ export class GameSession {
     readonly minproblemsCompletedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
-    constructor(appController: AppController, gamePage : GamePage, gameType: GameType) {
+    constructor(appController: AppController, gamePage : GameSessionPage, gameType: GameType) {
         this.appController = appController;
         this.gamePage = gamePage;
         
@@ -108,7 +108,7 @@ export class GameSession {
         this.errorCount++;
         this.gamePage.updateSessionTimeIndicator();
 
-        this.gamePage.showPrompt();
         this.getCurrentPrompt().failedAttempts++;
+        this.nextQuestion();
     }
 }

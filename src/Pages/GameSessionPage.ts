@@ -1,61 +1,10 @@
-import * as PageRouter from "./PageRouter"
-import { GameSession } from "./GameSession";
-import { AppController } from "./AppController";
-import { ResultStats } from "./ResultStats";
-import * as util from "./util"
-import * as PromptTypes from "./GameTypes";
+import * as PageRouter from "../PageRouter"
+import { GameSession } from "../GameSession";
+import { AppController } from "../AppController";
+import { ResultStats } from "../ResultStats";
+import * as util from "../util"
 
-export class DashboardPage extends PageRouter.Page {
-    private freePlayGameTypeList : HTMLUListElement;
-    private helloNameContainer : HTMLSpanElement;
-    
-    private readonly initialHtml = `
-        <h2>Привет, <span id="helloNameContainer"></span>!</h2>
-        <section id="currentHomeworkDashboardSection">
-            <h3>Сегашно домашно</h3>
-        </section>
-        <section id="freePlayDashboardSection">
-            <h3>Игра по избор</h3>
-            <ul id="freePlayGameTypeList">
-            </ul>
-        </section>
-    `;
-
-    constructor(private appController : AppController) {
-        super();
-
-        document.getElementById("dashboardPage")!.innerHTML = this.initialHtml;
-        this.freePlayGameTypeList = document.getElementById("freePlayGameTypeList") as HTMLUListElement;
-        this.helloNameContainer = document.getElementById("helloNameContainer") as HTMLSpanElement;
-        this.initGameTypeList();
-
-        if(this.appController.userEmail !== null) {
-            this.helloNameContainer.innerText = this.appController.userEmail;
-        }
-
-        // todo: unsubscribe on navigating-away?
-        this.appController.firebaseController.bus.on("loggedIn", ({ user }) => {
-            this.helloNameContainer.innerText = user.email!;
-        });
-        this.appController.firebaseController.bus.on("loggedOut", () => {
-            this.helloNameContainer.innerText = "страннико";
-        });
-    }
-
-    private initGameTypeList(): void {
-        const gameTypes = this.appController.getAvailableGameTypes();
-        gameTypes.forEach((gameType: PromptTypes.GameType) => {
-            const gameTypeLink = document.createElement("li") as HTMLLIElement;
-            gameTypeLink.addEventListener("click", () => {
-                window.location.hash = `game?type=${encodeURIComponent(gameType.persistencyKey)}`;
-            });
-            gameTypeLink.innerText = gameType.localizedName;
-            this.freePlayGameTypeList.appendChild(gameTypeLink);
-        });
-    }
-}
-
-export class GamePage extends PageRouter.Page {
+export class GameSessionPage extends PageRouter.Page {
     private gameSession : GameSession;
     
     private log : HTMLElement;
@@ -157,6 +106,7 @@ export class GamePage extends PageRouter.Page {
         this.#setupKeypadButton(btnArray, 0, 2, "7");
         this.#setupKeypadButton(btnArray, 1, 2, "8");
         this.#setupKeypadButton(btnArray, 2, 2, "9");
+        this.#setupKeypadButton(btnArray, 0, 3, "-");
         this.#setupKeypadButton(btnArray, 1, 3, "0");
         this.#setupKeypadButton(btnArray, 3, 2, "<img src='assets/backspace.svg'>", () => {
             //this.userAnswerBox.value = this.userAnswerBox.value.slice(0, -1);
@@ -204,13 +154,10 @@ export class GamePage extends PageRouter.Page {
         this.gameSession.onUserAnswered(userAnswer);
         this.userAnswerBox.value = "";
     }
-    private ensureTextContainsSign(n: number): string {
-        return (n >= 0 ? "+" : "") + n.toString();
-    }
     updateProgressIndicator(): void {
         const progressIndicator = document.getElementById("progressIndicator") as HTMLElement;
         progressIndicator.innerHTML = "<b>Точки: " +
-            this.ensureTextContainsSign(this.gameSession.pointsTowardWin) +
+            util.ensureTextContainsSign(this.gameSession.pointsTowardWin) +
             '</b>.<br>За победа ти трябват още ' +
             (this.gameSession.pointsRequiredToWin - this.gameSession.pointsTowardWin) +
             " точки и " + (this.gameSession.minproblemsCompletedToWin - this.gameSession.problemsCompleted) + " пробвани задачи";
