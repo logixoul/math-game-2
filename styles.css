@@ -7,6 +7,7 @@
 :root {
     --bottom-pane-height: 20rem;
     --header-text-color: white;
+    --darker-gray: #e0e1e3;
 }
 
 /* gpt */
@@ -144,7 +145,7 @@ input, button {
     font-size: 1.2em !important;
     text-align: center;
     
-    background-color: #e0e1e3;
+    background-color: var(--darker-gray);
 }
 #progressIndicator {
     color: green;
@@ -164,10 +165,31 @@ input, button {
     font-size: 1.4em !important;
     padding: 0.5em;
     margin: 0.5em auto;
-    display: none;
     border-radius: 10px;
     border: 2px solid #ccc;
     box-sizing: border-box;
+}
+
+#inputMethodDesktop {
+    display: flex;
+    flex-direction: row;
+    width: 70%;
+    margin: 0px auto;
+}
+
+#desktopBtnRequestAnswerReveal {
+    background-color: var(--darker-gray);
+    color: #f40;
+    font-size: 1.4em !important;
+    padding: 0.5em;
+    margin: 0.5em auto;
+    border: 0px solid transparent;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+#inputMethodDesktop {
+    display: none;
 }
 
 #keypad {

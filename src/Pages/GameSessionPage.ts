@@ -15,6 +15,8 @@ export class GameSessionPage extends PageRouter.Page {
     private userAnswerBox : HTMLInputElement;
     private keypad : HTMLElement;
     private numericEntry : HTMLElement;
+    private inputMethodDesktop : HTMLDivElement;
+    private desktopBtnRequestAnswerReveal : HTMLButtonElement;
     private btnStartOver : HTMLButtonElement;
     private indicators : HTMLElement;
     private latestAnswerField!: HTMLSpanElement;
@@ -26,7 +28,10 @@ export class GameSessionPage extends PageRouter.Page {
         <button id="btnStartOver" style="display:none;">ОТНАЧАЛО :)</button>
         <div id="keypadAndIndicators">
             <div id="numericEntry">
-                <input id="userAnswerBox" type="text" enterkeyhint="Да" name="userAnswer" placeholder="Твоят отговор" autocomplete="off"></input>
+                <div id="inputMethodDesktop">
+                    <input id="userAnswerBox" type="text" enterkeyhint="Да" name="userAnswer" placeholder="Твоят отговор" autocomplete="off"></input>
+                    <button id="desktopBtnRequestAnswerReveal">Не знам</button>
+                </div>
                 <div id="keypad"></div>
             </div>
             <div id="indicators">
@@ -45,7 +50,9 @@ export class GameSessionPage extends PageRouter.Page {
         
         this.keypadAndIndicators = document.getElementById("keypadAndIndicators") as HTMLElement;
         this.userAnswerBox = document.getElementById("userAnswerBox") as HTMLInputElement;
-        this.numericEntry = document.getElementById("numericEntry") as HTMLInputElement;
+        this.numericEntry = document.getElementById("numericEntry") as HTMLDivElement;
+        this.inputMethodDesktop = document.getElementById("inputMethodDesktop") as HTMLDivElement;
+        this.desktopBtnRequestAnswerReveal = document.getElementById("desktopBtnRequestAnswerReveal") as HTMLButtonElement;
         this.btnStartOver = document.getElementById("btnStartOver") as HTMLButtonElement;
         this.indicators = document.getElementById("indicators") as HTMLElement;
         this.keypad = document.getElementById("keypad") as HTMLElement;
@@ -55,6 +62,10 @@ export class GameSessionPage extends PageRouter.Page {
             this.btnStartOver.style.display = "none";
             this.beginNewSession();
         });
+
+        this.desktopBtnRequestAnswerReveal.addEventListener("click", () => {
+            this.gameSession.onUserRequestedAnswerReveal();
+        })
         
         this.userAnswerBox.addEventListener("keydown", (e: KeyboardEvent) => {
             if(e.key === "Enter") {
@@ -67,10 +78,10 @@ export class GameSessionPage extends PageRouter.Page {
 
         if(util.isMobileDevice()) {
             this.keypad.style.display = "grid";
-            this.userAnswerBox.style.display = "none";
+            this.inputMethodDesktop.style.display = "none";
         } else {
             this.keypad.style.display = "none";
-            this.userAnswerBox.style.display = "block";
+            this.inputMethodDesktop.style.display = "block";
         }
 
         this.timerId = window.setInterval(() => {
