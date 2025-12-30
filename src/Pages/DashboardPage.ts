@@ -8,6 +8,7 @@ export class DashboardPage extends PageRouter.Page {
     
     private readonly initialHtml = `
         <h2><span id="helloNameContainer"></span></h2>
+        <p id="subtitle">Готов ли си?</p>
         <section id="currentHomeworkDashboardSection">
             <h3>Сегашно домашно за теб</h3>
             <ul>
@@ -16,7 +17,7 @@ export class DashboardPage extends PageRouter.Page {
             </ul>
         </section>
         <section id="freePlayDashboardSection">
-            <h3>Игра по избор</h3>
+            <h3>Свободна тренировка</h3>
             <ul id="freePlayGameTypeList">
             </ul>
         </section>

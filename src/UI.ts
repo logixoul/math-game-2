@@ -88,6 +88,10 @@ export class UIController {
                 this.userInfo.innerText = "Здравей, " + user.displayName;
                 this.loginBtn.style.display = "none";
                 this.logoutBtn.style.display = "inline";
+
+                if(user.email === "logixoul@gmail.com") {
+                    (document.getElementById("dbg") as HTMLButtonElement).style.display = "block";
+                }
         });
         this.appController.firebaseController.bus.on("loggedOut", () => {
                 this.appController.user = null;

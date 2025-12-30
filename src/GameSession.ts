@@ -22,7 +22,7 @@ export class GameSession {
     gameStartTimestamp: number = Date.now();
     
     readonly pointsRequiredToWin: number = 20;
-    readonly minproblemsCompletedToWin: number = 20;
+    readonly minProblemsCompletedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
     constructor(appController: AppController, gamePage : GameSessionPage, gameType: GameType) {
@@ -43,7 +43,7 @@ export class GameSession {
     }
 
     win(): void {
-        this.gamePage.informUser("КЪРТИШ! ПОБЕДА! 🥳", "green", true);
+        this.gamePage.informUser("КЪРТИШ! ПОБЕДА! 🥳\nМоля направи скрийншот и ми го пратѝ.", "green", true);
         const timeElapsed = Date.now() - (this.gameStartTimestamp ?? 0);
         const total = this.numCorrectAtFirstTry + this.numWrongAtFirstTry;
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / total);
@@ -63,7 +63,7 @@ export class GameSession {
     }
     winConditionsMet(): boolean {
         const enoughPoints: boolean = this.pointsTowardWin >= this.pointsRequiredToWin;
-        const enoughAnswered: boolean = this.problemsCompleted >= this.minproblemsCompletedToWin;
+        const enoughAnswered: boolean = this.problemsCompleted >= this.minProblemsCompletedToWin;
         const withinTimeLimit: boolean = (Date.now() - this.gameStartTimestamp) <= this.maxSessionDurationMs;
         return enoughPoints && enoughAnswered && withinTimeLimit;
     }

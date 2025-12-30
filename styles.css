@@ -222,9 +222,10 @@ input, button {
 }
 
 #middlePane {
-    /*background: url("assets/background.png") no-repeat;
-    background-attachment: local;
-    background-size: var(--header-width) var(--header-height);*/
+    background: url("assets/bodybg.png") no-repeat;
+    background-position-y: 10%;
+    background-size:cover;
+
     margin: 0;
     overflow-y: auto;        /* scroll within itself */
     box-sizing: border-box;
@@ -274,12 +275,23 @@ input, button {
 
 #dashboardPage li:hover {
     cursor: pointer;
-    background-color: #eee;
-    box-shadow: ;
+    background-color: rgba(0,0,0,0.03);
+    outline: 1px solid rgba(0,0,0, 0.1);
+    box-sizing: border-box;
+    sbox-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 #dashboardPage > section {
     border-radius: 3px;
-    border: 2px solid lightgray;
+    border: 1px solid rgba(0,0,0,.2);
+    box-shadow: 0 2px 50px rgba(0,0,0,0.1);
+    background: url("assets/gradbg.png") no-repeat;
+    
     margin: 1em;
+}
+#subtitle {
+    font-weight: 200;
+    font-style: italic;
+    margin-top: 0px;
+    font-size: 120%;
 }

@@ -3,6 +3,7 @@ import { GameSession } from "../GameSession";
 import { AppController } from "../AppController";
 import { ResultStats } from "../ResultStats";
 import * as util from "../util"
+import * as GameTypes from "../GameTypes"
 
 export class GameSessionPage extends PageRouter.Page {
     private gameSession : GameSession;
@@ -31,11 +32,9 @@ export class GameSessionPage extends PageRouter.Page {
             </div>
         </div>`;
 
-    constructor(private appController : AppController, private gameType : GameType) {
+    constructor(private appController : AppController, private gameType : GameTypes.GameType) {
         super();
 
-        this.gameSession = new GameSession(appController, this, gameType);
-        
         document.getElementById("gameSessionPage")!.innerHTML = this.initialHtml;
         this.log = document.getElementById("log") as HTMLElement;
         
@@ -48,9 +47,7 @@ export class GameSessionPage extends PageRouter.Page {
         
         this.btnStartOver.addEventListener("click", () => {
             this.btnStartOver.style.display = "none";
-            this.gameSession = new GameSession(this.appController, this, this.gameType);
-            this.onNewSession();
-            this.userAnswerBox.focus();
+            this.beginNewSession();
         });
         
         this.userAnswerBox.addEventListener("keydown", (e: KeyboardEvent) => {
@@ -60,7 +57,6 @@ export class GameSessionPage extends PageRouter.Page {
             return false;
         });
 
-        this.userAnswerBox.focus();
         this.#buildKeypad();
 
         if(util.isMobileDevice()) {
@@ -75,7 +71,7 @@ export class GameSessionPage extends PageRouter.Page {
             this.updateSessionTimeIndicator();
         }, 1000);
 
-        this.onNewSession();
+        this.beginNewSession();
     }
 
     #buildKeypad(): void {
@@ -133,8 +129,9 @@ export class GameSessionPage extends PageRouter.Page {
         return btn;
     }
 
-    onNewSession(): void {
-        // todo
+    beginNewSession(): void {
+        this.gameSession = new GameSession(this.appController, this, this.gameType);
+        
         this.log.textContent = "";
         if(!util.isMobileDevice()) {
             this.userAnswerBox.style.display = "block";
@@ -142,6 +139,8 @@ export class GameSessionPage extends PageRouter.Page {
         this.updateProgressIndicator();
         this.updateSessionTimeIndicator();
         this.showPrompt();
+        this.userAnswerBox.focus();
+
     }
 
     onUserPressedEnter(): void {
@@ -160,7 +159,7 @@ export class GameSessionPage extends PageRouter.Page {
             util.ensureTextContainsSign(this.gameSession.pointsTowardWin) +
             '</b>.<br>За победа ти трябват още ' +
             (this.gameSession.pointsRequiredToWin - this.gameSession.pointsTowardWin) +
-            " точки и " + (this.gameSession.minproblemsCompletedToWin - this.gameSession.problemsCompleted) + " пробвани задачи";
+            " точки и " + (this.gameSession.minProblemsCompletedToWin - this.gameSession.problemsCompleted) + " пробвани задачи";
     }
     updateSessionTimeIndicator(): void {
         const progressIndicator = document.getElementById("sessionTimeIndicator") as HTMLElement;
