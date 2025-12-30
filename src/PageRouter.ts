@@ -1,7 +1,7 @@
 import { TypedEventEmitter } from "./TypedEventEmitter";
 
-export class Page {
-
+export abstract class Page {
+    abstract onLeave() : void;
 }
 
 type PageMap = Map<string, HTMLElement>;

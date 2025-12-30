@@ -18,11 +18,12 @@ export class GameSession {
     
     // from gpt suggestions (for winconditions):
     pointsTowardWin: number = 0;
-    problemsCompleted: number = 0;
+    maxReachedPointsTowardWin: number = 0;
+    problemsAttempted: number = 0;
     gameStartTimestamp: number = Date.now();
     
     readonly pointsRequiredToWin: number = 20;
-    readonly minProblemsCompletedToWin: number = 20;
+    readonly minProblemsAttemptedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
     constructor(appController: AppController, gamePage : GameSessionPage, gameType: GameType) {
@@ -41,15 +42,17 @@ export class GameSession {
         
         this.errorCount = 0;
     }
-
-    win(): void {
-        this.gamePage.informUser("КЪРТИШ! ПОБЕДА! 🥳\nМоля направи скрийншот и ми го пратѝ.", "green", true);
+    public getResultStats() {
         const timeElapsed = Date.now() - (this.gameStartTimestamp ?? 0);
         const total = this.numCorrectAtFirstTry + this.numWrongAtFirstTry;
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / total);
-        this.gamePage.onWin(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
-
-        this.appController.firebaseController.onGameEnd(new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry));
+        const percentCorrectOnFirstTry_Safe = total == 0 ? 0 : percentCorrectOnFirstTry;
+        return new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry_Safe, this.pointsTowardWin, this.problemsAttempted, this.maxReachedPointsTowardWin)
+    }
+    win(): void {
+        const stats = this.getResultStats();
+        this.gamePage.onWin(stats);
+        this.appController.firebaseController.onGameEnd(stats);
     }
 
     nextQuestion(): void {
@@ -63,16 +66,18 @@ export class GameSession {
     }
     winConditionsMet(): boolean {
         const enoughPoints: boolean = this.pointsTowardWin >= this.pointsRequiredToWin;
-        const enoughAnswered: boolean = this.problemsCompleted >= this.minProblemsCompletedToWin;
+        const enoughAnswered: boolean = this.problemsAttempted >= this.minProblemsAttemptedToWin;
         const withinTimeLimit: boolean = (Date.now() - this.gameStartTimestamp) <= this.maxSessionDurationMs;
         return enoughPoints && enoughAnswered && withinTimeLimit;
     }
     onUserAnswered(userAnswer: number): void {
         if(userAnswer === this.currentPrompt.answer) {
             this.pointsTowardWin++;
+            this.maxReachedPointsTowardWin = Math.max(this.pointsTowardWin, this.maxReachedPointsTowardWin);
+
             this.gamePage.informUser("✅ Точно така!", "#00c000");
             if(this.winConditionsMet()) {
-                this.problemsCompleted++;
+                this.problemsAttempted++;
                 this.gamePage.updateProgressIndicator();
                 this.win();
                 return;
@@ -80,7 +85,7 @@ export class GameSession {
             else {
                 this.nextQuestion();
             }
-            this.problemsCompleted++;
+            this.problemsAttempted++;
             this.gamePage.updateProgressIndicator();
 
             if(this.currentPrompt.failedAttempts === 0) {
@@ -102,7 +107,7 @@ export class GameSession {
 
     onUserRequestedAnswerReveal(): void {
         this.pointsTowardWin-=2;
-        this.problemsCompleted++;
+        this.problemsAttempted++;
         this.gamePage.updateProgressIndicator();
 
         const answer = this.getCurrentPrompt().answer;

@@ -7,23 +7,28 @@ import * as GameTypes from "../GameTypes"
 
 export class GameSessionPage extends PageRouter.Page {
     private gameSession : GameSession;
+    private inActiveSession  = true;
+    private timerId : number;
     
     private log : HTMLElement;
     private keypadAndIndicators : HTMLElement;
     private userAnswerBox : HTMLInputElement;
+    private keypad : HTMLElement;
+    private numericEntry : HTMLElement;
     private btnStartOver : HTMLButtonElement;
     private indicators : HTMLElement;
-    private keypad : HTMLElement;
     private latestAnswerField!: HTMLSpanElement;
     private middlePane: HTMLDivElement;
 
     private readonly initialHtml = `
         <div id="log">
         </div>
-        <input id="userAnswerBox" type="text" enterkeyhint="Да" name="userAnswer" placeholder="Твоят отговор" autocomplete="off"></input>
         <button id="btnStartOver" style="display:none;">ОТНАЧАЛО :)</button>
         <div id="keypadAndIndicators">
-            <div id="keypad"></div>
+            <div id="numericEntry">
+                <input id="userAnswerBox" type="text" enterkeyhint="Да" name="userAnswer" placeholder="Твоят отговор" autocomplete="off"></input>
+                <div id="keypad"></div>
+            </div>
             <div id="indicators">
                 <div id="progressIndicator">
                 </div>
@@ -40,6 +45,7 @@ export class GameSessionPage extends PageRouter.Page {
         
         this.keypadAndIndicators = document.getElementById("keypadAndIndicators") as HTMLElement;
         this.userAnswerBox = document.getElementById("userAnswerBox") as HTMLInputElement;
+        this.numericEntry = document.getElementById("numericEntry") as HTMLInputElement;
         this.btnStartOver = document.getElementById("btnStartOver") as HTMLButtonElement;
         this.indicators = document.getElementById("indicators") as HTMLElement;
         this.keypad = document.getElementById("keypad") as HTMLElement;
@@ -67,11 +73,37 @@ export class GameSessionPage extends PageRouter.Page {
             this.userAnswerBox.style.display = "block";
         }
 
-        window.setInterval(() => {
+        this.timerId = window.setInterval(() => {
+            if(!this.inActiveSession) {
+                return;
+            }
+            if(this.getTimeLeftMs() <= 0) {
+                this.timeOut();
+                return;
+            }
             this.updateSessionTimeIndicator();
         }, 1000);
 
         this.beginNewSession();
+    }
+
+    onLeave() {
+        window.clearInterval(this.timerId);
+    }
+
+    private timeOut() {
+        this.informUser(`Времето ти свърши!`, "red", true);
+        this.informUser(`Това не значи че си се провалил, а че още се учиш 😜.
+            \nМоля направи скрийншот и ми го пратѝ!`, "black", true);
+        const stats = this.gameSession.getResultStats();
+        
+        this.informUser("   • Ти игра в режим " + stats.gameType.localizedName + ".", "black");
+        this.informUser("   • Текущи точки: " + stats.pointsTowardWin + ".", "black");
+        this.informUser("   • Максимални точки този път: " + stats.maxReachedPointsTowardWin + ".", "black");
+        this.informUser("   • Пробвани задачи: " + stats.problemsAttempted + ".", "black");
+        this.informUser("   • Позна " + stats.percentCorrectOnFirstTry + "% от първи опит.", "black");
+        
+        this.onSessionFinished();
     }
 
     #buildKeypad(): void {
@@ -133,14 +165,13 @@ export class GameSessionPage extends PageRouter.Page {
         this.gameSession = new GameSession(this.appController, this, this.gameType);
         
         this.log.textContent = "";
-        if(!util.isMobileDevice()) {
-            this.userAnswerBox.style.display = "block";
-        }
+        this.numericEntry.style.display = "block";
         this.updateProgressIndicator();
         this.updateSessionTimeIndicator();
         this.showPrompt();
         this.userAnswerBox.focus();
 
+        this.inActiveSession = true;
     }
 
     onUserPressedEnter(): void {
@@ -159,11 +190,14 @@ export class GameSessionPage extends PageRouter.Page {
             util.ensureTextContainsSign(this.gameSession.pointsTowardWin) +
             '</b>.<br>За победа ти трябват още ' +
             (this.gameSession.pointsRequiredToWin - this.gameSession.pointsTowardWin) +
-            " точки и " + (this.gameSession.minProblemsCompletedToWin - this.gameSession.problemsCompleted) + " пробвани задачи";
+            " точки и " + (this.gameSession.minProblemsAttemptedToWin - this.gameSession.problemsAttempted) + " пробвани задачи";
+    }
+    private getTimeLeftMs() {
+        return this.gameSession.maxSessionDurationMs - (Date.now() - this.gameSession.gameStartTimestamp);
     }
     updateSessionTimeIndicator(): void {
+        const minutesLeft = Math.floor(this.getTimeLeftMs() / 60000);
         const progressIndicator = document.getElementById("sessionTimeIndicator") as HTMLElement;
-        const minutesLeft = Math.floor((this.gameSession.maxSessionDurationMs - (Date.now() - this.gameSession.gameStartTimestamp)) / 60000);
         progressIndicator.textContent = "Имаш още " + minutesLeft + " минути";
     }
     scrollToBottom(): void {
@@ -182,12 +216,20 @@ export class GameSessionPage extends PageRouter.Page {
     }
 
     onWin(resultStats: ResultStats): void {
+        this.informUser("КЪРТИШ! ПОБЕДА! 🥳\nМоля направи скрийншот и ми го пратѝ.", "green", true);
+        
         const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
         const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
         
         this.informUser("Отне ти " + minutes + "мин " + seconds + "сек. Познал си " + resultStats.percentCorrectOnFirstTry + "% от първи опит.", "black");
-        this.userAnswerBox.style.display = "none";
+        this.onSessionFinished();
+    }
+
+    onSessionFinished() {
+        this.numericEntry.style.display = "none";
         this.btnStartOver.style.display = "inline";
+
+        this.inActiveSession = false;
     }
 
     informUser(message: string, color: string, isBold?: boolean): HTMLElement {

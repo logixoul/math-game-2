@@ -1,21 +1,23 @@
 import { GameType } from "./GameTypes";
 
 export class ResultStats {
-    gameType: GameType;
-    timeElapsedMs: number;
-    percentCorrectOnFirstTry: number;
-
-    constructor(gameType: GameType, timeElapsedMs: number, percentCorrectOnFirstTry: number) {
-        this.gameType = gameType;
-        this.timeElapsedMs = timeElapsedMs;
-        this.percentCorrectOnFirstTry = percentCorrectOnFirstTry;
+    constructor(
+        public gameType: GameType,
+        public timeElapsedMs: number,
+        public percentCorrectOnFirstTry: number,
+        public pointsTowardWin: number,
+        public problemsAttempted : number,
+        public maxReachedPointsTowardWin : number) {
     }
 
     toPlainObject() {
         return {
             gameType: this.gameType.persistencyKey,
             timeElapsedMs: this.timeElapsedMs,
-            percentCorrectOnFirstTry: this.percentCorrectOnFirstTry
+            percentCorrectOnFirstTry: this.percentCorrectOnFirstTry,
+            pointsTowardWin: this.pointsTowardWin,
+            problemsAttempted: this.problemsAttempted,
+            maxReachedPointsTowardWin: this.maxReachedPointsTowardWin,
         };
     }
 }
