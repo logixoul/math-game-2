@@ -42,6 +42,10 @@ export class DashboardPage extends PageRouter.Page {
         });
     }
 
+    onLeave(): void {
+        
+    }
+
     createGreeting() {
         const displayName : string = this.appController.user?.displayName ?? "страннико";
         return "Привет, " + displayName + "!";

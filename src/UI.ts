@@ -23,6 +23,9 @@ export class UIController {
     
     constructor(public appController: AppController) {
         this.pageRouter.bus.on("pageChanged", (e) => {
+            if(this.currentPage)
+                this.currentPage.onLeave();
+
             if (e.newPage === "game") {
                 const gameTypeKey = e.query.get("type");
                 if (!gameTypeKey) {
