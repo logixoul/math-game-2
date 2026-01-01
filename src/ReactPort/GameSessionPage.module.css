@@ -1,15 +1,15 @@
 .page {
-	min-height: 100vh;
+	height: 100vh;
 	display: flex;
 	flex-direction: column;
 }
 
 .content {
 	padding: 24px;
-	padding-bottom: 140px;
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
+	flex: 1;
 }
 
 .messageLog {
@@ -48,10 +48,6 @@
 }
 
 .statusBar {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
 	background: #ededed;
 	border-top: 1px solid #d0d0d0;
 	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08);
@@ -61,6 +57,7 @@
 	align-items: center;
 	gap: 32px;
 	font-size: 15px;
+	flex: 0 0 auto;
 }
 
 .statusProgress {
