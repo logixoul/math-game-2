@@ -5,6 +5,7 @@ import { FirebaseController } from "../FirebaseController";
 import { GameSession, GameSessionUI } from "../GameSession";
 import * as util from "../util";
 import { AppController } from "../AppController";
+import { GameInputArea } from "./GameInputArea";
 
 type GameSessionPageProps = {
 	gameType: GameType | null;
@@ -286,72 +287,17 @@ export function GameSessionPage({
 								</p>
 							))}
 						</div>
-						<div className="input-area">
-							{isMobile ? (
-								<div className="keypad">
-									{["1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "0"].map(
-										(label) => (
-									<button
-										key={label}
-										type="button"
-										className="keypad-button"
-										disabled={sessionComplete}
-										onClick={() => handleKeypadAppend(label)}
-									>
-												{label}
-											</button>
-										)
-									)}
-									<button
-										type="button"
-										className="keypad-button keypad-button-secondary"
-										disabled={sessionComplete}
-										onClick={handleKeypadBackspace}
-									>
-										Back
-									</button>
-									<button
-										type="button"
-										className="keypad-button keypad-button-ok"
-										disabled={sessionComplete}
-										onClick={handleKeypadOk}
-									>
-										OK
-									</button>
-								</div>
-							) : (
-								<div className="desktop-input">
-									<input
-										type="text"
-										value={desktopInput}
-										disabled={sessionComplete}
-										onChange={(event) => setDesktopInput(event.target.value)}
-										onKeyDown={(event) => {
-											if (event.key === "Enter") {
-												handleDesktopSubmit();
-											}
-										}}
-										placeholder="Type answer and press Enter"
-									/>
-									<button
-										type="button"
-										className="start-button"
-										disabled={sessionComplete}
-										onClick={handleDesktopSubmit}
-									>
-										Submit
-									</button>
-								</div>
-							)}
-							<button
-								type="button"
-								className="reveal-button"
-								disabled={sessionComplete}
-								onClick={handleReveal}
-							>
-								I don't know
-							</button>
-						</div>
+						<GameInputArea
+							isMobile={isMobile}
+							sessionComplete={sessionComplete}
+							desktopInput={desktopInput}
+							setDesktopInput={setDesktopInput}
+							onDesktopSubmit={handleDesktopSubmit}
+							onKeypadAppend={handleKeypadAppend}
+							onKeypadBackspace={handleKeypadBackspace}
+							onKeypadOk={handleKeypadOk}
+							onReveal={handleReveal}
+						/>
 					</>
 				)}
 			</main>
