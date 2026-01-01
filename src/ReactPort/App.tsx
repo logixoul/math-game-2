@@ -1,13 +1,13 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { DashboardPage } from "./DashboardPage";
-import { GameSessionPlaceholder } from "./GameSessionPlaceholder";
+import { GameSessionRoute } from "./GameSessionPage";
 
 export function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<DashboardPage />} />
-				<Route path="/game/:gameTypeKey" element={<GameSessionPlaceholder />} />
+				<Route path="/game/:gameTypeKey" element={<GameSessionRoute />} />
 			</Routes>
 		</BrowserRouter>
 	);

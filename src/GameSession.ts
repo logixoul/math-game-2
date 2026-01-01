@@ -1,11 +1,22 @@
-import type { AppController } from './AppController';
+import type { FirebaseController } from './FirebaseController';
 import { GameType, Prompt, PromptScheduler } from './GameTypes';
 import { ResultStats } from './ResultStats';
-import { GameSessionPage } from './Pages/GameSessionPage';
+
+export type GameSessionAppContext = {
+    firebaseController: FirebaseController;
+};
+
+export type GameSessionUI = {
+    updateProgressIndicator: () => void;
+    showPrompt: () => void;
+    updateSessionTimeIndicator: () => void;
+    informUser: (message: string, color: string, isBold?: boolean) => void;
+    onWin: (resultStats: ResultStats) => void;
+};
 
 export class GameSession {
-    appController: AppController;
-    gamePage: GameSessionPage;
+    appController: GameSessionAppContext;
+    gamePage: GameSessionUI;
     errorCount: number;
     gameType: GameType;
     numCorrectAtFirstTry: number;
@@ -25,7 +36,7 @@ export class GameSession {
     readonly minProblemsAttemptedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
-    constructor(appController: AppController, gamePage : GameSessionPage, gameType: GameType) {
+    constructor(appController: GameSessionAppContext, gamePage : GameSessionUI, gameType: GameType) {
         this.appController = appController;
         this.gamePage = gamePage;
         
