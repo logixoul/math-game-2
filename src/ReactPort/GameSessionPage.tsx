@@ -313,30 +313,31 @@ export function GameSessionPage({
 							onKeypadOk={handleKeypadOk}
 							onReveal={handleReveal}
 						/>
-						{(progress || minutesLeft !== null) && (
-							<div className={styles.statusBar}>
-								{progress && (
-									<div className={styles.statusProgress}>
-										<div>
-											Points {progress.pointsTowardWin}/
-											{progress.pointsRequiredToWin}
-										</div>
-										<div>
-											Problems {progress.problemsAttempted}/
-											{progress.minProblemsAttemptedToWin}
-										</div>
-									</div>
-								)}
-								{minutesLeft !== null && (
-									<div className={styles.statusTimer}>
-										Minutes left: {minutesLeft}
-									</div>
-								)}
-							</div>
-						)}
 					</>
 				)}
 			</main>
+			{(progress || minutesLeft !== null) && (
+			<div className={styles.statusBar}>
+				{progress && (
+					<div className={styles.statusProgress}>
+						<div>
+							Points {progress.pointsTowardWin}/
+							{progress.pointsRequiredToWin}
+						</div>
+						<div>
+							Problems {progress.problemsAttempted}/
+							{progress.minProblemsAttemptedToWin}
+						</div>
+					</div>
+				)}
+				{minutesLeft !== null && (
+					<div className={styles.statusTimer}>
+						Minutes left: {minutesLeft}
+					</div>
+				)}
+			</div>
+		)}
+
 		</div>
 	);
 }
