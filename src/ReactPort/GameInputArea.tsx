@@ -1,9 +1,6 @@
 type GameInputAreaProps = {
 	isMobile: boolean;
 	sessionComplete: boolean;
-	desktopInput: string;
-	setDesktopInput: (value: string) => void;
-	onDesktopSubmit: () => void;
 	onKeypadAppend: (value: string) => void;
 	onKeypadBackspace: () => void;
 	onKeypadOk: () => void;
@@ -13,9 +10,6 @@ type GameInputAreaProps = {
 export function GameInputArea({
 	isMobile,
 	sessionComplete,
-	desktopInput,
-	setDesktopInput,
-	onDesktopSubmit,
 	onKeypadAppend,
 	onKeypadBackspace,
 	onKeypadOk,
@@ -55,30 +49,7 @@ export function GameInputArea({
 						OK
 					</button>
 				</div>
-			) : (
-				<div className="desktop-input">
-					<input
-						type="text"
-						value={desktopInput}
-						disabled={sessionComplete}
-						onChange={(event) => setDesktopInput(event.target.value)}
-						onKeyDown={(event) => {
-							if (event.key === "Enter") {
-								onDesktopSubmit();
-							}
-						}}
-						placeholder="Type answer and press Enter"
-					/>
-					<button
-						type="button"
-						className="start-button"
-						disabled={sessionComplete}
-						onClick={onDesktopSubmit}
-					>
-						Submit
-					</button>
-				</div>
-			)}
+			) : null}
 			<button
 				type="button"
 				className="reveal-button"

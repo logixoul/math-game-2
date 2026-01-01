@@ -56,6 +56,7 @@ export function GameSessionPage({
 	const [activePromptIndex, setActivePromptIndex] = useState<number | null>(null);
 	const isMobile = useMemo(() => util.isMobileDevice(), []);
 	const timedOutRef = useRef(false);
+	const desktopInputRef = useRef<HTMLInputElement | null>(null);
 	const ui = useMemo<GameSessionUI>(() => {
 		return {
 			informUser: (message, color, isBold) => {
@@ -194,6 +195,11 @@ export function GameSessionPage({
 		log.scrollTop = log.scrollHeight;
 	}, [messages, currentAnswer]);
 
+	useEffect(() => {
+		if (isMobile || sessionComplete) return;
+		desktopInputRef.current?.focus();
+	}, [activePromptIndex, isMobile, sessionComplete]);
+
 	const submitAnswer = (text: string) => {
 		if (!sessionRef.current || sessionComplete) return;
 		const trimmed = text.trim();
@@ -281,7 +287,31 @@ export function GameSessionPage({
 									{message.isPrompt && (
 										<span className="answer-inline">
 											{message.answer ??
-												(index === activePromptIndex ? currentAnswer : "")}
+												(index === activePromptIndex
+													? isMobile
+														? currentAnswer
+														: null
+													: "")}
+											{index === activePromptIndex &&
+												!isMobile &&
+												!message.answer && (
+													<input
+														ref={desktopInputRef}
+														type="text"
+														value={desktopInput}
+														disabled={sessionComplete}
+														onChange={(event) =>
+															setDesktopInput(event.target.value)
+														}
+														onKeyDown={(event) => {
+															if (event.key === "Enter") {
+																handleDesktopSubmit();
+															}
+														}}
+														placeholder="Type answer"
+														className="inline-answer-input"
+													/>
+												)}
 										</span>
 									)}
 								</p>
@@ -290,9 +320,6 @@ export function GameSessionPage({
 						<GameInputArea
 							isMobile={isMobile}
 							sessionComplete={sessionComplete}
-							desktopInput={desktopInput}
-							setDesktopInput={setDesktopInput}
-							onDesktopSubmit={handleDesktopSubmit}
 							onKeypadAppend={handleKeypadAppend}
 							onKeypadBackspace={handleKeypadBackspace}
 							onKeypadOk={handleKeypadOk}

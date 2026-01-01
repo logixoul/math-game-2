@@ -94,6 +94,15 @@ body {
 	font-weight: 600;
 }
 
+.inline-answer-input {
+	margin-left: 6px;
+	padding: 4px 8px;
+	border-radius: 6px;
+	border: 1px solid #cbd2d9;
+	font-size: 16px;
+	max-width: 160px;
+}
+
 .input-area {
 	margin-top: 16px;
 	display: flex;
