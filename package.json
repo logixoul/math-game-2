@@ -22,10 +22,15 @@
   },
   "homepage": "https://github.com/logixoul/math-game-2#readme",
   "devDependencies": {
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
     "typescript": "^4.9.5",
     "vite": "^7.3.0"
   },
   "dependencies": {
-    "firebase": "^12.7.0"
+    "firebase": "^12.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1"
   }
 }

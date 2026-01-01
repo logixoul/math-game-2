@@ -1,7 +1,6 @@
 import type { AppController } from './AppController';
-import { GameType, GameTypeCtor, Prompt, PromptScheduler } from './GameTypes';
+import { GameType, Prompt, PromptScheduler } from './GameTypes';
 import { ResultStats } from './ResultStats';
-import type { UIController } from './UI';
 import { GameSessionPage } from './Pages/GameSessionPage';
 
 export class GameSession {

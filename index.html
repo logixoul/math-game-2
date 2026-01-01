@@ -4,52 +4,9 @@
 		<meta charset="utf-8">
 		<title>stefan play</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-		<!-- Google Fonts stuff -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Andada+Pro:ital,wght@0,400..840;1,400..840&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-		
-		<link rel="stylesheet" href="assets/styles.css">
 	</head>
 	<body>
-		<div id="header">
-			<a id="homeLink" href="#"><img id="logo" src="assets/play-logo.png" width="40" height="40"/>stefan play (v0.1)</a>
-			<div id="rightAlignedPart">
-				<div id="menuContents" style="display: none;">
-					<nav id="mainNav">
-						<a href="#dashboard">Начало</a>
-						<a href="#instructions">Инструкции</a>
-						<a href="#leaderboard">Рекордьори</a>
-					</nav>
-					<button id="loginBtn" style="display: none;">Вход</button>
-					<div id="userInfo"></div>
-					<button id="logoutBtn">[Изход]</button>
-					<button id="dbg" style="display: none"></button>
-				</div>
-				<img src="assets/menu.svg" width="30" height="30" id="btnMenu"/>
-			</div>
-		</div>
-		<div id="middlePane">
-			<section id="dashboardPage" class="page" data-route="dashboard">
-			</section>
-			<section id="instructionsPage" class="page" data-route="instructions">
-				<h2>Instructions</h2>
-				Finish a session when:
-				<ul>
-					<li>You reach X net points</li>
-					<li>AND you have answered at least Y problems</li>
-					<li>AND the session lasts no more than Z minutes</li>
-				</ul>
-			</section>
-			<section id="leaderboardPage" class="page" data-route="leaderboard">
-				<h2>Leaderboard</h2>
-				<p>Coming soon.</p>
-			</section>
-			<section id="gameSessionPage" class="page" data-route="game">
-			</section>
-		</div>
-		<script type="module" src="/src/main.ts"></script>
+		<div id="react-root"></div>
+		<script type="module" src="/src/ReactPort/main.tsx"></script>
 	</body>
 </html>

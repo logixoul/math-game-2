@@ -16,6 +16,10 @@ export class AppController {
     }
 
     getAvailableGameTypes(): GameTypes.GameType[] {
+        return AppController.getAvailableGameTypes();
+    }
+
+    static getAvailableGameTypes(): GameTypes.GameType[] {
         return [
             new GameTypes.MultiplicationGameType(new GameTypes.Range(0, 10)),
             new GameTypes.DivisionGameType(new GameTypes.Range(0, 10)),
