@@ -130,6 +130,13 @@ body {
 	cursor: pointer;
 }
 
+.keypad-button:disabled,
+.start-button:disabled,
+.reveal-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
 .keypad-button-secondary {
 	background: #edf2f7;
 }
@@ -145,6 +152,16 @@ body {
 	border: 1px solid #cbd2d9;
 	background: #ffffff;
 	color: #1f2933;
+	padding: 8px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.start-over-button {
+	align-self: flex-start;
+	border: none;
+	background: #1f7a8c;
+	color: #ffffff;
 	padding: 8px 12px;
 	border-radius: 6px;
 	cursor: pointer;

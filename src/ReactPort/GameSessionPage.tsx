@@ -49,10 +49,12 @@ export function GameSessionPage({
 	const [progress, setProgress] = useState<ProgressSnapshot | null>(null);
 	const [minutesLeft, setMinutesLeft] = useState<number | null>(null);
 	const [hasWon, setHasWon] = useState(false);
+	const [sessionComplete, setSessionComplete] = useState(false);
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [desktopInput, setDesktopInput] = useState("");
 	const [activePromptIndex, setActivePromptIndex] = useState<number | null>(null);
 	const isMobile = useMemo(() => util.isMobileDevice(), []);
+	const timedOutRef = useRef(false);
 	const ui = useMemo<GameSessionUI>(() => {
 		return {
 			informUser: (message, color, isBold) => {
@@ -92,34 +94,50 @@ export function GameSessionPage({
 				setCurrentAnswer("");
 				setDesktopInput("");
 			},
-			onWin: () => {
+			onWin: (resultStats) => {
 				setHasWon(true);
+				setSessionComplete(true);
+				const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
+				const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
+				setMessages((prev) => [
+					...prev,
+					{ text: "You win!", color: "green", isBold: true },
+					{
+						text: `Time: ${minutes}m ${seconds}s. Accuracy: ${resultStats.percentCorrectOnFirstTry}%.`,
+						color: "black",
+					},
+				]);
 			},
 		};
 	}, []);
 
-	useEffect(() => {
+	const startNewSession = (nextGameType: GameType) => {
 		setMessages([]);
 		setProgress(null);
 		setMinutesLeft(null);
 		setHasWon(false);
+		setSessionComplete(false);
 		setCurrentAnswer("");
 		setDesktopInput("");
 		setActivePromptIndex(null);
-
-		if (!gameType) {
-			sessionRef.current = null;
-			return;
-		}
+		timedOutRef.current = false;
 
 		const firebaseController = new FirebaseController();
 		void firebaseController.init();
 		const appContext = { firebaseController };
-		const session = new GameSession(appContext, ui, gameType);
+		const session = new GameSession(appContext, ui, nextGameType);
 		sessionRef.current = session;
 		ui.updateProgressIndicator();
 		ui.updateSessionTimeIndicator();
 		ui.showPrompt();
+	};
+
+	useEffect(() => {
+		if (!gameType) {
+			sessionRef.current = null;
+			return;
+		}
+		startNewSession(gameType);
 
 		return () => {
 			sessionRef.current = null;
@@ -128,13 +146,46 @@ export function GameSessionPage({
 
 	useEffect(() => {
 		const intervalId = window.setInterval(() => {
-			if (!sessionRef.current || hasWon) return;
+			const session = sessionRef.current;
+			if (!session || sessionComplete) return;
 			ui.updateSessionTimeIndicator();
+			const msLeft =
+				session.maxSessionDurationMs -
+				(Date.now() - session.gameStartTimestamp);
+			if (msLeft <= 0 && !timedOutRef.current) {
+				timedOutRef.current = true;
+				setSessionComplete(true);
+				const stats = session.getResultStats();
+				setMessages((prev) => [
+					...prev,
+					{ text: "Time is up.", color: "red", isBold: true },
+					{
+						text: `Game type: ${stats.gameType.localizedName}.`,
+						color: "black",
+					},
+					{
+						text: `Points: ${stats.pointsTowardWin}.`,
+						color: "black",
+					},
+					{
+						text: `Max points reached: ${stats.maxReachedPointsTowardWin}.`,
+						color: "black",
+					},
+					{
+						text: `Problems attempted: ${stats.problemsAttempted}.`,
+						color: "black",
+					},
+					{
+						text: `Accuracy: ${stats.percentCorrectOnFirstTry}%.`,
+						color: "black",
+					},
+				]);
+			}
 		}, 1000);
 		return () => {
 			window.clearInterval(intervalId);
 		};
-	}, [hasWon, ui]);
+	}, [sessionComplete, ui]);
 
 	useEffect(() => {
 		const log = logRef.current;
@@ -143,7 +194,7 @@ export function GameSessionPage({
 	}, [messages, currentAnswer]);
 
 	const submitAnswer = (text: string) => {
-		if (!sessionRef.current) return;
+		if (!sessionRef.current || sessionComplete) return;
 		const trimmed = text.trim();
 		if (!trimmed) return;
 		setMessages((prev) => {
@@ -178,6 +229,7 @@ export function GameSessionPage({
 	};
 
 	const handleReveal = () => {
+		if (sessionComplete) return;
 		sessionRef.current?.onUserRequestedAnswerReveal();
 	};
 
@@ -206,6 +258,15 @@ export function GameSessionPage({
 						)}
 						{minutesLeft !== null && <p>Minutes left: {minutesLeft}</p>}
 						{hasWon && <p>Session complete.</p>}
+						{sessionComplete && (
+							<button
+								type="button"
+								className="start-over-button"
+								onClick={() => gameType && startNewSession(gameType)}
+							>
+								Start over
+							</button>
+						)}
 						<div className="message-log" ref={logRef}>
 							{messages.map((message, index) => (
 								<p
@@ -230,12 +291,13 @@ export function GameSessionPage({
 								<div className="keypad">
 									{["1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "0"].map(
 										(label) => (
-											<button
-												key={label}
-												type="button"
-												className="keypad-button"
-												onClick={() => handleKeypadAppend(label)}
-											>
+									<button
+										key={label}
+										type="button"
+										className="keypad-button"
+										disabled={sessionComplete}
+										onClick={() => handleKeypadAppend(label)}
+									>
 												{label}
 											</button>
 										)
@@ -243,6 +305,7 @@ export function GameSessionPage({
 									<button
 										type="button"
 										className="keypad-button keypad-button-secondary"
+										disabled={sessionComplete}
 										onClick={handleKeypadBackspace}
 									>
 										Back
@@ -250,6 +313,7 @@ export function GameSessionPage({
 									<button
 										type="button"
 										className="keypad-button keypad-button-ok"
+										disabled={sessionComplete}
 										onClick={handleKeypadOk}
 									>
 										OK
@@ -260,6 +324,7 @@ export function GameSessionPage({
 									<input
 										type="text"
 										value={desktopInput}
+										disabled={sessionComplete}
 										onChange={(event) => setDesktopInput(event.target.value)}
 										onKeyDown={(event) => {
 											if (event.key === "Enter") {
@@ -271,6 +336,7 @@ export function GameSessionPage({
 									<button
 										type="button"
 										className="start-button"
+										disabled={sessionComplete}
 										onClick={handleDesktopSubmit}
 									>
 										Submit
@@ -280,6 +346,7 @@ export function GameSessionPage({
 							<button
 								type="button"
 								className="reveal-button"
+								disabled={sessionComplete}
 								onClick={handleReveal}
 							>
 								I don't know
