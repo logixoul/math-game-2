@@ -7,6 +7,7 @@ import * as util from "../util";
 import { AppController } from "../AppController";
 import { GameInputArea } from "./GameInputArea";
 import { TopBar } from "./TopBar";
+import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
 	gameType: GameType | null;
@@ -242,10 +243,9 @@ export function GameSessionPage({
 	};
 
 	return (
-		<div className="page">
+		<div className={styles.page}>
 			<TopBar />
-			<main className="content">
-				<h1>Game Session</h1>
+			<main className={styles.content}>
 				{decodedKey && !gameType && (
 					<p>Game type not found for key: {decodedKey}</p>
 				)}
@@ -256,13 +256,13 @@ export function GameSessionPage({
 						{sessionComplete && (
 							<button
 								type="button"
-								className="start-over-button"
+								className={styles.startOverButton}
 								onClick={() => gameType && startNewSession(gameType)}
 							>
 								Start over
 							</button>
 						)}
-						<div className="message-log" ref={logRef}>
+						<div className={styles.messageLog} ref={logRef}>
 							{messages.map((message, index) => (
 								<p
 									key={`${index}-${message.text}`}
@@ -273,7 +273,7 @@ export function GameSessionPage({
 								>
 									{message.text}
 									{message.isPrompt && (
-										<span className="answer-inline">
+										<span className={styles.answerInline}>
 											{message.answer ??
 												(index === activePromptIndex
 													? isMobile
@@ -297,7 +297,7 @@ export function GameSessionPage({
 															}
 														}}
 														placeholder="Type answer"
-														className="inline-answer-input"
+														className={styles.inlineAnswerInput}
 													/>
 												)}
 										</span>
@@ -314,9 +314,9 @@ export function GameSessionPage({
 							onReveal={handleReveal}
 						/>
 						{(progress || minutesLeft !== null) && (
-							<div className="status-bar">
+							<div className={styles.statusBar}>
 								{progress && (
-									<div className="status-progress">
+									<div className={styles.statusProgress}>
 										<div>
 											Points {progress.pointsTowardWin}/
 											{progress.pointsRequiredToWin}
@@ -328,7 +328,7 @@ export function GameSessionPage({
 									</div>
 								)}
 								{minutesLeft !== null && (
-									<div className="status-timer">
+									<div className={styles.statusTimer}>
 										Minutes left: {minutesLeft}
 									</div>
 								)}

@@ -1,0 +1,47 @@
+.page {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.content {
+	padding: 24px;
+	padding-bottom: 140px;
+}
+
+.gameList {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.gameCard {
+	background: #ffffff;
+	border: 1px solid #e0e6ed;
+	border-radius: 8px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.gameName {
+	font-weight: 600;
+}
+
+.startButton {
+	align-self: flex-start;
+	border: none;
+	background: #1f7a8c;
+	color: #ffffff;
+	padding: 8px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.startButton:hover {
+	background: #166070;
+}

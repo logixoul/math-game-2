@@ -1,3 +1,5 @@
+import styles from "./GameInputArea.module.css";
+
 type GameInputAreaProps = {
 	isMobile: boolean;
 	sessionComplete: boolean;
@@ -16,15 +18,15 @@ export function GameInputArea({
 	onReveal,
 }: GameInputAreaProps) {
 	return (
-		<div className="input-area">
+		<div className={styles.inputArea}>
 			{isMobile ? (
-				<div className="keypad">
+				<div className={styles.keypad}>
 					{["1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "0"].map(
 						(label) => (
 							<button
 								key={label}
 								type="button"
-								className="keypad-button"
+								className={styles.keypadButton}
 								disabled={sessionComplete}
 								onClick={() => onKeypadAppend(label)}
 							>
@@ -34,7 +36,7 @@ export function GameInputArea({
 					)}
 					<button
 						type="button"
-						className="keypad-button keypad-button-secondary"
+						className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
 						disabled={sessionComplete}
 						onClick={onKeypadBackspace}
 					>
@@ -42,7 +44,7 @@ export function GameInputArea({
 					</button>
 					<button
 						type="button"
-						className="keypad-button keypad-button-ok"
+						className={`${styles.keypadButton} ${styles.keypadButtonOk}`}
 						disabled={sessionComplete}
 						onClick={onKeypadOk}
 					>
@@ -52,7 +54,7 @@ export function GameInputArea({
 			) : null}
 			<button
 				type="button"
-				className="reveal-button"
+				className={styles.revealButton}
 				disabled={sessionComplete}
 				onClick={onReveal}
 			>

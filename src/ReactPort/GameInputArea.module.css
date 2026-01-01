@@ -1,0 +1,48 @@
+.inputArea {
+	margin-top: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-bottom: 100px;
+}
+
+.keypad {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+}
+
+.keypadButton {
+	padding: 12px 0;
+	border: 1px solid #cbd2d9;
+	background: #ffffff;
+	border-radius: 6px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.keypadButton:disabled,
+.revealButton:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.keypadButtonSecondary {
+	background: #edf2f7;
+}
+
+.keypadButtonOk {
+	background: #1f7a8c;
+	color: #ffffff;
+	border-color: #1f7a8c;
+}
+
+.revealButton {
+	align-self: flex-start;
+	border: 1px solid #cbd2d9;
+	background: #ffffff;
+	color: #1f2933;
+	padding: 8px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+}

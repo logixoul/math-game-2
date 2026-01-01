@@ -2,23 +2,24 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppController } from "../AppController";
 import { TopBar } from "./TopBar";
+import styles from "./DashboardPage.module.css";
 
 export function DashboardPage() {
 	const navigate = useNavigate();
 	const gameTypes = useMemo(() => AppController.getAvailableGameTypes(), []);
 
 	return (
-		<div className="page">
+		<div className={styles.page}>
 			<TopBar />
-			<main className="content">
+			<main className={styles.content}>
 				<h1>Dashboard</h1>
-				<ul className="game-list">
+				<ul className={styles.gameList}>
 					{gameTypes.map((gameType) => (
-						<li key={gameType.persistencyKey} className="game-card">
-							<div className="game-name">{gameType.localizedName}</div>
+						<li key={gameType.persistencyKey} className={styles.gameCard}>
+							<div className={styles.gameName}>{gameType.localizedName}</div>
 							<button
 								type="button"
-								className="start-button"
+								className={styles.startButton}
 								onClick={() =>
 									navigate(`/game/${encodeURIComponent(gameType.persistencyKey)}`)
 								}
