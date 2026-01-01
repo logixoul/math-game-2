@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppController } from "../AppController";
+import { TopBar } from "./TopBar";
 
 export function DashboardPage() {
 	const navigate = useNavigate();
@@ -8,10 +9,7 @@ export function DashboardPage() {
 
 	return (
 		<div className="page">
-			<header className="top-bar">
-				<div className="logo">stefan play</div>
-				<div className="login-status">Not logged in</div>
-			</header>
+			<TopBar />
 			<main className="content">
 				<h1>Dashboard</h1>
 				<ul className="game-list">

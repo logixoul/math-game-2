@@ -6,6 +6,7 @@ import { GameSession, GameSessionUI } from "../GameSession";
 import * as util from "../util";
 import { AppController } from "../AppController";
 import { GameInputArea } from "./GameInputArea";
+import { TopBar } from "./TopBar";
 
 type GameSessionPageProps = {
 	gameType: GameType | null;
@@ -242,10 +243,7 @@ export function GameSessionPage({
 
 	return (
 		<div className="page">
-			<header className="top-bar">
-				<div className="logo">stefan play</div>
-				<div className="login-status">Not logged in</div>
-			</header>
+			<TopBar />
 			<main className="content">
 				<h1>Game Session</h1>
 				{decodedKey && !gameType && (
