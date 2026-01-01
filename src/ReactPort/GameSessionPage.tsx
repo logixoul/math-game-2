@@ -254,16 +254,6 @@ export function GameSessionPage({
 				{!decodedKey && <p>Missing game type key.</p>}
 				{gameType && (
 					<>
-						<p>Game type: {gameType.localizedName}</p>
-						{progress && (
-							<p>
-								Points {progress.pointsTowardWin}/
-								{progress.pointsRequiredToWin}, Problems{" "}
-								{progress.problemsAttempted}/
-								{progress.minProblemsAttemptedToWin}
-							</p>
-						)}
-						{minutesLeft !== null && <p>Minutes left: {minutesLeft}</p>}
 						{hasWon && <p>Session complete.</p>}
 						{sessionComplete && (
 							<button
@@ -325,6 +315,27 @@ export function GameSessionPage({
 							onKeypadOk={handleKeypadOk}
 							onReveal={handleReveal}
 						/>
+						{(progress || minutesLeft !== null) && (
+							<div className="status-bar">
+								{progress && (
+									<div className="status-progress">
+										<div>
+											Points {progress.pointsTowardWin}/
+											{progress.pointsRequiredToWin}
+										</div>
+										<div>
+											Problems {progress.problemsAttempted}/
+											{progress.minProblemsAttemptedToWin}
+										</div>
+									</div>
+								)}
+								{minutesLeft !== null && (
+									<div className="status-timer">
+										Minutes left: {minutesLeft}
+									</div>
+								)}
+							</div>
+						)}
 					</>
 				)}
 			</main>
