@@ -305,36 +305,39 @@ export function GameSessionPage({
 								</p>
 							))}
 						</div>
-						<GameInputArea
-							isMobile={isMobile}
-							sessionComplete={sessionComplete}
-							onKeypadAppend={handleKeypadAppend}
-							onKeypadBackspace={handleKeypadBackspace}
-							onKeypadOk={handleKeypadOk}
-							onReveal={handleReveal}
-						/>
 					</>
 				)}
 			</main>
 			{(progress || minutesLeft !== null) && (
-				<div className={styles.statusBar}>
-					{progress && (
-						<div className={styles.statusProgress}>
-							<div>
-								Points {progress.pointsTowardWin}/
-								{progress.pointsRequiredToWin}
+				<div className={styles.bottomPane}>
+					<GameInputArea
+						isMobile={isMobile}
+						sessionComplete={sessionComplete}
+						onKeypadAppend={handleKeypadAppend}
+						onKeypadBackspace={handleKeypadBackspace}
+						onKeypadOk={handleKeypadOk}
+						onReveal={handleReveal}
+					/>
+					<div className={styles.statusBar}>
+						{progress && (
+							<div className={styles.statusProgress}>
+								<div>
+									Points {progress.pointsTowardWin}/
+									{progress.pointsRequiredToWin}
+								</div>
+								<div>
+									Problems {progress.problemsAttempted}/
+									{progress.minProblemsAttemptedToWin}
+								</div>
 							</div>
-							<div>
-								Problems {progress.problemsAttempted}/
-								{progress.minProblemsAttemptedToWin}
+						)}
+						{minutesLeft !== null && (
+							<div className={styles.statusTimer}>
+								Minutes left: {minutesLeft}
 							</div>
-						</div>
-					)}
-					{minutesLeft !== null && (
-						<div className={styles.statusTimer}>
-							Minutes left: {minutesLeft}
-						</div>
-					)}
+						)}
+					</div>
+
 				</div>
 			)}
 		</div>
