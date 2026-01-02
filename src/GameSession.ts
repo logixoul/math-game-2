@@ -62,7 +62,7 @@ export class GameSession {
     win(): void {
         const stats = this.getResultStats();
         this.gamePage.onWin(stats);
-        this.appController.firebaseController.onGameEnd(stats);
+        //this.appController.firebaseController.onGameEnd(stats);
     }
 
     nextQuestion(): void {

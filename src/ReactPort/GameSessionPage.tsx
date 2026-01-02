@@ -96,9 +96,9 @@ export function GameSessionPage({
 				const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
 				setMessages((prev) => [
 					...prev,
-					{ text: "You win!", color: "green", isBold: true },
+					{ text: "КЪРТИШ! ПОБЕДА! 🥳\nМоля направи скрийншот и ми го пратѝ.", color: "green", isBold: true },
 					{
-						text: `Time: ${minutes}m ${seconds}s. Accuracy: ${resultStats.percentCorrectOnFirstTry}%.`,
+						text: `Отне ти ${minutes} мин ${seconds} сек. Познал си ${resultStats.percentCorrectOnFirstTry}% от първи опит.`,
 						color: "black",
 					},
 				]);
@@ -164,25 +164,22 @@ export function GameSessionPage({
 				const stats = session.getResultStats();
 				setMessages((prev) => [
 					...prev,
-					{ text: "Time is up.", color: "red", isBold: true },
+					{ text: "Край на тренировката - честито! (времето изтече 🙂 )", color: "green", isBold: true },
+					{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 					{
-						text: `Game type: ${stats.gameType.localizedName}.`,
+						text: `Ти игра "${stats.gameType.localizedName}".`,
 						color: "black",
 					},
 					{
-						text: `Points: ${stats.pointsTowardWin}.`,
+						text: `Точки: ${stats.pointsTowardWin}.`,
 						color: "black",
 					},
 					{
-						text: `Max points reached: ${stats.maxReachedPointsTowardWin}.`,
+						text: `Максимални достигнати точки: ${stats.maxReachedPointsTowardWin}.`,
 						color: "black",
 					},
 					{
-						text: `Problems attempted: ${stats.problemsAttempted}.`,
-						color: "black",
-					},
-					{
-						text: `Accuracy: ${stats.percentCorrectOnFirstTry}%.`,
+						text: `Познати от първи опит: ${stats.percentCorrectOnFirstTry}%.`,
 						color: "black",
 					},
 				]);
@@ -246,14 +243,13 @@ export function GameSessionPage({
 		<div className={"page"}>
 			<TopBar />
 			<main className={styles.content}>
-				{hasWon && <p>Session complete.</p>}
 				{sessionComplete && (
 					<button
 						type="button"
 						className={styles.startOverButton}
 						onClick={() => startNewSession(gameType)}
 					>
-						Start over
+						Отначало
 					</button>
 				)}
 				<MessageLog
