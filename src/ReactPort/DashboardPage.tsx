@@ -9,19 +9,18 @@ export function DashboardPage() {
 	const gameTypes = useMemo(() => AppController.getAvailableGameTypes(), []);
 
 	return (
-		<div className={styles.page + " page"}>
+		<div className={"page"}>
 			<TopBar />
 			<main className={styles.content}>
-				<h1>Привет!</h1>
+				<h2>Привет!</h2>
 				<p className={styles.subtitle}>Готов ли си?</p>
 				<section className={styles.section}>
 					<h3>Свободна тренировка</h3>
 					<ul className={styles.gameList}>
 						{gameTypes.map((gameType) => (
-							<li key={gameType.persistencyKey} className={styles.gameCard}>
-								<div onClick={() =>
+							<li key={gameType.persistencyKey} className={styles.gameCard} onClick={() =>
 										navigate(`/game/${encodeURIComponent(gameType.persistencyKey)}`)
-									} className={styles.gameName}>{gameType.localizedName}</div>
+									}>{gameType.localizedName}
 							</li>
 						))}
 					</ul>

@@ -14,4 +14,7 @@ body {
 .page {
 	background: url("/assets/bodybg.png") no-repeat;
     background-size:cover;
+	height: 100dvh;
+	display: flex;
+	flex-direction: column;
 }

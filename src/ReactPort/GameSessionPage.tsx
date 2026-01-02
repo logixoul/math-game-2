@@ -38,6 +38,9 @@ export function GameSessionRoute() {
 			(type) => type.persistencyKey === decodedKey
 		);
 	}, [decodedKey]);
+	if(!gameType) {
+		return <ErrorPage></ErrorPage>
+	}
 
 	return <GameSessionPage gameType={gameType} decodedKey={decodedKey} />;
 }
@@ -243,7 +246,7 @@ export function GameSessionPage({
 	};
 
 	return (
-		<div className={styles.page + " page"}>
+		<div className={"page"}>
 			<TopBar />
 			<main className={styles.content}>
 				{decodedKey && !gameType && (
