@@ -144,6 +144,23 @@ export function GameSessionPage({
 	}, [gameType, ui]);
 
 	useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			const parsedInt = parseInt(e.key, 10);
+			if(!Number.isNaN(parsedInt)) {
+				handleKeypadAppend(e.key);
+			}
+			else if(e.key == "Enter") {
+				handleKeypadOk();
+			} else if(e.key == "Backspace") {
+				handleKeypadBackspace();
+			}
+		};
+
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, []);
+
+	useEffect(() => {
 		const intervalId = window.setInterval(() => {
 			const session = getSession();
 			
@@ -242,32 +259,31 @@ export function GameSessionPage({
 					logRef={logRef}
 				/>
 			</main>
-			{progress && (
 				<div className={styles.bottomPane}>
-					<KeyPad
-						isMobile={isMobile}
-						sessionComplete={sessionComplete}
-						onKeypadAppend={handleKeypadAppend}
-						onKeypadBackspace={handleKeypadBackspace}
-						onKeypadOk={handleKeypadOk}
-						onReveal={handleReveal}
-					/>
+					{
+						isMobile ?
+							<KeyPad
+								onKeypadAppend={handleKeypadAppend}
+								onKeypadBackspace={handleKeypadBackspace}
+								onKeypadOk={handleKeypadOk}
+								onReveal={handleReveal}
+							/>
+							:
+							<button type="button" className={styles.revealButton} onClick={handleReveal}>Не знам</button>
+					}
 					<div className={styles.statusBar}>
-						{progress && (
-							<div className={styles.statusProgress}>
-								<div>
-									<b>Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}</b>.<br />
-									За победа ти трябват още {progress.pointsRequiredToWin - progress.pointsTowardWin} точки и {progress.minProblemsAttemptedToWin - progress.problemsAttempted} пробвани задачи
-								</div>
+						<div className={styles.statusProgress}>
+							<div>
+								<b>Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}</b>.<br />
+								За победа ти трябват още {progress.pointsRequiredToWin - progress.pointsTowardWin} точки и {progress.minProblemsAttemptedToWin - progress.problemsAttempted} пробвани задачи
 							</div>
-						)}
+						</div>
 						<div className={styles.statusTimer}>
 							Имаш още {minutesLeft} минути
 						</div>
 					</div>
 
 				</div>
-			)}
 		</div>
 	);
 }

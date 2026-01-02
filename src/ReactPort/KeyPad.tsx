@@ -1,8 +1,6 @@
 import styles from "./KeyPad.module.css";
 
 type KeyPadProps = {
-	isMobile: boolean;
-	sessionComplete: boolean;
 	onKeypadAppend: (value: string) => void;
 	onKeypadBackspace: () => void;
 	onKeypadOk: () => void;
@@ -10,8 +8,6 @@ type KeyPadProps = {
 };
 
 export function KeyPad({
-	isMobile,
-	sessionComplete,
 	onKeypadAppend,
 	onKeypadBackspace,
 	onKeypadOk,
@@ -38,81 +34,65 @@ export function KeyPad({
 
 	return (
 		<div className={styles.inputArea}>
-			{isMobile ? (
-				<div className={styles.keypad}>
-					{keypadLayout.map((item, index) => {
-						if (item.type === "empty") {
-							return (
-								<div
-									key={`empty-${index}`}
-									className={styles.keypadSpacer}
-									aria-hidden="true"
-								/>
-							);
-						}
-						if (item.type === "append") {
-							return (
-								<button
-									key={item.label}
-									type="button"
-									className={styles.keypadButton}
-									disabled={sessionComplete}
-									onClick={() => onKeypadAppend(item.label)}
-								>
-									{item.label}
-								</button>
-							);
-						}
-						if (item.type === "reveal") {
-							return (
-								<button
-									key="reveal"
-									type="button"
-									className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
-									disabled={sessionComplete}
-									onClick={onReveal}
-								>
-									{item.label}
-								</button>
-							);
-						}
-						if (item.type === "backspace") {
-							return (
-								<button
-									key="backspace"
-									type="button"
-									className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
-									disabled={sessionComplete}
-									onClick={onKeypadBackspace}
-								>
-									<img src="/assets/backspace.svg" alt="Backspace" />
-								</button>
-							);
-						}
+			<div className={styles.keypad}>
+				{keypadLayout.map((item, index) => {
+					if (item.type === "empty") {
+						return (
+							<div
+								key={`empty-${index}`}
+								className={styles.keypadSpacer}
+								aria-hidden="true"
+							/>
+						);
+					}
+					if (item.type === "append") {
 						return (
 							<button
-								key="ok"
+								key={item.label}
 								type="button"
-								className={`${styles.keypadButton} ${styles.keypadButtonOk}`}
-								disabled={sessionComplete}
-								onClick={onKeypadOk}
+								className={styles.keypadButton}
+								onClick={() => onKeypadAppend(item.label)}
 							>
 								{item.label}
 							</button>
 						);
-					})}
-				</div>
-			) : null}
-			{!isMobile && (
-				<button
-					type="button"
-					className={styles.revealButton}
-					disabled={sessionComplete}
-					onClick={onReveal}
-				>
-					Не знам
-				</button>
-			)}
+					}
+					if (item.type === "reveal") {
+						return (
+							<button
+								key="reveal"
+								type="button"
+								className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
+								onClick={onReveal}
+							>
+								{item.label}
+							</button>
+						);
+					}
+					if (item.type === "backspace") {
+						return (
+							<button
+								key="backspace"
+								type="button"
+								className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
+								onClick={onKeypadBackspace}
+							>
+								<img src="/assets/backspace.svg" alt="Backspace" />
+							</button>
+						);
+					}
+					return (
+						<button
+							key="ok"
+							type="button"
+							className={`${styles.keypadButton} ${styles.keypadButtonOk}`}
+							onClick={onKeypadOk}
+						>
+							{item.label}
+						</button>
+					);
+				})}
+			</div>
 		</div>
 	);
 }
