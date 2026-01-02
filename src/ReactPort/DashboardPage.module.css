@@ -5,35 +5,39 @@
 }
 
 .content {
+	text-align: center;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
 	padding: 24px;
 	padding-bottom: 140px;
 }
 
 .gameList {
-	list-style: none;
-	padding: 0;
+	list-style-type: none;
+	padding-inline-start: 0;
 	margin: 0;
-	display: grid;
-	gap: 16px;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .gameCard {
-	background: #ffffff;
-	border: 1px solid #e0e6ed;
-	border-radius: 8px;
-	padding: 16px;
+	padding: 10px;
+	margin: 10px;
+	border-radius: 10px;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 8px;
+	align-items: center;
 }
 
-.gameName {
-	font-weight: 600;
+.gameCard:hover {
+	cursor: pointer;
+	background-color: rgba(0, 0, 0, 0.03);
+	outline: 1px solid rgba(0, 0, 0, 0.1);
+	box-sizing: border-box;
 }
 
 .startButton {
-	align-self: flex-start;
+	align-self: center;
 	border: none;
 	background: #1f7a8c;
 	color: #ffffff;
@@ -44,4 +48,19 @@
 
 .startButton:hover {
 	background: #166070;
+}
+
+.subtitle {
+	font-weight: 200;
+	font-style: italic;
+	margin-top: 0px;
+	font-size: 120%;
+}
+
+.section {
+	border-radius: 3px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0 2px 50px rgba(0, 0, 0, 0.1);
+	background: url("/assets/gradbg.png") no-repeat;
+	margin: 1em;
 }

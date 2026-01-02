@@ -12,23 +12,20 @@ export function DashboardPage() {
 		<div className={styles.page + " page"}>
 			<TopBar />
 			<main className={styles.content}>
-				<h1>Dashboard</h1>
-				<ul className={styles.gameList}>
-					{gameTypes.map((gameType) => (
-						<li key={gameType.persistencyKey} className={styles.gameCard}>
-							<div className={styles.gameName}>{gameType.localizedName}</div>
-							<button
-								type="button"
-								className={styles.startButton}
-								onClick={() =>
-									navigate(`/game/${encodeURIComponent(gameType.persistencyKey)}`)
-								}
-							>
-								Start game
-							</button>
-						</li>
-					))}
-				</ul>
+				<h1>Привет!</h1>
+				<p className={styles.subtitle}>Готов ли си?</p>
+				<section className={styles.section}>
+					<h3>Свободна тренировка</h3>
+					<ul className={styles.gameList}>
+						{gameTypes.map((gameType) => (
+							<li key={gameType.persistencyKey} className={styles.gameCard}>
+								<div onClick={() =>
+										navigate(`/game/${encodeURIComponent(gameType.persistencyKey)}`)
+									} className={styles.gameName}>{gameType.localizedName}</div>
+							</li>
+						))}
+					</ul>
+				</section>
 			</main>
 		</div>
 	);
