@@ -268,7 +268,7 @@ export function GameSessionPage({
 					onDesktopSubmit={handleDesktopSubmit}
 				/>
 			</main>
-			{(progress || minutesLeft !== null) && (
+			{progress && (
 				<div className={styles.bottomPane}>
 					<GameInputArea
 						isMobile={isMobile}
@@ -282,20 +282,16 @@ export function GameSessionPage({
 						{progress && (
 							<div className={styles.statusProgress}>
 								<div>
-									Points {progress.pointsTowardWin}/
-									{progress.pointsRequiredToWin}
-								</div>
-								<div>
-									Problems {progress.problemsAttempted}/
-									{progress.minProblemsAttemptedToWin}
+									<b>Точки: 
+									{util.ensureTextContainsSign(progress.pointsTowardWin)}
+									</b>.<br />
+									За победа ти трябват още {progress.pointsRequiredToWin - progress.pointsTowardWin} точки и {progress.minProblemsAttemptedToWin - progress.problemsAttempted} пробвани задачи
 								</div>
 							</div>
 						)}
-						{minutesLeft !== null && (
-							<div className={styles.statusTimer}>
-								Minutes left: {minutesLeft}
-							</div>
-						)}
+						<div className={styles.statusTimer}>
+							Имаш още {minutesLeft} минути
+						</div>
 					</div>
 
 				</div>
