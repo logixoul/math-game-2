@@ -6,6 +6,7 @@ export function ErrorPage() {
         <div className={styles.page + " page"}>
             <TopBar />
             <main className={styles.content}>
+                Страницата не е намерена! 😮
             </main>
         </div>);
 }

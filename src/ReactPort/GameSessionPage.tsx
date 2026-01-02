@@ -7,11 +7,11 @@ import * as util from "../util";
 import { AppController } from "../AppController";
 import { GameInputArea } from "./GameInputArea";
 import { TopBar } from "./TopBar";
+import { ErrorPage } from "./ErrorPage";
 import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
-	gameType: GameType | null;
-	decodedKey: string | null;
+	gameType: GameType;
 };
 
 type Message = {
@@ -31,23 +31,21 @@ type ProgressSnapshot = {
 
 export function GameSessionRoute() {
 	const { gameTypeKey } = useParams<{ gameTypeKey: string }>();
-	const decodedKey = gameTypeKey ? decodeURIComponent(gameTypeKey) : null;
+	const decodedKey = decodeURIComponent(gameTypeKey!);
 	const gameType = useMemo(() => {
-		if (!decodedKey) return null;
 		return AppController.getAvailableGameTypes().find(
 			(type) => type.persistencyKey === decodedKey
 		);
 	}, [decodedKey]);
 	if(!gameType) {
-		return <ErrorPage></ErrorPage>
+		return <ErrorPage></ErrorPage>;
 	}
 
-	return <GameSessionPage gameType={gameType} decodedKey={decodedKey} />;
+	return <GameSessionPage gameType={gameType} />;
 }
 
 export function GameSessionPage({
 	gameType,
-	decodedKey,
 }: GameSessionPageProps) {
 	const sessionRef = useRef<GameSession | null>(null);
 	const logRef = useRef<HTMLDivElement | null>(null);
@@ -140,15 +138,7 @@ export function GameSessionPage({
 	};
 
 	useEffect(() => {
-		if (!gameType) {
-			sessionRef.current = null;
-			return;
-		}
 		startNewSession(gameType);
-
-		return () => {
-			sessionRef.current = null;
-		};
 	}, [gameType, ui]);
 
 	useEffect(() => {
@@ -249,67 +239,59 @@ export function GameSessionPage({
 		<div className={"page"}>
 			<TopBar />
 			<main className={styles.content}>
-				{decodedKey && !gameType && (
-					<p>Game type not found for key: {decodedKey}</p>
+				{hasWon && <p>Session complete.</p>}
+				{sessionComplete && (
+					<button
+						type="button"
+						className={styles.startOverButton}
+						onClick={() => startNewSession(gameType)}
+					>
+						Start over
+					</button>
 				)}
-				{!decodedKey && <p>Missing game type key.</p>}
-				{gameType && (
-					<>
-						{hasWon && <p>Session complete.</p>}
-						{sessionComplete && (
-							<button
-								type="button"
-								className={styles.startOverButton}
-								onClick={() => gameType && startNewSession(gameType)}
-							>
-								Start over
-							</button>
-						)}
-						<div className={styles.messageLog} ref={logRef}>
-							{messages.map((message, index) => (
-								<p
-									key={`${index}-${message.text}`}
-									style={{
-										color: message.color,
-										fontWeight: message.isBold ? "bold" : "normal",
-									}}
-								>
-									{message.text}
-									{message.isPrompt && (
-										<span className={styles.answerInline}>
-											{message.answer ??
-												(index === activePromptIndex
-													? isMobile
-														? currentAnswer
-														: null
-													: "")}
-											{index === activePromptIndex &&
-												!isMobile &&
-												!message.answer && (
-													<input
-														ref={desktopInputRef}
-														type="text"
-														value={desktopInput}
-														disabled={sessionComplete}
-														onChange={(event) =>
-															setDesktopInput(event.target.value)
-														}
-														onKeyDown={(event) => {
-															if (event.key === "Enter") {
-																handleDesktopSubmit();
-															}
-														}}
-														placeholder="Type answer"
-														className={styles.inlineAnswerInput}
-													/>
-												)}
-										</span>
-									)}
-								</p>
-							))}
-						</div>
-					</>
-				)}
+				<div className={styles.messageLog} ref={logRef}>
+					{messages.map((message, index) => (
+						<p
+							key={`${index}-${message.text}`}
+							style={{
+								color: message.color,
+								fontWeight: message.isBold ? "bold" : "normal",
+							}}
+						>
+							{message.text}
+							{message.isPrompt && (
+								<span className={styles.answerInline}>
+									{message.answer ??
+										(index === activePromptIndex
+											? isMobile
+												? currentAnswer
+												: null
+											: "")}
+									{index === activePromptIndex &&
+										!isMobile &&
+										!message.answer && (
+											<input
+												ref={desktopInputRef}
+												type="text"
+												value={desktopInput}
+												disabled={sessionComplete}
+												onChange={(event) =>
+													setDesktopInput(event.target.value)
+												}
+												onKeyDown={(event) => {
+													if (event.key === "Enter") {
+														handleDesktopSubmit();
+													}
+												}}
+												placeholder="Type answer"
+												className={styles.inlineAnswerInput}
+											/>
+										)}
+								</span>
+							)}
+						</p>
+					))}
+				</div>
 			</main>
 			{(progress || minutesLeft !== null) && (
 				<div className={styles.bottomPane}>
