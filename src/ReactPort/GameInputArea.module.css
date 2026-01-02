@@ -7,7 +7,7 @@
 
 .keypad {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 8px;
 }
 
@@ -34,6 +34,11 @@
 	background: #1f7a8c;
 	color: #ffffff;
 	border-color: #1f7a8c;
+}
+
+.keypadSpacer {
+	padding: 12px 0;
+	border: 1px solid transparent;
 }
 
 .revealButton {

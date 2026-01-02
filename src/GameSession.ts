@@ -121,7 +121,7 @@ export class GameSession {
         this.gamePage.updateProgressIndicator();
 
         const answer = this.getCurrentPrompt().answer;
-        this.gamePage.informUser("Отговорът е "+answer+". Запомнѝ го! 😇", "red");
+        this.gamePage.informUser("Отговорът е "+answer+"", "#4ac");
         
         this.promptScheduler.postponePrompt(this.currentPrompt);
 
