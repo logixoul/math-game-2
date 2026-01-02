@@ -282,9 +282,7 @@ export function GameSessionPage({
 						{progress && (
 							<div className={styles.statusProgress}>
 								<div>
-									<b>Точки: 
-									{util.ensureTextContainsSign(progress.pointsTowardWin)}
-									</b>.<br />
+									<b>Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}</b>.<br />
 									За победа ти трябват още {progress.pointsRequiredToWin - progress.pointsTowardWin} точки и {progress.minProblemsAttemptedToWin - progress.problemsAttempted} пробвани задачи
 								</div>
 							</div>

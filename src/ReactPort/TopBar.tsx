@@ -5,7 +5,7 @@ type TopBarProps = {
 	statusText?: string;
 };
 
-export function TopBar({ statusText = "Not logged in" }: TopBarProps) {
+export function TopBar({ statusText = "Не си влязъл в системата" }: TopBarProps) {
 	return (
 		<header className={styles.topBar}>
 			<Link className={styles.homeLink} to="/">

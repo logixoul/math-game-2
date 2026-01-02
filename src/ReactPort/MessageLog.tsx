@@ -69,7 +69,7 @@ export function MessageLog({
 												onDesktopSubmit();
 											}
 										}}
-										placeholder="Type answer"
+										placeholder="Твоят отговор"
 										className={styles.inlineAnswerInput}
 									/>
 								)}
