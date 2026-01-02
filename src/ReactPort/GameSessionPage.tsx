@@ -50,13 +50,19 @@ export function GameSessionPage({
 	const sessionRef = useRef<GameSession | null>(null);
 	const logRef = useRef<HTMLDivElement | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [progress, setProgress] = useState<ProgressSnapshot | null>(null);
-	const [minutesLeft, setMinutesLeft] = useState<number | null>(null);
+	const [progress, setProgress] = useState<ProgressSnapshot>({
+		// todo: fix zeros?
+		pointsTowardWin: 0,
+		problemsAttempted: 0,
+		pointsRequiredToWin: 0,
+		minProblemsAttemptedToWin: 0,
+	});
+	const [minutesLeft, setMinutesLeft] = useState<number>(0);
 	const [hasWon, setHasWon] = useState(false);
 	const [sessionComplete, setSessionComplete] = useState(false);
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [desktopInput, setDesktopInput] = useState("");
-	const [activePromptIndex, setActivePromptIndex] = useState<number | null>(null);
+	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
 	const isMobile = useMemo(() => util.isMobileDevice(), []);
 	const timedOutRef = useRef(false);
 	const desktopInputRef = useRef<HTMLInputElement | null>(null);
@@ -66,28 +72,18 @@ export function GameSessionPage({
 				setMessages((prev) => [...prev, { text: message, color, isBold }]);
 			},
 			updateProgressIndicator: () => {
-				const session = sessionRef.current;
-				if (!session) return;
-				setProgress({
-					pointsTowardWin: session.pointsTowardWin,
-					problemsAttempted: session.problemsAttempted,
-					pointsRequiredToWin: session.pointsRequiredToWin,
-					minProblemsAttemptedToWin: session.minProblemsAttemptedToWin,
-				});
+				syncProgressFromGameSession();
 			},
 			updateSessionTimeIndicator: () => {
-				const session = sessionRef.current;
-				if (!session) return;
+				const session = getSession();
 				const msLeft =
 					session.maxSessionDurationMs -
 					(Date.now() - session.gameStartTimestamp);
 				setMinutesLeft(Math.max(0, Math.floor(msLeft / 60000)));
 			},
 			showPrompt: () => {
-				const session = sessionRef.current;
-				if (!session) return;
+				const session = getSession();
 				const prompt = session.getCurrentPrompt();
-				if (!prompt) return;
 				setMessages((prev) => {
 					const nextIndex = prev.length;
 					setActivePromptIndex(nextIndex);
@@ -115,16 +111,32 @@ export function GameSessionPage({
 			},
 		};
 	}, []);
-
+	function getSession(): GameSession {
+		const s = sessionRef.current;
+		if (!s) throw new Error("Session not initialized");
+		return s;
+	}
+	function getLog(): HTMLDivElement {
+		const log = logRef.current;
+		if (!log) throw new Error("Log not initialized");
+		return log;
+	}
+	function syncProgressFromGameSession() {
+		const session = getSession();
+		setProgress({
+			pointsTowardWin: session.pointsTowardWin,
+			problemsAttempted: session.problemsAttempted,
+			pointsRequiredToWin: session.pointsRequiredToWin,
+			minProblemsAttemptedToWin: session.minProblemsAttemptedToWin,
+		});
+	}
 	const startNewSession = (nextGameType: GameType) => {
 		setMessages([]);
-		setProgress(null);
-		setMinutesLeft(null);
 		setHasWon(false);
 		setSessionComplete(false);
 		setCurrentAnswer("");
 		setDesktopInput("");
-		setActivePromptIndex(null);
+		setActivePromptIndex(0);
 		timedOutRef.current = false;
 
 		const firebaseController = new FirebaseController();
@@ -132,6 +144,9 @@ export function GameSessionPage({
 		const appContext = { firebaseController };
 		const session = new GameSession(appContext, ui, nextGameType);
 		sessionRef.current = session;
+
+		syncProgressFromGameSession();
+
 		ui.updateProgressIndicator();
 		ui.updateSessionTimeIndicator();
 		ui.showPrompt();
@@ -143,8 +158,8 @@ export function GameSessionPage({
 
 	useEffect(() => {
 		const intervalId = window.setInterval(() => {
-			const session = sessionRef.current;
-			if (!session || sessionComplete) return;
+			const session = getSession();
+			
 			ui.updateSessionTimeIndicator();
 			const msLeft =
 				session.maxSessionDurationMs -
@@ -185,8 +200,7 @@ export function GameSessionPage({
 	}, [sessionComplete, ui]);
 
 	useEffect(() => {
-		const log = logRef.current;
-		if (!log) return;
+		const log = getLog();
 		log.scrollTop = log.scrollHeight;
 	}, [messages, currentAnswer]);
 
@@ -196,22 +210,22 @@ export function GameSessionPage({
 	}, [activePromptIndex, isMobile, sessionComplete]);
 
 	const submitAnswer = (text: string) => {
-		if (!sessionRef.current || sessionComplete) return;
-		const trimmed = text.trim();
-		if (!trimmed) return;
+		const session = getSession();
+		if (sessionComplete) return;
+		
 		setMessages((prev) => {
 			if (activePromptIndex === null) return prev;
 			return prev.map((message, index) =>
 				index === activePromptIndex
-					? { ...message, answer: trimmed }
+					? { ...message, answer: text }
 					: message
 			);
 		});
 		setCurrentAnswer("");
 		setDesktopInput("");
-		const numeric = Number.parseInt(trimmed, 10);
+		const numeric = Number.parseInt(text, 10);
 		if (Number.isNaN(numeric)) return;
-		sessionRef.current.onUserAnswered(numeric);
+		session.onUserAnswered(numeric);
 	};
 
 	const handleDesktopSubmit = () => {
@@ -231,7 +245,6 @@ export function GameSessionPage({
 	};
 
 	const handleReveal = () => {
-		if (sessionComplete) return;
 		sessionRef.current?.onUserRequestedAnswerReveal();
 	};
 
