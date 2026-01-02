@@ -1,9 +1,9 @@
 import * as PageRouter from "../PageRouter"
-import { GameSession } from "../GameSession";
-import { AppController } from "../AppController";
-import { ResultStats } from "../ResultStats";
-import * as util from "../util"
-import * as GameTypes from "../GameTypes"
+import { GameSession } from "../../GameSession";
+import { AppController } from "../../AppController";
+import { ResultStats } from "../../ResultStats";
+import * as util from "../../util"
+import * as GameTypes from "../../GameTypes"
 
 export class GameSessionPage extends PageRouter.Page {
     private gameSession : GameSession;

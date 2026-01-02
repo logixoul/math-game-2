@@ -213,6 +213,159 @@ export class KaloyanHomework_28_12_2025_GameType extends GameType {
     }
 }
 
+export class BracketExpansion extends GameType {
+    constructor(
+        localizedName: string,
+        private nestingLevel: number,
+        private persistencyKeyValue: string,
+        private outerRange: Range = new Range(1, 20),
+        private innerRange: Range = new Range(-12, 12)
+    ) {
+        super(localizedName);
+    }
+
+    get persistencyKey(): string {
+        return this.persistencyKeyValue;
+    }
+
+    createRandomPrompt(): Prompt {
+        const forceNested = this.nestingLevel >= 2;
+        const expression = this.buildExpression(
+            this.nestingLevel,
+            this.nestingLevel > 0,
+            this.nestingLevel > 0,
+            forceNested,
+            2,
+            4,
+            this.outerRange
+        );
+        return new Prompt(`${expression.text}`, expression.value, `${this.persistencyKey}:${expression.text}`);
+    }
+
+    private buildExpression(
+        maxDepth: number,
+        allowParens: boolean,
+        forceParen: boolean,
+        forceNested: boolean,
+        minTerms: number,
+        maxTerms: number,
+        numberRange: Range
+    ): { text: string; value: number; hasParen: boolean; hasNested: boolean } {
+        if (!allowParens || maxDepth <= 0) {
+            return this.buildLinearExpression(minTerms, maxTerms, numberRange);
+        }
+
+        const termCount = util.randomInt(minTerms, maxTerms);
+        const forcedParenIndex = forceParen ? util.randomInt(0, termCount - 1) : -1;
+        const forcedNestedIndex =
+            forceNested && maxDepth >= 2 ? util.randomInt(0, termCount - 1) : -1;
+        const terms: { text: string; value: number; hasParen: boolean; hasNested: boolean }[] = [];
+
+        for (let i = 0; i < termCount; i++) {
+            const mustParen = i === forcedParenIndex || i === forcedNestedIndex;
+            const shouldParen = mustParen || util.randomInt(0, 1) === 1;
+            if (shouldParen && maxDepth > 0) {
+                const inner = this.buildExpression(
+                    maxDepth - 1,
+                    maxDepth - 1 > 0,
+                    i === forcedNestedIndex,
+                    false,
+                    1,
+                    3,
+                    this.innerRange
+                );
+                terms.push({
+                    text: `(${inner.text})`,
+                    value: inner.value,
+                    hasParen: true,
+                    hasNested: inner.hasParen || inner.hasNested,
+                });
+            } else {
+                const magnitude = this.randomNonZeroInt(numberRange.min, numberRange.max);
+                terms.push({
+                    text: `${Math.abs(magnitude)}`,
+                    value: Math.abs(magnitude),
+                    hasParen: false,
+                    hasNested: false,
+                });
+            }
+        }
+
+        return this.combineTerms(terms);
+    }
+
+    private buildLinearExpression(
+        minTerms: number,
+        maxTerms: number,
+        numberRange: Range
+    ): { text: string; value: number; hasParen: boolean; hasNested: boolean } {
+        const termCount = util.randomInt(minTerms, maxTerms);
+        const terms: { text: string; value: number; hasParen: boolean; hasNested: boolean }[] = [];
+        for (let i = 0; i < termCount; i++) {
+            const magnitude = this.randomNonZeroInt(numberRange.min, numberRange.max);
+            terms.push({
+                text: `${Math.abs(magnitude)}`,
+                value: Math.abs(magnitude),
+                hasParen: false,
+                hasNested: false,
+            });
+        }
+        return this.combineTerms(terms);
+    }
+
+    private combineTerms(
+        terms: { text: string; value: number; hasParen: boolean; hasNested: boolean }[]
+    ): { text: string; value: number; hasParen: boolean; hasNested: boolean } {
+        let total = 0;
+        let expression = "";
+        let hasParen = false;
+        let hasNested = false;
+
+        for (let i = 0; i < terms.length; i++) {
+            const sign = util.randomInt(0, 1) === 1 ? 1 : -1;
+            const term = terms[i];
+            total += sign * term.value;
+            hasParen = hasParen || term.hasParen;
+            hasNested = hasNested || term.hasNested;
+
+            if (i === 0) {
+                expression += sign === -1 ? `-${term.text}` : term.text;
+            } else {
+                const op = sign === 1 ? "+" : "-";
+                expression += ` ${op} ${term.text}`;
+            }
+        }
+
+        return { text: expression, value: total, hasParen, hasNested };
+    }
+
+    private randomNonZeroInt(min: number, max: number): number {
+        let value: number;
+        do {
+            value = util.randomInt(min, max);
+        } while (value === 0);
+        return value;
+    }
+}
+
+export class BracketExpansionNesting0GameType extends BracketExpansion {
+    constructor() {
+        super("-1 + 2 - 3 + 4", 0, "bracketExpansion.nesting0.v1");
+    }
+}
+
+export class BracketExpansionNesting1GameType extends BracketExpansion {
+    constructor() {
+        super("Разкриване на скоби (невложени)", 1, "bracketExpansion.nesting1.v1");
+    }
+}
+
+export class BracketExpansionNesting2GameType extends BracketExpansion {
+    constructor() {
+        super("Разкриване на скоби (вложени)", 2, "bracketExpansion.nesting2.v1");
+    }
+}
+
 function ensureNegativeNumbersHaveParens(n : number) {
     if(n < 0)
         return `(${n})`
@@ -221,3 +374,4 @@ function ensureNegativeNumbersHaveParens(n : number) {
 }
 
 export type GameTypeCtor = new () => GameType;
+

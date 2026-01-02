@@ -1,5 +1,5 @@
 import * as PageRouter from "../PageRouter"
-import { AppController } from "../AppController";
+import { AppController } from "../../AppController";
 import * as FirebaseAuth from "firebase/auth";
 
 export class DashboardPage extends PageRouter.Page {

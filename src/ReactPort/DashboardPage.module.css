@@ -4,7 +4,6 @@
 	margin-left: auto;
 	margin-right: auto;
 	padding: 24px;
-	padding-bottom: 140px;
 }
 
 .gameList {
@@ -56,5 +55,6 @@
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	box-shadow: 0 2px 50px rgba(0, 0, 0, 0.1);
 	background: url("/assets/gradbg.png") no-repeat;
+	background-size: contain;
 	margin: 1em;
 }
