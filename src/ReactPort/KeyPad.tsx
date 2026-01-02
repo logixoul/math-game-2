@@ -1,6 +1,6 @@
-import styles from "./GameInputArea.module.css";
+import styles from "./KeyPad.module.css";
 
-type GameInputAreaProps = {
+type KeyPadProps = {
 	isMobile: boolean;
 	sessionComplete: boolean;
 	onKeypadAppend: (value: string) => void;
@@ -9,14 +9,14 @@ type GameInputAreaProps = {
 	onReveal: () => void;
 };
 
-export function GameInputArea({
+export function KeyPad({
 	isMobile,
 	sessionComplete,
 	onKeypadAppend,
 	onKeypadBackspace,
 	onKeypadOk,
 	onReveal,
-}: GameInputAreaProps) {
+}: KeyPadProps) {
 	const keypadLayout = [
 		{ type: "append", label: "1" },
 		{ type: "append", label: "2" },

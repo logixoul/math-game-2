@@ -1,4 +1,5 @@
-import { RefObject } from "react";
+import { RefObject, useMemo, useState } from "react";
+import * as util from "../util";
 import styles from "./GameSessionPage.module.css";
 
 export type Message = {
@@ -12,27 +13,15 @@ export type Message = {
 type MessageLogProps = {
 	messages: Message[];
 	activePromptIndex: number | null;
-	isMobile: boolean;
 	currentAnswer: string;
-	desktopInput: string;
-	sessionComplete: boolean;
 	logRef: RefObject<HTMLDivElement>;
-	desktopInputRef: RefObject<HTMLInputElement>;
-	onDesktopInputChange: (value: string) => void;
-	onDesktopSubmit: () => void;
 };
 
 export function MessageLog({
 	messages,
 	activePromptIndex,
-	isMobile,
 	currentAnswer,
-	desktopInput,
-	sessionComplete,
 	logRef,
-	desktopInputRef,
-	onDesktopInputChange,
-	onDesktopSubmit,
 }: MessageLogProps) {
 	return (
 		<div className={styles.messageLog} ref={logRef}>
@@ -49,30 +38,8 @@ export function MessageLog({
 						<span className={styles.answerInline}>
 							{message.answer ??
 								(index === activePromptIndex
-									? isMobile
-										? currentAnswer
-										: null
+									? currentAnswer
 									: "")}
-							{index === activePromptIndex &&
-								!isMobile &&
-								!message.answer && (
-									<input
-										ref={desktopInputRef}
-										type="text"
-										value={desktopInput}
-										disabled={sessionComplete}
-										onChange={(event) =>
-											onDesktopInputChange(event.target.value)
-										}
-										onKeyDown={(event) => {
-											if (event.key === "Enter") {
-												onDesktopSubmit();
-											}
-										}}
-										placeholder="Твоят отговор"
-										className={styles.inlineAnswerInput}
-									/>
-								)}
 						</span>
 					)}
 				</p>

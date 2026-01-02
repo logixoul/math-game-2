@@ -5,7 +5,7 @@ import { FirebaseController } from "../FirebaseController";
 import { GameSession, GameSessionUI } from "../GameSession";
 import * as util from "../util";
 import { AppController } from "../AppController";
-import { GameInputArea } from "./GameInputArea";
+import { KeyPad } from "./KeyPad";
 import { TopBar } from "./TopBar";
 import { ErrorPage } from "./ErrorPage";
 import { MessageLog, Message } from "./MessageLog";
@@ -52,14 +52,11 @@ export function GameSessionPage({
 		minProblemsAttemptedToWin: 0,
 	});
 	const [minutesLeft, setMinutesLeft] = useState<number>(0);
-	const [hasWon, setHasWon] = useState(false);
 	const [sessionComplete, setSessionComplete] = useState(false);
 	const [currentAnswer, setCurrentAnswer] = useState("");
-	const [desktopInput, setDesktopInput] = useState("");
 	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
 	const isMobile = useMemo(() => util.isMobileDevice(), []);
 	const timedOutRef = useRef(false);
-	const desktopInputRef = useRef<HTMLInputElement | null>(null);
 	const ui = useMemo<GameSessionUI>(() => {
 		return {
 			informUser: (message, color, isBold) => {
@@ -87,10 +84,8 @@ export function GameSessionPage({
 					];
 				});
 				setCurrentAnswer("");
-				setDesktopInput("");
 			},
 			onWin: (resultStats) => {
-				setHasWon(true);
 				setSessionComplete(true);
 				const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
 				const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
@@ -126,10 +121,8 @@ export function GameSessionPage({
 	}
 	const startNewSession = (nextGameType: GameType) => {
 		setMessages([]);
-		setHasWon(false);
 		setSessionComplete(false);
 		setCurrentAnswer("");
-		setDesktopInput("");
 		setActivePromptIndex(0);
 		timedOutRef.current = false;
 
@@ -195,11 +188,6 @@ export function GameSessionPage({
 		log.scrollTop = log.scrollHeight;
 	}, [messages, currentAnswer]);
 
-	useEffect(() => {
-		if (isMobile || sessionComplete) return;
-		desktopInputRef.current?.focus();
-	}, [activePromptIndex, isMobile, sessionComplete]);
-
 	const submitAnswer = (text: string) => {
 		const session = getSession();
 		if (sessionComplete) return;
@@ -213,14 +201,9 @@ export function GameSessionPage({
 			);
 		});
 		setCurrentAnswer("");
-		setDesktopInput("");
 		const numeric = Number.parseInt(text, 10);
 		if (Number.isNaN(numeric)) return;
 		session.onUserAnswered(numeric);
-	};
-
-	const handleDesktopSubmit = () => {
-		submitAnswer(desktopInput);
 	};
 
 	const handleKeypadOk = () => {
@@ -255,19 +238,13 @@ export function GameSessionPage({
 				<MessageLog
 					messages={messages}
 					activePromptIndex={activePromptIndex}
-					isMobile={isMobile}
 					currentAnswer={currentAnswer}
-					desktopInput={desktopInput}
-					sessionComplete={sessionComplete}
 					logRef={logRef}
-					desktopInputRef={desktopInputRef}
-					onDesktopInputChange={setDesktopInput}
-					onDesktopSubmit={handleDesktopSubmit}
 				/>
 			</main>
 			{progress && (
 				<div className={styles.bottomPane}>
-					<GameInputArea
+					<KeyPad
 						isMobile={isMobile}
 						sessionComplete={sessionComplete}
 						onKeypadAppend={handleKeypadAppend}
