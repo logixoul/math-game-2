@@ -1,22 +1,18 @@
 import { GameSession } from './GameSession';
-import { UIController } from './UI';
+import { UIController } from './non-react legacy/UI';
 import { FirebaseController } from "./FirebaseController";
 import * as GameTypes from './GameTypes';
 import * as FirebaseAuth from "firebase/auth";
 
 export class AppController {
-    uiController: UIController;
+    uiController: any;
     firebaseController: FirebaseController;
     user: FirebaseAuth.User | null = null; // null when not logged in
     
     constructor() {
         this.firebaseController = new FirebaseController();
         this.firebaseController.init();
-        this.uiController = new UIController(this);
-    }
-
-    getAvailableGameTypes(): GameTypes.GameType[] {
-        return AppController.getAvailableGameTypes();
+        //this.uiController = new UIController(this);
     }
 
     static getAvailableGameTypes(): GameTypes.GameType[] {

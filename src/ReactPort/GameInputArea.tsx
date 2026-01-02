@@ -110,7 +110,7 @@ export function GameInputArea({
 					disabled={sessionComplete}
 					onClick={onReveal}
 				>
-					?? ????
+					Не знам
 				</button>
 			)}
 		</div>
