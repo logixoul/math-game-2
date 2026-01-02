@@ -10,3 +10,8 @@ body {
 	background: #f5f6f8;
 	color: #1f2933;
 }
+
+.page {
+	background: url("/assets/bodybg.png") no-repeat;
+    background-size:cover;
+}

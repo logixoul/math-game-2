@@ -9,7 +9,7 @@ export function DashboardPage() {
 	const gameTypes = useMemo(() => AppController.getAvailableGameTypes(), []);
 
 	return (
-		<div className={styles.page}>
+		<div className={styles.page + " page"}>
 			<TopBar />
 			<main className={styles.content}>
 				<h1>Dashboard</h1>
