@@ -8,18 +8,11 @@ import { AppController } from "../AppController";
 import { GameInputArea } from "./GameInputArea";
 import { TopBar } from "./TopBar";
 import { ErrorPage } from "./ErrorPage";
+import { MessageLog, Message } from "./MessageLog";
 import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
 	gameType: GameType;
-};
-
-type Message = {
-	text: string;
-	color: string;
-	isBold?: boolean;
-	isPrompt?: boolean;
-	answer?: string;
 };
 
 type ProgressSnapshot = {
@@ -262,49 +255,18 @@ export function GameSessionPage({
 						Start over
 					</button>
 				)}
-				<div className={styles.messageLog} ref={logRef}>
-					{messages.map((message, index) => (
-						<p
-							key={`${index}-${message.text}`}
-							style={{
-								color: message.color,
-								fontWeight: message.isBold ? "bold" : "normal",
-							}}
-						>
-							{message.text}
-							{message.isPrompt && (
-								<span className={styles.answerInline}>
-									{message.answer ??
-										(index === activePromptIndex
-											? isMobile
-												? currentAnswer
-												: null
-											: "")}
-									{index === activePromptIndex &&
-										!isMobile &&
-										!message.answer && (
-											<input
-												ref={desktopInputRef}
-												type="text"
-												value={desktopInput}
-												disabled={sessionComplete}
-												onChange={(event) =>
-													setDesktopInput(event.target.value)
-												}
-												onKeyDown={(event) => {
-													if (event.key === "Enter") {
-														handleDesktopSubmit();
-													}
-												}}
-												placeholder="Type answer"
-												className={styles.inlineAnswerInput}
-											/>
-										)}
-								</span>
-							)}
-						</p>
-					))}
-				</div>
+				<MessageLog
+					messages={messages}
+					activePromptIndex={activePromptIndex}
+					isMobile={isMobile}
+					currentAnswer={currentAnswer}
+					desktopInput={desktopInput}
+					sessionComplete={sessionComplete}
+					logRef={logRef}
+					desktopInputRef={desktopInputRef}
+					onDesktopInputChange={setDesktopInput}
+					onDesktopSubmit={handleDesktopSubmit}
+				/>
 			</main>
 			{(progress || minutesLeft !== null) && (
 				<div className={styles.bottomPane}>
