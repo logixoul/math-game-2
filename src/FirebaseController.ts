@@ -50,7 +50,10 @@ export class FirebaseController {
         await FirebaseAuth.setPersistence(this.auth, FirebaseAuth.browserLocalPersistence);
 
         FirebaseAuth.onAuthStateChanged(this.auth, (user) => {
-            this.state.user = user;
+            this.state = {
+                user: user,
+                unlockStatus: { status: "unlocked" }
+            };
             this.notifyListeners();
         });
     }
