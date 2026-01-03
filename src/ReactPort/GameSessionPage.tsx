@@ -55,7 +55,6 @@ export function GameSessionPage({
 	const [sessionComplete, setSessionComplete] = useState(false);
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
-	const isMobile = useMemo(() => util.isMobileDevice(), []);
 	const timedOutRef = useRef(false);
 	const ui = useMemo<GameSessionUI>(() => {
 		return {
@@ -144,23 +143,6 @@ export function GameSessionPage({
 	}, [gameType, ui]);
 
 	useEffect(() => {
-		const onKeyDown = (e: KeyboardEvent) => {
-			const parsedInt = parseInt(e.key, 10);
-			if(!Number.isNaN(parsedInt)) {
-				handleKeypadAppend(e.key);
-			}
-			else if(e.key == "Enter") {
-				handleKeypadOk();
-			} else if(e.key == "Backspace") {
-				handleKeypadBackspace();
-			}
-		};
-
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
-	}, []);
-
-	useEffect(() => {
 		const intervalId = window.setInterval(() => {
 			const session = getSession();
 			
@@ -239,6 +221,24 @@ export function GameSessionPage({
 		sessionRef.current?.onUserRequestedAnswerReveal();
 	};
 
+	
+	useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			const parsedInt = parseInt(e.key, 10);
+			if(!Number.isNaN(parsedInt) || e.key == "-") {
+				handleKeypadAppend(e.key);
+			}
+			else if(e.key == "Enter") {
+				handleKeypadOk();
+			} else if(e.key == "Backspace") {
+				handleKeypadBackspace();
+			}
+		};
+
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [handleKeypadAppend, handleKeypadBackspace, handleKeypadOk]);
+
 	return (
 		<div className={"page"}>
 			<TopBar />
@@ -261,11 +261,11 @@ export function GameSessionPage({
 			</main>
 				<div className={styles.bottomPane}>
 					{
-						isMobile ?
+						util.isMobileDevice() ?
 							<KeyPad
 								onKeypadAppend={handleKeypadAppend}
 								onKeypadBackspace={handleKeypadBackspace}
-								onKeypadOk={handleKeypadOk}
+								onKeypadOk={(handleKeypadOk)}
 								onReveal={handleReveal}
 							/>
 							:
