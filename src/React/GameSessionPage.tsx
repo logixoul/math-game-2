@@ -240,50 +240,47 @@ export function GameSessionPage({
 	}, [handleKeypadAppend, handleKeypadBackspace, handleKeypadOk]);
 
 	return (
-		<div className={"page"}>
-			<TopBar />
-			<main className={styles.content}>
-				{sessionComplete && (
-					<button
-						type="button"
-						className={styles.startOverButton}
-						onClick={() => startNewSession(gameType)}
-					>
-						Отначало
-					</button>
-				)}
-				<MessageLog
-					messages={messages}
-					activePromptIndex={activePromptIndex}
-					currentAnswer={currentAnswer}
-					logRef={logRef}
-				/>
-			</main>
-				<div className={styles.bottomPane}>
-					{
-						util.isMobileDevice() ?
-							<KeyPad
-								onKeypadAppend={handleKeypadAppend}
-								onKeypadBackspace={handleKeypadBackspace}
-								onKeypadOk={(handleKeypadOk)}
-								onReveal={handleReveal}
-							/>
-							:
-							<button type="button" className={styles.revealButton} onClick={handleReveal}>Не знам</button>
-					}
-					<div className={styles.statusBar}>
-						<div className={styles.statusProgress}>
-							<div>
-								<b>Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}</b>.<br />
-								За победа ти трябват още {progress.pointsRequiredToWin - progress.pointsTowardWin} точки и {progress.minProblemsAttemptedToWin - progress.problemsAttempted} пробвани задачи
-							</div>
-						</div>
-						<div className={styles.statusTimer}>
-							Имаш още {minutesLeft} минути
+		<>
+			{sessionComplete && (
+				<button
+					type="button"
+					className={styles.startOverButton}
+					onClick={() => startNewSession(gameType)}
+				>
+					Отначало
+				</button>
+			)}
+			<MessageLog
+				messages={messages}
+				activePromptIndex={activePromptIndex}
+				currentAnswer={currentAnswer}
+				logRef={logRef}
+			/>
+			<div className={styles.bottomPane}>
+				{
+					util.isMobileDevice() ?
+						<KeyPad
+							onKeypadAppend={handleKeypadAppend}
+							onKeypadBackspace={handleKeypadBackspace}
+							onKeypadOk={(handleKeypadOk)}
+							onReveal={handleReveal}
+						/>
+						:
+						<button type="button" className={styles.revealButton} onClick={handleReveal}>Не знам</button>
+				}
+				<div className={styles.statusBar}>
+					<div className={styles.statusProgress}>
+						<div>
+							<b>Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}</b>.<br />
+							За победа ти трябват още {progress.pointsRequiredToWin - progress.pointsTowardWin} точки и {progress.minProblemsAttemptedToWin - progress.problemsAttempted} пробвани задачи
 						</div>
 					</div>
-
+					<div className={styles.statusTimer}>
+						Имаш още {minutesLeft} минути
+					</div>
 				</div>
-		</div>
+
+			</div>
+		</>
 	);
 }

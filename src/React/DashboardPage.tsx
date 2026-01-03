@@ -24,14 +24,11 @@ export function DashboardPage() {
 	;
 
 	return (
-		<div className={"page"}>
-			<TopBar />
-			<main className={styles.content}>
-				<h2>Привет!</h2>
-				<p className={styles.subtitle}>Готов ли си?</p>
-				{createSection("Свободна тренировка - 5кл.", gameTypes.fifthGrade)}
-				{createSection("Свободна тренировка - 6кл.", gameTypes.sixthGrade)}
-			</main>
+		<div className={styles.dashboardContainer}>
+			<h2>Привет!</h2>
+			<p className={styles.subtitle}>Готов ли си?</p>
+			{createSection("Свободна тренировка - 5кл.", gameTypes.fifthGrade)}
+			{createSection("Свободна тренировка - 6кл.", gameTypes.sixthGrade)}
 		</div>
 	);
 }

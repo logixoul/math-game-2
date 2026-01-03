@@ -18,7 +18,3 @@ body {
 	display: flex;
 	flex-direction: column;
 }
-
-main {
-	soverflow: scroll;
-}
