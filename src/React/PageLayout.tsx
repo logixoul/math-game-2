@@ -2,10 +2,15 @@ import { Outlet } from "react-router-dom";
 import { TopBar } from "./TopBar";
 import styles from "./PageLayout.module.css";
 
-export function PageLayout() {
+type PageLayoutProps = {
+    loggedIn: boolean;
+    onLogOutRequested: () => void;
+};
+
+export function PageLayout({loggedIn, onLogOutRequested} : PageLayoutProps) {
     return (
         <div className={"page"}>
-            <TopBar />
+            <TopBar loggedIn={loggedIn} onLogOutRequested={onLogOutRequested}/>
             <main className={styles.content}>
                 <Outlet />
             </main>

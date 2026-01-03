@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { GameType } from "../GameTypes";
-import { FirebaseController } from "../FirebaseController";
+import * as GameTypes from "../GameTypes";
 import { GameSession, GameSessionUI } from "../GameSession";
 import * as util from "../util";
-import { AppController } from "../AppController";
 import { KeyPad } from "./KeyPad";
 import { TopBar } from "./TopBar";
 import { ErrorPage } from "./ErrorPage";
@@ -12,7 +10,7 @@ import { MessageLog, Message } from "./MessageLog";
 import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
-	gameType: GameType;
+	gameType: GameTypes.GameType;
 };
 
 type ProgressSnapshot = {
@@ -26,7 +24,7 @@ export function GameSessionRoute() {
 	const { gameTypeKey } = useParams<{ gameTypeKey: string }>();
 	const decodedKey = decodeURIComponent(gameTypeKey!);
 	const gameType = useMemo(() => {
-		const gameTypes = AppController.getAvailableGameTypes();
+		const gameTypes = GameTypes.getAvailableGameTypes();
 		return (gameTypes.fifthGrade.concat(gameTypes.sixthGrade)).find(
 			(type) => type.persistencyKey === decodedKey
 		);
@@ -118,17 +116,14 @@ export function GameSessionPage({
 			minProblemsAttemptedToWin: session.minProblemsAttemptedToWin,
 		});
 	}
-	const startNewSession = (nextGameType: GameType) => {
+	const startNewSession = (nextGameType: GameTypes.GameType) => {
 		setMessages([]);
 		setSessionComplete(false);
 		setCurrentAnswer("");
 		setActivePromptIndex(0);
 		timedOutRef.current = false;
 
-		const firebaseController = new FirebaseController();
-		void firebaseController.init();
-		const appContext = { firebaseController };
-		const session = new GameSession(appContext, ui, nextGameType);
+		const session = new GameSession(ui, nextGameType);
 		sessionRef.current = session;
 
 		syncProgressFromGameSession();

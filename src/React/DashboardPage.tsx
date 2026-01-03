@@ -1,15 +1,14 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppController } from "../AppController";
 import { TopBar } from "./TopBar";
 import styles from "./DashboardPage.module.css";
-import { GameType } from "../GameTypes";
+import * as GameTypes from "../GameTypes";
 
 export function DashboardPage() {
 	const navigate = useNavigate();
-	const gameTypes = useMemo(() => AppController.getAvailableGameTypes(), []);
+	const gameTypes = useMemo(() => GameTypes.getAvailableGameTypes(), []);
 
-	const createSection = (title:string, gameTypesSingleCategory : GameType[]) =>
+	const createSection = (title:string, gameTypesSingleCategory : GameTypes.GameType[]) =>
 		<section className={styles.section}>
 			<h3>{title}</h3>
 			<ul className={styles.gameList}>

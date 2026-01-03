@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import styles from "./TopBar.module.css";
+import { useFirebaseSnapshot, firebaseController } from "../FirebaseController";
 
 type TopBarProps = {
-	statusText?: string;
 };
 
-export function TopBar({ statusText = "Не си влязъл в системата" }: TopBarProps) {
+export function TopBar({  }: TopBarProps) {
+	const firebaseState = useFirebaseSnapshot();
+
 	return (
 		<header className={styles.topBar}>
 			<Link className={styles.homeLink} to="/">
@@ -14,7 +16,13 @@ export function TopBar({ statusText = "Не си влязъл в система�
 					stefan play (v0.1)
 				</div>
 			</Link>
-			<div className={styles.loginStatus}>{statusText}</div>
+			<div className={styles.loginStatus}>{
+				firebaseState.user &&
+					<>
+						Здравей, потребителю!
+						<button onClick={() => firebaseController.logout()}>Излез</button>
+					</>
+			}</div>
 		</header>
 	);
 }

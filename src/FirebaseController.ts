@@ -1,31 +1,37 @@
-﻿import * as FirebaseApp from "firebase/app";
+﻿import { useSyncExternalStore } from "react";
+import * as FirebaseApp from "firebase/app";
 import * as FirebaseAuth from "firebase/auth";
 import * as Firestore from "firebase/firestore";
-import type { UIController } from "./UI";
-import { TypedEventEmitter } from "./TypedEventEmitter";
 import { ResultStats } from "./ResultStats";
 
-type FirebaseEvents = {
+/*type FirebaseEvents = {
   loggedIn: { user: FirebaseAuth.User };
   loggedOut: {};
   scoreChanged: { score: number; delta: number };
   levelUp: { level: number };
-};
+};*/
 
 export type UnlockStatus =
     | { status: "signed_out" }
     | { status: "locked" }
     | { status: "unlocked"; unlockedWithCode?: string }
 
+export type FirebaseState = {
+    user: FirebaseAuth.User | null;
+    unlockStatus: UnlockStatus;
+};
+
+type Listener = () => void;
+
 export class FirebaseController {
     private auth!: FirebaseAuth.Auth;
     private db!: Firestore.Firestore;
+    private listeners = new Set<Listener>();
 
-    #bus = new TypedEventEmitter<FirebaseEvents>();
-
-    get bus() {
-        return this.#bus;
-    }
+    private state: FirebaseState = {
+        user: null,
+        unlockStatus: { status: "signed_out" }
+    };
 
     static #firebaseConfig = {
         apiKey: "AIzaSyCehCZKaxW-_qYW5-Vvk9JHJ8nBoLSNIm0",
@@ -44,12 +50,26 @@ export class FirebaseController {
         await FirebaseAuth.setPersistence(this.auth, FirebaseAuth.browserLocalPersistence);
 
         FirebaseAuth.onAuthStateChanged(this.auth, (user) => {
-            if (user) {
-                this.#bus.emit("loggedIn", { user });
-            } else {
-                this.#bus.emit("loggedOut", {});
-            }
+            this.state.user = user;
+            this.notifyListeners();
         });
+    }
+
+    getSnapshot(): FirebaseState { // for react
+        return this.state;
+    }
+
+    subscribe(listener: Listener): () => void {
+        this.listeners.add(listener);
+        return () => {
+            this.listeners.delete(listener);
+        };
+    }
+
+    private notifyListeners(): void {
+        for (const listener of this.listeners) {
+            listener();
+        }
     }
 
     async login(): Promise<void> {
@@ -177,4 +197,15 @@ export class FirebaseController {
             }
         );
     }
+}
+
+export const firebaseController = new FirebaseController();
+await firebaseController.init();
+
+export function useFirebaseSnapshot() {
+    return useSyncExternalStore(
+        firebaseController.subscribe.bind(firebaseController),
+        firebaseController.getSnapshot.bind(firebaseController),
+        firebaseController.getSnapshot.bind(firebaseController)
+    );
 }

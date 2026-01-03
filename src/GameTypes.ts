@@ -373,5 +373,28 @@ function ensureNegativeNumbersHaveParens(n : number) {
         return `${n}`
 }
 
-export type GameTypeCtor = new () => GameType;
+//export type GameTypeCtor = new () => GameType;
 
+export type GameTypeList = {
+    fifthGrade : GameType[]
+    sixthGrade : GameType[]
+}
+
+export function getAvailableGameTypes(): GameTypeList {
+    return {
+        fifthGrade: [
+            new MultiplicationGameType(new Range(0, 10)),
+            new DivisionGameType(new Range(0, 10)),
+            new AdditionFifthGradeGameType(100),
+            new SubtractionFifthGradeGameType(100),
+            new KaloyanHomework_28_12_2025_GameType()
+        ],
+        sixthGrade: [
+            new AdditionSixthGradeGameType(new Range(-40, 40)),
+            new SubtractionSixthGradeGameType(new Range(-40, 40)),
+            new BracketExpansionNesting0GameType(),
+            new BracketExpansionNesting1GameType(),
+            new BracketExpansionNesting2GameType(),
+        ]
+    };
+}

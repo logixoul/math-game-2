@@ -2,10 +2,6 @@ import type { FirebaseController } from './FirebaseController';
 import { GameType, Prompt, PromptScheduler } from './GameTypes';
 import { ResultStats } from './ResultStats';
 
-export type GameSessionAppContext = {
-    firebaseController: FirebaseController;
-};
-
 export type GameSessionUI = {
     updateProgressIndicator: () => void;
     showPrompt: () => void;
@@ -15,7 +11,6 @@ export type GameSessionUI = {
 };
 
 export class GameSession {
-    appController: GameSessionAppContext;
     gamePage: GameSessionUI;
     errorCount: number;
     gameType: GameType;
@@ -36,8 +31,7 @@ export class GameSession {
     readonly minProblemsAttemptedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
-    constructor(appController: GameSessionAppContext, gamePage : GameSessionUI, gameType: GameType) {
-        this.appController = appController;
+    constructor(gamePage : GameSessionUI, gameType: GameType) {
         this.gamePage = gamePage;
         
         this.errorCount = 0;
@@ -62,7 +56,7 @@ export class GameSession {
     win(): void {
         const stats = this.getResultStats();
         this.gamePage.onWin(stats);
-        //this.appController.firebaseController.onGameEnd(stats);
+        //firebaseController.onGameEnd(stats);
     }
 
     nextQuestion(): void {
