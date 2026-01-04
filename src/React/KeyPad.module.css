@@ -16,7 +16,8 @@
 	border: 1px solid #cbd2d9;
 	background: #ffffff;
 	border-radius: 6px;
-	font-size: 16px;
+	font-size: 1.4em;
+	font-weight: bold;
 	cursor: pointer;
 	touch-action: none;
 }
@@ -35,6 +36,10 @@
 	background: #1f7a8c;
 	color: #ffffff;
 	border-color: #1f7a8c;
+}
+
+.keypadButtonReveal {
+	font-size: 1em;
 }
 
 .keypadSpacer {

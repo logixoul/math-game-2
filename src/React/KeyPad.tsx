@@ -62,7 +62,7 @@ export function KeyPad({
 						return (
 							<NonScrollingButton
 								key="reveal"
-								className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
+								className={`${styles.keypadButton} ${styles.keypadButtonSecondary} ${styles.keypadButtonReveal}` }
 								onPress={onReveal}
 							>
 								{item.label}
