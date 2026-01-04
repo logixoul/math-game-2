@@ -11,6 +11,10 @@ body {
 	color: #1f2933;
 }
 
+html, body {
+	overscroll-behavior: none; 
+}
+
 .page {
 	background: url("/assets/bodybg.png") no-repeat;
     background-size:cover;
