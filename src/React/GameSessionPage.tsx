@@ -261,15 +261,19 @@ export function GameSessionPage({
 			/>
 			<div className={styles.bottomPane}>
 				{
-					util.isMobileDevice() ?
-						<KeyPad
-							onKeypadAppend={handleKeypadAppend}
-							onKeypadBackspace={handleKeypadBackspace}
-							onKeypadOk={(handleKeypadOk)}
-							onReveal={handleReveal}
-						/>
+					!sessionComplete
+					?
+						util.isMobileDevice()
+						?
+							<KeyPad
+								onKeypadAppend={handleKeypadAppend}
+								onKeypadBackspace={handleKeypadBackspace}
+								onKeypadOk={(handleKeypadOk)}
+								onReveal={handleReveal}
+							/>
 						:
-						<button type="button" className={styles.revealButton} onClick={handleReveal}>Не знам</button>
+							<button type="button" className={styles.revealButton} onClick={handleReveal}>Не знам</button>
+					: null
 				}
 				<div className={styles.statusBar}>
 					<div className={styles.statusProgress}>
