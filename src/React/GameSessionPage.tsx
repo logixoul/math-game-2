@@ -160,7 +160,7 @@ export function GameSessionPage({
 					{ text: "Край на тренировката - честито! (времето изтече 🙂 )", color: "green", isBold: true },
 					{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 					{
-						text: `Ти игра "${stats.gameType.localizedName}".`,
+						text: `Ти игра "${stats.gameType.uiLabel}".`,
 						color: "black",
 					},
 					{

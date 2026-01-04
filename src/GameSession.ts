@@ -110,7 +110,7 @@ export class GameSession {
 
 
     onUserRequestedAnswerReveal(): void {
-        this.pointsTowardWin-=2;
+        this.pointsTowardWin-=1;
         this.problemsAttempted++;
         this.gamePage.updateProgressIndicator();
 

@@ -75,7 +75,7 @@ export class PromptScheduler {
 }
 
 export abstract class GameType {
-    constructor(public readonly localizedName: string) {
+    constructor(public readonly uiLabel: string) {
     }
 
     abstract createRandomPrompt() : Prompt;
@@ -91,8 +91,8 @@ export class Range { // inclusive (includes both ends of the range)
 //function maybeAddSignAndOrParens
 
 export class MultiplicationGameType extends GameType {
-    constructor(private range : Range) {
-        super("Умножение");
+    constructor(uiLabel: string, private range : Range) {
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -108,8 +108,8 @@ export class MultiplicationGameType extends GameType {
 }
 
 export class DivisionGameType extends GameType {
-    constructor(private range : Range) {
-        super("Деление");
+    constructor(uiLabel: string, private range : Range) {
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -131,8 +131,8 @@ export class DivisionGameType extends GameType {
 }
 
 export class SubtractionFifthGradeGameType extends GameType {
-    constructor(private rangeMax : number) {
-        super("Изваждане (5 клас)");
+    constructor(uiLabel: string, private rangeMax : number) {
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -147,8 +147,8 @@ export class SubtractionFifthGradeGameType extends GameType {
 }
 
 export class SubtractionSixthGradeGameType extends GameType {
-    constructor(private range : Range) {
-        super("Изваждане (6 клас)");
+    constructor(uiLabel: string, private range : Range) {
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -169,8 +169,8 @@ export class AdditionFifthGradeGameType extends GameType {
         const b = util.randomInt(0, this.rangeMax);
         return new Prompt(`${a} + ${b}`, a + b, `${this.persistencyKey}:${a}:${b}`);
     }
-    constructor(private rangeMax : number) {
-        super("Събиране (5 клас)");
+    constructor(uiLabel: string, private rangeMax : number) {
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -185,8 +185,8 @@ export class AdditionSixthGradeGameType extends GameType {
         const bStr = ensureNegativeNumbersHaveParens(b);
         return new Prompt(`${a} + ${bStr}`, a + b, `${this.persistencyKey}:${a}:${b}`);
     }
-    constructor(private range : Range) {
-        super("Събиране (6 клас)");
+    constructor(uiLabel: string, private range : Range) {
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -195,17 +195,17 @@ export class AdditionSixthGradeGameType extends GameType {
 }
 
 export class KaloyanHomework_28_12_2025_GameType extends GameType {
-    readonly mul = new MultiplicationGameType(new Range(-10, 10))
-    readonly div = new DivisionGameType(new Range(-10, 10))
-    readonly add = new AdditionSixthGradeGameType(new Range(-40, 40));
-    readonly sub = new SubtractionSixthGradeGameType(new Range(-40, 40));
+    readonly mul = new MultiplicationGameType("", new Range(-10, 10))
+    readonly div = new DivisionGameType("", new Range(-10, 10))
+    readonly add = new AdditionSixthGradeGameType("", new Range(-40, 40));
+    readonly sub = new SubtractionSixthGradeGameType("", new Range(-40, 40));
 
     createRandomPrompt(): Prompt {
         const randomIndex : number = util.randomInt(0, 3);
         return [this.mul,this.div,this.add,this.sub][randomIndex].createRandomPrompt();
     }
-    constructor() {
-        super("KaloyanHomework_28_12_2025");
+    constructor(uiLabel: string) {
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -215,13 +215,13 @@ export class KaloyanHomework_28_12_2025_GameType extends GameType {
 
 export class BracketExpansion extends GameType {
     constructor(
-        localizedName: string,
+        uiLabel: string,
         private nestingLevel: number,
         private persistencyKeyValue: string,
         private outerRange: Range = new Range(1, 20),
         private innerRange: Range = new Range(-12, 12)
     ) {
-        super(localizedName);
+        super(uiLabel);
     }
 
     get persistencyKey(): string {
@@ -349,20 +349,20 @@ export class BracketExpansion extends GameType {
 }
 
 export class BracketExpansionNesting0GameType extends BracketExpansion {
-    constructor() {
-        super("-1 + 2 - 3 + 4", 0, "bracketExpansion.nesting0.v1");
+    constructor(uiLabel: string) {
+        super(uiLabel, 0, "bracketExpansion.nesting0.v1");
     }
 }
 
 export class BracketExpansionNesting1GameType extends BracketExpansion {
-    constructor() {
-        super("Разкриване на скоби (невложени)", 1, "bracketExpansion.nesting1.v1");
+    constructor(uiLabel: string) {
+        super(uiLabel, 1, "bracketExpansion.nesting1.v1");
     }
 }
 
 export class BracketExpansionNesting2GameType extends BracketExpansion {
-    constructor() {
-        super("Разкриване на скоби (вложени)", 2, "bracketExpansion.nesting2.v1");
+    constructor(uiLabel: string) {
+        super(uiLabel, 2, "bracketExpansion.nesting2.v1");
     }
 }
 
@@ -383,18 +383,18 @@ export type GameTypeList = {
 export function getAvailableGameTypes(): GameTypeList {
     return {
         fifthGrade: [
-            new MultiplicationGameType(new Range(0, 10)),
-            new DivisionGameType(new Range(0, 10)),
-            new AdditionFifthGradeGameType(100),
-            new SubtractionFifthGradeGameType(100),
-            new KaloyanHomework_28_12_2025_GameType()
+            new AdditionFifthGradeGameType("Събиране 5кл", 100),
+            new SubtractionFifthGradeGameType("Изваждане 5кл", 100),
+            new MultiplicationGameType("Умножение 5кл", new Range(0, 10)),
+            new DivisionGameType("Деление 5кл", new Range(0, 10)),
+            new KaloyanHomework_28_12_2025_GameType("Калоян старо домашно")
         ],
         sixthGrade: [
-            new AdditionSixthGradeGameType(new Range(-40, 40)),
-            new SubtractionSixthGradeGameType(new Range(-40, 40)),
-            new BracketExpansionNesting0GameType(),
-            new BracketExpansionNesting1GameType(),
-            new BracketExpansionNesting2GameType(),
+            new AdditionSixthGradeGameType("Събиране 6кл", new Range(-40, 40)),
+            new SubtractionSixthGradeGameType("Изваждане 6кл", new Range(-40, 40)),
+            new BracketExpansionNesting0GameType("-1 + 2 - 3 + 90"),
+            new BracketExpansionNesting1GameType("Разкриване на скоби"),
+            new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
         ]
     };
 }

@@ -15,7 +15,7 @@ export function DashboardPage() {
 				{gameTypesSingleCategory.map((gameType) => (
 					<li key={gameType.persistencyKey} className={styles.gameCard} onClick={() =>
 								navigate(`/game/${encodeURIComponent(gameType.persistencyKey)}`)
-							}>{gameType.localizedName}
+							}>{gameType.uiLabel}
 					</li>
 				))}
 			</ul>

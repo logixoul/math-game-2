@@ -10,7 +10,7 @@ type PageLayoutProps = {
 export function PageLayout({loggedIn, onLogOutRequested} : PageLayoutProps) {
     return (
         <div className={"page"}>
-            <TopBar loggedIn={loggedIn} onLogOutRequested={onLogOutRequested}/>
+            <TopBar/>
             <main className={styles.content}>
                 <Outlet />
             </main>
