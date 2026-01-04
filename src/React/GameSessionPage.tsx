@@ -191,7 +191,9 @@ export function GameSessionPage({
 	const submitAnswer = (text: string) => {
 		const session = getSession();
 		if (sessionComplete) return;
-		
+		const numeric = Number.parseInt(text, 10);
+		if (Number.isNaN(numeric)) return;
+
 		setMessages((prev) => {
 			if (activePromptIndex === null) return prev;
 			return prev.map((message, index) =>
@@ -201,8 +203,6 @@ export function GameSessionPage({
 			);
 		});
 		setCurrentAnswer("");
-		const numeric = Number.parseInt(text, 10);
-		if (Number.isNaN(numeric)) return;
 		session.onUserAnswered(numeric);
 	};
 
@@ -211,7 +211,9 @@ export function GameSessionPage({
 	};
 
 	const handleKeypadAppend = (value: string) => {
-		setCurrentAnswer((prev) => prev + value);
+		setCurrentAnswer((prev) => {
+			return prev + value;
+		});
 	};
 
 	const handleKeypadBackspace = () => {
