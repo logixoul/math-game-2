@@ -21,10 +21,6 @@
 	touch-action: none;
 }
 
-.keypadButton:active {
-	background-color: lightblue;
-}
-
 .keypadButton:disabled,
 .revealButton:disabled {
 	opacity: 0.6;

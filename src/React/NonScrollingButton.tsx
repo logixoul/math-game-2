@@ -1,4 +1,5 @@
 import * as React from "react";
+import styles from "./NonScrollingButton.module.css";
 
 type NonScrollingButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -12,11 +13,13 @@ export function NonScrollingButton({
   disabled,
   children,
   style,
+  className,
   ...rest
 }: NonScrollingButtonProps) {
   // Track whether this pointer interaction began on the button.
   const activePointerId = React.useRef<number | null>(null);
   const pressed = React.useRef(false);
+  const [isDown, setIsDown] = React.useState(false);
 
   return (
     <button
@@ -27,6 +30,7 @@ export function NonScrollingButton({
         WebkitTapHighlightColor: "transparent",
         ...style,
       }}
+      className={[className, isDown ? styles.isDown : null].filter(Boolean).join(" ")}
       {...rest}
       onPointerDown={(e) => {
         if (disabled) return;
@@ -36,6 +40,7 @@ export function NonScrollingButton({
 
         pressed.current = true;
         activePointerId.current = e.pointerId;
+        setIsDown(true);
 
         // Ensures we receive pointerup even if the finger drifts off the button.
         e.currentTarget.setPointerCapture(e.pointerId);
@@ -52,13 +57,15 @@ export function NonScrollingButton({
 
         pressed.current = false;
         activePointerId.current = null;
+        setIsDown(false);
 
         onPress(e);
       }}
       onPointerCancel={() => {
-        // Cancel means the OS/browser aborted the gesture — we don’t fire.
+        // Cancel means the OS/browser aborted the gesture; we do not fire.
         pressed.current = false;
         activePointerId.current = null;
+        setIsDown(false);
       }}
     >
       {children}
