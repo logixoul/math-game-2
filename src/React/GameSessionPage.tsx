@@ -68,7 +68,7 @@ export function GameSessionPage({
 				const msLeft =
 					session.maxSessionDurationMs -
 					(Date.now() - session.gameStartTimestamp);
-				setMinutesLeft(Math.max(0, Math.floor(msLeft / 60000)));
+				setMinutesLeft(Math.max(0, Math.ceil(msLeft / 60000)));
 			},
 			showPrompt: () => {
 				const session = getSession();
