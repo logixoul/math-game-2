@@ -1,3 +1,5 @@
+import type { PointerEvent } from "react";
+import { NonScrollingButton } from "./NonScrollingButton"
 import styles from "./KeyPad.module.css";
 
 type KeyPadProps = {
@@ -47,49 +49,45 @@ export function KeyPad({
 					}
 					if (item.type === "append") {
 						return (
-							<button
+							<NonScrollingButton
 								key={item.label}
-								type="button"
 								className={styles.keypadButton}
-								onClick={() => onKeypadAppend(item.label)}
+								onPress={() => onKeypadAppend(item.label)}
 							>
 								{item.label}
-							</button>
+							</NonScrollingButton>
 						);
 					}
 					if (item.type === "reveal") {
 						return (
-							<button
+							<NonScrollingButton
 								key="reveal"
-								type="button"
 								className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
-								onClick={onReveal}
+								onPress={onReveal}
 							>
 								{item.label}
-							</button>
+							</NonScrollingButton>
 						);
 					}
 					if (item.type === "backspace") {
 						return (
-							<button
+							<NonScrollingButton
 								key="backspace"
-								type="button"
 								className={`${styles.keypadButton} ${styles.keypadButtonSecondary}`}
-								onClick={onKeypadBackspace}
+								onPress={onKeypadBackspace}
 							>
 								<img src="/assets/backspace.svg" alt="Backspace" />
-							</button>
+							</NonScrollingButton>
 						);
 					}
 					return (
-						<button
+						<NonScrollingButton
 							key="ok"
-							type="button"
 							className={`${styles.keypadButton} ${styles.keypadButtonOk}`}
-							onClick={onKeypadOk}
+							onPress={onKeypadOk}
 						>
 							{item.label}
-						</button>
+						</NonScrollingButton>
 					);
 				})}
 			</div>

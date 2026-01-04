@@ -5,6 +5,7 @@ import "./global.css";
 import { QuickDebugLogger } from "../QuickDebugLogger";
 
 const qdl = QuickDebugLogger.instance;
+qdl.beginListeningForErrors();
 
 const container = document.getElementById("react-root");
 if (!container) {

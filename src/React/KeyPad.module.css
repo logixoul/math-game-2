@@ -18,6 +18,11 @@
 	border-radius: 6px;
 	font-size: 16px;
 	cursor: pointer;
+	touch-action: none;
+}
+
+.keypadButton:active {
+	background-color: lightblue;
 }
 
 .keypadButton:disabled,
