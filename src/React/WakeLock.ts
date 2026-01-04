@@ -7,16 +7,25 @@ export const attachWakeLock = (): WakeLockHandle => {
 	let wakeLock: WakeLockSentinel | null = null;
 
 	const requestWakeLock = async () => {
-		if (!("wakeLock" in navigator)) return;
-		if (!window.isSecureContext) return;
+		if (!("wakeLock" in navigator)){
+			console.warn("failure1");
+			return;
+		}
+		if (!window.isSecureContext) {
+			console.warn("failure2");
+			return;
+		}
 		try {
 			const lock = await navigator.wakeLock.request("screen");
+			console.log("WakeLock active!")
+			
 			if (!isMounted) {
 				await lock.release();
 				return;
 			}
 			wakeLock = lock;
 		} catch {
+			console.warn("failure3");
 			// Ignore; wake lock can be denied (battery saver, no gesture, etc.)
 		}
 	};
