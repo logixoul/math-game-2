@@ -7,6 +7,7 @@ import { KeyPad } from "./KeyPad";
 import { TopBar } from "./TopBar";
 import { ErrorPage } from "./ErrorPage";
 import { MessageLog, Message } from "./MessageLog";
+import { attachWakeLock } from "./WakeLock";
 import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
@@ -136,6 +137,11 @@ export function GameSessionPage({
 	useEffect(() => {
 		startNewSession(gameType);
 	}, [gameType, ui]);
+
+	useEffect(() => {
+		const wakeLock = attachWakeLock();
+		return () => wakeLock.dispose();
+	}, []);
 
 	useEffect(() => {
 		const intervalId = window.setInterval(() => {
