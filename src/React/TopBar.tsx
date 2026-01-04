@@ -19,7 +19,7 @@ export function TopBar({  }: TopBarProps) {
 			<div className={styles.loginStatus}>{
 				firebaseState.user &&
 					<>
-						Здравей, потребителю!
+						Здравей, {firebaseState.user.displayName}!
 						<button onClick={() => firebaseController.logout()}>Излез</button>
 					</>
 			}</div>

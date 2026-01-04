@@ -195,7 +195,7 @@ export class AdditionSixthGradeGameType extends GameType {
 }
 
 export class KaloyanHomework_28_12_2025_GameType extends GameType {
-    readonly mul = new MultiplicationGameType(new Range(-12, 12))
+    readonly mul = new MultiplicationGameType(new Range(-10, 10))
     readonly div = new DivisionGameType(new Range(-10, 10))
     readonly add = new AdditionSixthGradeGameType(new Range(-40, 40));
     readonly sub = new SubtractionSixthGradeGameType(new Range(-40, 40));
