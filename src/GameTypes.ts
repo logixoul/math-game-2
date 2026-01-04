@@ -195,8 +195,8 @@ export class AdditionSixthGradeGameType extends GameType {
 }
 
 export class KaloyanHomework_28_12_2025_GameType extends GameType {
-    readonly mul = new MultiplicationGameType("", new Range(-10, 10))
-    readonly div = new DivisionGameType("", new Range(-10, 10))
+    readonly mul = new MultiplicationGameType("", new Range(-10, 10));
+    readonly div = new DivisionGameType("", new Range(-10, 10));
     readonly add = new AdditionSixthGradeGameType("", new Range(-40, 40));
     readonly sub = new SubtractionSixthGradeGameType("", new Range(-40, 40));
 
@@ -210,6 +210,40 @@ export class KaloyanHomework_28_12_2025_GameType extends GameType {
 
     get persistencyKey(): string {
         return "KaloyanHomework_28_12_2025_GameType.v1";
+    }
+}
+
+export class KrisHomework_4_1_2026_GameType_1 extends GameType {
+    readonly add = new AdditionSixthGradeGameType("", new Range(-40, 40));
+    readonly sub = new SubtractionSixthGradeGameType("", new Range(-40, 40));
+
+    createRandomPrompt(): Prompt {
+        const randomIndex : number = util.randomInt(0, 1);
+        return [this.add,this.sub][randomIndex].createRandomPrompt();
+    }
+    constructor(uiLabel: string) {
+        super(uiLabel);
+    }
+
+    get persistencyKey(): string {
+        return "kris1";
+    }
+}
+
+export class KrisHomework_4_1_2026_GameType_2 extends GameType {
+    readonly mul = new MultiplicationGameType("", new Range(0, 10));
+    readonly div = new DivisionGameType("", new Range(0, 10));
+
+    createRandomPrompt(): Prompt {
+        const randomIndex : number = util.randomInt(0, 1);
+        return [this.mul,this.div][randomIndex].createRandomPrompt();
+    }
+    constructor(uiLabel: string) {
+        super(uiLabel);
+    }
+
+    get persistencyKey(): string {
+        return "kris2";
     }
 }
 
@@ -392,9 +426,12 @@ export function getAvailableGameTypes(): GameTypeList {
         sixthGrade: [
             new AdditionSixthGradeGameType("Събиране 6кл", new Range(-40, 40)),
             new SubtractionSixthGradeGameType("Изваждане 6кл", new Range(-40, 40)),
+            new MultiplicationGameType("Умножение 6кл", new Range(-10, 10)),
             new BracketExpansionNesting0GameType("-1 + 2 - 3 + 90"),
             new BracketExpansionNesting1GameType("Разкриване на скоби"),
             new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
+            new KrisHomework_4_1_2026_GameType_1("Крис домашно (събиране и изваждане)"),
+            new KrisHomework_4_1_2026_GameType_2("Крис домашно (умножение и деление)"),
         ]
     };
 }
