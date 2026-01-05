@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./TopBar.module.css";
 import { useFirebaseSnapshot, firebaseController } from "../FirebaseController";
+import { Popup } from "./Popup";
 
 type TopBarProps = {
 };
@@ -9,31 +10,6 @@ type TopBarProps = {
 export function TopBar({  }: TopBarProps) {
 	const firebaseState = useFirebaseSnapshot();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
-	const popupRef = useRef<HTMLDivElement | null>(null);
-
-	useEffect(() => {
-		if (!isPopupOpen) return;
-
-		const handleClickOutside = (event: MouseEvent) => {
-			const target = event.target as Node | null;
-			if (popupRef.current && target && !popupRef.current.contains(target)) {
-				setIsPopupOpen(false);
-			}
-		};
-
-		const handleEscape = (event: KeyboardEvent) => {
-			if (event.key === "Escape") {
-				setIsPopupOpen(false);
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-		document.addEventListener("keydown", handleEscape);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-			document.removeEventListener("keydown", handleEscape);
-		};
-	}, [isPopupOpen]);
 
 	const handleGoogleAuth = async () => {
 		await firebaseController.login();
@@ -68,12 +44,10 @@ export function TopBar({  }: TopBarProps) {
 								Account
 							</button>
 						</div>
-						{isPopupOpen && (
-							<div className={styles.authPopup} ref={popupRef}>
+						<Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} className={styles.authPopup}>
 								<button className={styles.authOption} onClick={handleGoogleAuth}>с Google акаунт</button>
 								<button className={styles.authOption} onClick={handleEmailPassword}>с имейл и парола</button>
-							</div>
-						)}
+						</Popup>
 					</>
 			}</div>
 		</header>
