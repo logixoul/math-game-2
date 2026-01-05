@@ -77,7 +77,23 @@ export class FirebaseController {
 
     async login(): Promise<void> {
         const provider = new FirebaseAuth.GoogleAuthProvider();
-        const result = await FirebaseAuth.signInWithPopup(this.auth, provider);
+        await FirebaseAuth.signInWithPopup(this.auth, provider);
+    }
+
+    async loginWithEmailPassword(emailRaw: string, passwordRaw: string): Promise<void> {
+        const email = emailRaw.trim();
+        const password = passwordRaw.trim();
+        if (!email || !password) throw new Error("Email and password required");
+
+        try {
+            await FirebaseAuth.signInWithEmailAndPassword(this.auth, email, password);
+        } catch (error: any) {
+            if (error?.code === "auth/user-not-found") {
+                await FirebaseAuth.createUserWithEmailAndPassword(this.auth, email, password);
+                return;
+            }
+            throw error;
+        }
     }
 
     async logout(): Promise<void> {

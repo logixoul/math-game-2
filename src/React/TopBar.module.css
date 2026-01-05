@@ -49,20 +49,6 @@
 	cursor: pointer;
 }
 
-.authPopup {
-	position: absolute;
-	right: 0;
-	top: calc(100% + 8px);
-	z-index: 10;
-	display: grid;
-	gap: 8px;
-	min-width: 200px;
-	padding: 10px;
-	background: rgba(20, 20, 20, 0.95);
-	border: 1px solid rgba(255, 255, 255, 0.2);
-	border-radius: 8px;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-}
 
 .authOption {
 	padding: 8px 10px;
@@ -72,4 +58,40 @@
 	color: #ffffff;
 	cursor: pointer;
 	text-align: left;
+}
+
+.authDivider {
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	font-size: 11px;
+	color: rgba(255, 255, 255, 0.6);
+	text-align: center;
+}
+
+.authForm {
+	display: grid;
+	gap: 8px;
+}
+
+.authInput {
+	padding: 8px 10px;
+	border-radius: 6px;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	background: rgba(0, 0, 0, 0.35);
+	color: #ffffff;
+}
+
+.authSubmit {
+	padding: 8px 10px;
+	border-radius: 6px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.08);
+	color: #ffffff;
+	cursor: pointer;
+	text-align: left;
+}
+
+.authError {
+	font-size: 12px;
+	color: #ffd4d4;
 }

@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useRef } from "react";
+import styles from "./Popup.module.css";
 
 type PopupProps = {
 	isOpen: boolean;
@@ -36,8 +37,12 @@ export function Popup({ isOpen, onClose, className, children }: PopupProps) {
 
 	if (!isOpen) return null;
 
+	const popupClassName = className
+		? `${styles.popup} ${className}`
+		: styles.popup;
+
 	return (
-		<div ref={popupRef} className={className}>
+		<div ref={popupRef} className={popupClassName}>
 			{children}
 		</div>
 	);
