@@ -428,6 +428,7 @@ export class MultiplicationGameTypeTmpAlex extends GameType{
 export type GameTypeList = {
     fifthGrade : GameType[]
     sixthGrade : GameType[]
+    homework : GameType[]
 }
 
 export function getAvailableGameTypes(): GameTypeList {
@@ -437,7 +438,6 @@ export function getAvailableGameTypes(): GameTypeList {
             new SubtractionFifthGradeGameType("Изваждане 5кл", 100),
             new MultiplicationGameType("Умножение 5кл", new Range(0, 10)),
             new DivisionGameType("Деление 5кл", new Range(0, 10)),
-            new KaloyanHomework_28_12_2025_GameType("Калоян старо домашно")
         ],
         sixthGrade: [
             new AdditionSixthGradeGameType("Събиране 6кл", new Range(-40, 40)),
@@ -446,9 +446,12 @@ export function getAvailableGameTypes(): GameTypeList {
             new BracketExpansionNesting0GameType("-1 + 2 - 3 + 90"),
             new BracketExpansionNesting1GameType("Разкриване на скоби"),
             new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
-            new KrisHomework_4_1_2026_GameType_1("Крис домашно (събиране и изваждане)"),
-            new KrisHomework_4_1_2026_GameType_2("Крис домашно (умножение и деление)"),
-            new MultiplicationGameTypeTmpAlex("Алекс 06.01.2026")
+        ],
+        homework: [
+            new KaloyanHomework_28_12_2025_GameType("Калоян от 28.12.2025"),
+            new KrisHomework_4_1_2026_GameType_1("Крис от 04.01.2026 (събиране и изваждане)"),
+            new KrisHomework_4_1_2026_GameType_2("Крис от 04.01.2026 (умножение и деление)"),
+            new MultiplicationGameTypeTmpAlex("Алекс от 06.01.2026")
         ]
     };
 }

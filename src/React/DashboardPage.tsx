@@ -28,6 +28,7 @@ export function DashboardPage() {
 			<p className={styles.subtitle}>Готов ли си?</p>
 			{createSection("Свободна тренировка - 5кл.", gameTypes.fifthGrade)}
 			{createSection("Свободна тренировка - 6кл.", gameTypes.sixthGrade)}
+			{createSection("Домашни", gameTypes.homework)}
 		</div>
 	);
 }
