@@ -86,7 +86,7 @@ export function TopBar({  }: TopBarProps) {
 			</Link>
 			<div className={styles.loginStatus}>{
 				firebaseState.user ?
-					<button onClick={() => firebaseController.logout()}>Изход</button>
+					<button className={styles.logoutButton} onClick={() => firebaseController.logout()}>Изход</button>
 					:
 					<>
 						<div className={styles.authButtons}>
@@ -179,3 +179,4 @@ export function TopBar({  }: TopBarProps) {
 		</header>
 	);
 }
+
