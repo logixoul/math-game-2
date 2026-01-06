@@ -12,10 +12,7 @@ export function DashboardPage() {
 	const [assignments, setAssignments] = useState<AssignmentRecord[]>([]);
 	const formatDate = (value?: Date | null) => {
 		if (!value) return "unknown date";
-		const day = String(value.getDate()).padStart(2, "0");
-		const month = String(value.getMonth() + 1).padStart(2, "0");
-		const year = value.getFullYear();
-		return `${day}.${month}.${year}`;
+		return value.toLocaleDateString("bg-BG");
 	};
 
 	useEffect(() => {
@@ -57,8 +54,7 @@ export function DashboardPage() {
 							onClick={() => navigate("/assignment/" + assignment.id)}
 						>
 							<div>
-								<b>{assignment.name.trim() ? assignment.name : "<без име>"}</b><br></br> (
-								{formatDate(assignment.createdAt?.toDate?.())})
+								<b>{assignment.name.trim() ? assignment.name : "<без име>"}</b><br></br> (от {formatDate(assignment.createdAt?.toDate?.())})
 							</div>
 							{assignment.dueText && <div className={styles.assignmentDue}>{assignment.dueText}</div>}
 						</li>
