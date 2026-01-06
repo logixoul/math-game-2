@@ -142,7 +142,7 @@ export function TopBar({  }: TopBarProps) {
 									<input
 										className={styles.authInput}
 										type="email"
-										placeholder="Email"
+										placeholder="Имейл"
 										autoComplete="email"
 										value={email}
 										onChange={(event) => setEmail(event.target.value)}
@@ -152,7 +152,7 @@ export function TopBar({  }: TopBarProps) {
 									<input
 										className={styles.authInput}
 										type="password"
-										placeholder="Password"
+										placeholder="Парола"
 										autoComplete={authMode === "signup" ? "new-password" : "current-password"}
 										value={password}
 										onChange={(event) => setPassword(event.target.value)}
@@ -165,7 +165,7 @@ export function TopBar({  }: TopBarProps) {
 										onClick={handleResetPassword}
 										disabled={isAuthBusy}
 									>
-										Forgot password?
+										Забравена парола?
 									</button>
 									<button className={styles.authSubmit} type="submit" disabled={isAuthBusy}>
 										{authMode === "signup" ? "Регистрирай се" : "Влез"}
