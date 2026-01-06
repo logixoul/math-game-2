@@ -1,4 +1,4 @@
-﻿import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./TopBar.module.css";
 import { useFirebaseSnapshot, firebaseController } from "../FirebaseController";
@@ -90,16 +90,16 @@ export function TopBar({  }: TopBarProps) {
 						{firebaseController.isCurrentUserAdmin() && (
 							<Link className={styles.adminButton} to="/admin">Admin</Link>
 						)}
-						<button className={styles.logoutButton} onClick={() => firebaseController.logout()}>D~Dú¥.D_D'</button>
+						<button className={styles.logoutButton} onClick={() => firebaseController.logout()}>Изход</button>
 					</>
 					:
 					<>
 						<div className={styles.authButtons}>
-						<button
+							<button
 								className={styles.authTrigger}
 								onClick={() => setIsPopupOpen((current) => !current)}
 							>
-								Ð’Ð»ÐµÐ·
+								Влез
 							</button>
 						</div>
 						<Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} className={styles.authPopup}>
@@ -112,7 +112,7 @@ export function TopBar({  }: TopBarProps) {
 										setAuthError(null);
 									}}
 								>
-									Ð’Ð»ÐµÐ·
+									Влез
 								</button>
 								<button
 									className={authMode === "signup" ? styles.authTabActive : styles.authTab}
@@ -122,13 +122,13 @@ export function TopBar({  }: TopBarProps) {
 										setAuthError(null);
 									}}
 								>
-									Ð ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€Ð°Ð¹ ÑÐµ
+									Регистрирай се
 								</button>
 							</div>
 							{authMode && (
 								<div className={styles.authOptions}>
 									<button className={styles.authOption} onClick={handleGoogleAuth} disabled={isAuthBusy}>
-										Ð¡ Google Ð°ÐºÐ°ÑƒÐ½Ñ‚
+										С Google акаунт
 									</button>
 									<button
 										className={styles.authOption}
@@ -138,7 +138,7 @@ export function TopBar({  }: TopBarProps) {
 										}}
 										disabled={isAuthBusy}
 									>
-										Ð¡ Ð¸Ð¼ÐµÐ¹Ð»
+										С имейл
 									</button>
 								</div>
 							)}
@@ -147,7 +147,7 @@ export function TopBar({  }: TopBarProps) {
 									<input
 										className={styles.authInput}
 										type="email"
-										placeholder="Ð˜Ð¼ÐµÐ¹Ð»"
+										placeholder="Имейл"
 										autoComplete="email"
 										value={email}
 										onChange={(event) => setEmail(event.target.value)}
@@ -157,7 +157,7 @@ export function TopBar({  }: TopBarProps) {
 									<input
 										className={styles.authInput}
 										type="password"
-										placeholder="ÐŸÐ°Ñ€Ð¾Ð»Ð°"
+										placeholder="Парола"
 										autoComplete={authMode === "signup" ? "new-password" : "current-password"}
 										value={password}
 										onChange={(event) => setPassword(event.target.value)}
@@ -170,10 +170,10 @@ export function TopBar({  }: TopBarProps) {
 										onClick={handleResetPassword}
 										disabled={isAuthBusy}
 									>
-										Ð—Ð°Ð±Ñ€Ð°Ð²ÐµÐ½Ð° Ð¿Ð°Ñ€Ð¾Ð»Ð°?
+										Забравена парола?
 									</button>
 									<button className={styles.authSubmit} type="submit" disabled={isAuthBusy}>
-										{authMode === "signup" ? "Ð ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€Ð°Ð¹ ÑÐµ" : "Ð’Ð»ÐµÐ·"}
+										{authMode === "signup" ? "Регистрирай се" : "Влез"}
 									</button>
 									{authError && <div className={styles.authError}>{authError}</div>}
 								</form>
