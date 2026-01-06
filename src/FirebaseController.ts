@@ -85,15 +85,20 @@ export class FirebaseController {
         const password = passwordRaw.trim();
         if (!email || !password) throw new Error("Email and password required");
 
-        try {
-            await FirebaseAuth.signInWithEmailAndPassword(this.auth, email, password);
-        } catch (error: any) {
-            if (error?.code === "auth/user-not-found") {
-                await FirebaseAuth.createUserWithEmailAndPassword(this.auth, email, password);
-                return;
-            }
-            throw error;
-        }
+        await FirebaseAuth.signInWithEmailAndPassword(this.auth, email, password);
+    }
+
+    async signupWithEmailPassword(emailRaw: string, passwordRaw: string): Promise<void> {
+        const email = emailRaw.trim();
+        const password = passwordRaw.trim();
+        if (!email || !password) throw new Error("Email and password required");
+        await FirebaseAuth.createUserWithEmailAndPassword(this.auth, email, password);
+    }
+
+    async sendPasswordReset(emailRaw: string): Promise<void> {
+        const email = emailRaw.trim();
+        if (!email) throw new Error("Email required");
+        await FirebaseAuth.sendPasswordResetEmail(this.auth, email);
     }
 
     async logout(): Promise<void> {

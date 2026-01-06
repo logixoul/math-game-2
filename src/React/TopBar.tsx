@@ -10,6 +10,8 @@ type TopBarProps = {
 export function TopBar({  }: TopBarProps) {
 	const firebaseState = useFirebaseSnapshot();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
+	const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
+	const [authMethod, setAuthMethod] = useState<"google" | "email" | null>(null);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [authError, setAuthError] = useState<string | null>(null);
@@ -17,6 +19,8 @@ export function TopBar({  }: TopBarProps) {
 
 	useEffect(() => {
 		if (!isPopupOpen) {
+			setAuthMode(null);
+			setAuthMethod(null);
 			setEmail("");
 			setPassword("");
 			setAuthError(null);
@@ -42,10 +46,31 @@ export function TopBar({  }: TopBarProps) {
 		setIsAuthBusy(true);
 		setAuthError(null);
 		try {
-			await firebaseController.loginWithEmailPassword(email, password);
+			if (authMode === "signup") {
+				await firebaseController.signupWithEmailPassword(email, password);
+			} else {
+				await firebaseController.loginWithEmailPassword(email, password);
+			}
 			setIsPopupOpen(false);
 		} catch (error: any) {
 			setAuthError(error?.message ?? "Login failed");
+		} finally {
+			setIsAuthBusy(false);
+		}
+	};
+
+	const handleResetPassword = async () => {
+		if (!email) {
+			setAuthError("Enter your email to reset the password.");
+			return;
+		}
+		setIsAuthBusy(true);
+		setAuthError(null);
+		try {
+			await firebaseController.sendPasswordReset(email);
+			setAuthError("Password reset email sent.");
+		} catch (error: any) {
+			setAuthError(error?.message ?? "Password reset failed");
 		} finally {
 			setIsAuthBusy(false);
 		}
@@ -61,10 +86,7 @@ export function TopBar({  }: TopBarProps) {
 			</Link>
 			<div className={styles.loginStatus}>{
 				firebaseState.user ?
-					<>
-						Здравей, {firebaseState.user.displayName}!
-						<button onClick={() => firebaseController.logout()}>Излез</button>
-					</>
+					<button onClick={() => firebaseController.logout()}>Изход</button>
 					:
 					<>
 						<div className={styles.authButtons}>
@@ -76,36 +98,81 @@ export function TopBar({  }: TopBarProps) {
 							</button>
 						</div>
 						<Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} className={styles.authPopup}>
-							<button className={styles.authOption} onClick={handleGoogleAuth} disabled={isAuthBusy}>
-								с Google акаунт
-							</button>
-							<div className={styles.authDivider}>или</div>
-							<form className={styles.authForm} onSubmit={handleEmailPassword}>
-								<input
-									className={styles.authInput}
-									type="email"
-									placeholder="Email"
-									autoComplete="email"
-									value={email}
-									onChange={(event) => setEmail(event.target.value)}
-									disabled={isAuthBusy}
-									required
-								/>
-								<input
-									className={styles.authInput}
-									type="password"
-									placeholder="Password"
-									autoComplete="current-password"
-									value={password}
-									onChange={(event) => setPassword(event.target.value)}
-									disabled={isAuthBusy}
-									required
-								/>
-								<button className={styles.authSubmit} type="submit" disabled={isAuthBusy}>
-									с имейл и парола
+							<div className={styles.authTabs}>
+								<button
+									className={authMode === "login" ? styles.authTabActive : styles.authTab}
+									onClick={() => {
+										setAuthMode("login");
+										setAuthMethod(null);
+										setAuthError(null);
+									}}
+								>
+									Влез
 								</button>
-								{authError && <div className={styles.authError}>{authError}</div>}
-							</form>
+								<button
+									className={authMode === "signup" ? styles.authTabActive : styles.authTab}
+									onClick={() => {
+										setAuthMode("signup");
+										setAuthMethod(null);
+										setAuthError(null);
+									}}
+								>
+									Регистрирай се
+								</button>
+							</div>
+							{authMode && (
+								<div className={styles.authOptions}>
+									<button className={styles.authOption} onClick={handleGoogleAuth} disabled={isAuthBusy}>
+										С Google акаунт
+									</button>
+									<button
+										className={styles.authOption}
+										onClick={() => {
+											setAuthMethod("email");
+											setAuthError(null);
+										}}
+										disabled={isAuthBusy}
+									>
+										С имейл
+									</button>
+								</div>
+							)}
+							{authMode && authMethod === "email" && (
+								<form className={styles.authForm} onSubmit={handleEmailPassword}>
+									<input
+										className={styles.authInput}
+										type="email"
+										placeholder="Email"
+										autoComplete="email"
+										value={email}
+										onChange={(event) => setEmail(event.target.value)}
+										disabled={isAuthBusy}
+										required
+									/>
+									<input
+										className={styles.authInput}
+										type="password"
+										placeholder="Password"
+										autoComplete={authMode === "signup" ? "new-password" : "current-password"}
+										value={password}
+										onChange={(event) => setPassword(event.target.value)}
+										disabled={isAuthBusy}
+										required
+									/>
+									<button
+										type="button"
+										className={styles.authLink}
+										onClick={handleResetPassword}
+										disabled={isAuthBusy}
+									>
+										Forgot password?
+									</button>
+									<button className={styles.authSubmit} type="submit" disabled={isAuthBusy}>
+										{authMode === "signup" ? "Регистрирай се" : "Влез"}
+									</button>
+									{authError && <div className={styles.authError}>{authError}</div>}
+								</form>
+							)}
 						</Popup>
 					</>
 			}</div>
