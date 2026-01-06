@@ -32,13 +32,16 @@
 .attemptTableWrap {
     width: 100%;
     overflow-x: auto;
-    border-radius: 10px;
 }
 
 .attemptTable {
     width: 100%;
-    border-collapse: collapse;
     border: 1px solid rgba(0, 0, 0, 0.12);
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
     background: #ffffff;
     font-size: 13px;
 }
