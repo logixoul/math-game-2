@@ -29,23 +29,42 @@
     font-weight: 600;
 }
 
-.attemptCard {
-    padding: 14px;
+.attemptTableWrap {
+    width: 100%;
+    overflow-x: auto;
     border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.attemptTable {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid rgba(0, 0, 0, 0.12);
     background: #ffffff;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    display: grid;
-    gap: 4px;
-}
-
-.attemptHeader {
-    font-weight: 600;
-}
-
-.attemptDetail {
     font-size: 13px;
-    color: rgba(0, 0, 0, 0.7);
+}
+
+.attemptTable th,
+.attemptTable td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.attemptTable th {
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.6);
+    background: rgba(31, 122, 140, 0.08);
+}
+
+.attemptTable tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.attemptTable tbody tr:hover {
+    background: rgba(31, 122, 140, 0.06);
 }
 
 .emptyState {

@@ -86,22 +86,39 @@ export function UserAttempts() {
                 {groupedAttempts.map((group) => (
                     <section key={group.key} className={styles.attemptGroup}>
                         <h3 className={styles.groupHeader}>{group.label}</h3>
-                        {group.attempts.map((attempt) => {
-                            const timestamp = attempt.createdAt?.toDate?.();
-                            const formatted = timestamp ? timestamp.toLocaleString() : "(unknown time)";
-                            const stats = attempt.resultStats;
-                            return (
-                                <div key={attempt.id} className={styles.attemptCard}>
-                                    <div className={styles.attemptHeader}>{formatted}</div>
-                                    <div className={styles.attemptDetail}>Reason: {attempt.completionReason}</div>
-                                    <div className={styles.attemptDetail}>Time: {Math.round(stats.timeElapsedMs / 1000)}s</div>
-                                    <div className={styles.attemptDetail}>Accuracy: {stats.percentCorrectOnFirstTry}%</div>
-                                    <div className={styles.attemptDetail}>Points: {stats.pointsTowardWin}</div>
-                                    <div className={styles.attemptDetail}>Problems: {stats.problemsAttempted}</div>
-                                    <div className={styles.attemptDetail}>Max points: {stats.maxReachedPointsTowardWin}</div>
-                                </div>
-                            );
-                        })}
+                        <div className={styles.attemptTableWrap}>
+                            <table className={styles.attemptTable}>
+                                <thead>
+                                    <tr>
+                                        <th>Played</th>
+                                        <th>Reason</th>
+                                        <th>Time (s)</th>
+                                        <th>Accuracy</th>
+                                        <th>Points</th>
+                                        <th>Problems</th>
+                                        <th>Max points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {group.attempts.map((attempt) => {
+                                        const timestamp = attempt.createdAt?.toDate?.();
+                                        const formatted = timestamp ? timestamp.toLocaleString() : "(unknown time)";
+                                        const stats = attempt.resultStats;
+                                        return (
+                                            <tr key={attempt.id}>
+                                                <td>{formatted}</td>
+                                                <td>{attempt.completionReason}</td>
+                                                <td>{Math.round(stats.timeElapsedMs / 1000)}</td>
+                                                <td>{stats.percentCorrectOnFirstTry}%</td>
+                                                <td>{stats.pointsTowardWin}</td>
+                                                <td>{stats.problemsAttempted}</td>
+                                                <td>{stats.maxReachedPointsTowardWin}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                 ))}
                 {groupedAttempts.length === 0 && (
