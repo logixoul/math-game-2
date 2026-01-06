@@ -55,7 +55,7 @@ export class QuickDebugLogger {
         container.style.boxShadow = '0 -2px 12px rgba(0,0,0,0.35)';
 
         const title = document.createElement('div');
-        title.textContent = 'Error Console (beta)';
+        title.textContent = 'Грешки! (пратѝ ми скрийншот)';
         title.style.padding = '6px 8px';
         title.style.background = 'rgba(0,0,0,0.5)';
         title.style.fontWeight = 'bold';
