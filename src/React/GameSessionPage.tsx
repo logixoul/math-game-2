@@ -55,6 +55,12 @@ export function GameSessionPage({
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
 	const timedOutRef = useRef(false);
+	const gameTypeByKey = useMemo(() => {
+		const gameTypes = GameTypes.getAvailableGameTypes();
+		return new Map(
+			gameTypes.fifthGrade.concat(gameTypes.sixthGrade).map((type) => [type.persistencyKey, type])
+		);
+	}, []);
 	const ui = useMemo<GameSessionUI>(() => {
 		return {
 			informUser: (message, color, isBold) => {
@@ -160,7 +166,7 @@ export function GameSessionPage({
 					{ text: "Край на тренировката - честито! (времето изтече 🙂 )", color: "green", isBold: true },
 					{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 					{
-						text: `Ти игра "${stats.gameType.uiLabel}".`,
+						text: `Ти игра "${gameTypeByKey.get(stats.gameTypeKey)?.uiLabel ?? stats.gameTypeKey}".`,
 						color: "black",
 					},
 					{
@@ -291,3 +297,4 @@ export function GameSessionPage({
 		</>
 	);
 }
+

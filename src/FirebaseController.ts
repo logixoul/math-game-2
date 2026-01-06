@@ -4,13 +4,6 @@ import * as FirebaseAuth from "firebase/auth";
 import * as Firestore from "firebase/firestore";
 import { ResultStats } from "./ResultStats";
 
-/*type FirebaseEvents = {
-  loggedIn: { user: FirebaseAuth.User };
-  loggedOut: {};
-  scoreChanged: { score: number; delta: number };
-  levelUp: { level: number };
-};*/
-
 export type UnlockStatus =
     | { status: "signed_out" }
     | { status: "locked" }
@@ -112,7 +105,7 @@ export class FirebaseController {
         const personalBestsRef = Firestore.doc(this.db, "users", user.uid, "personalBests", "summary");
 
         await Firestore.setDoc(personalBestsRef, {
-            stats: resultStats.toPlainObject(),
+            stats: resultStats,
             timestamp: Date.now()
         });
     }

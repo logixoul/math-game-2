@@ -46,12 +46,19 @@ export class GameSession {
         
         this.errorCount = 0;
     }
-    public getResultStats() {
+    public getResultStats(): ResultStats {
         const timeElapsed = Date.now() - (this.gameStartTimestamp ?? 0);
         const total = this.numCorrectAtFirstTry + this.numWrongAtFirstTry;
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / total);
         const percentCorrectOnFirstTry_Safe = total == 0 ? 0 : percentCorrectOnFirstTry;
-        return new ResultStats(this.gameType, timeElapsed, percentCorrectOnFirstTry_Safe, this.pointsTowardWin, this.problemsAttempted, this.maxReachedPointsTowardWin)
+        return {
+            gameTypeKey: this.gameType.persistencyKey,
+            timeElapsedMs: timeElapsed,
+            percentCorrectOnFirstTry: percentCorrectOnFirstTry_Safe,
+            pointsTowardWin: this.pointsTowardWin,
+            problemsAttempted: this.problemsAttempted,
+            maxReachedPointsTowardWin: this.maxReachedPointsTowardWin,
+        };
     }
     win(): void {
         const stats = this.getResultStats();
