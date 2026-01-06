@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./TopBar.module.css";
 import { useFirebaseSnapshot, firebaseController } from "../FirebaseController";
 import { Popup } from "./Popup";
@@ -9,6 +9,7 @@ type TopBarProps = {
 
 export function TopBar({  }: TopBarProps) {
 	const firebaseState = useFirebaseSnapshot();
+	const navigate = useNavigate();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
 	const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
 	const [authMethod, setAuthMethod] = useState<"google" | "email" | null>(null);
@@ -76,6 +77,14 @@ export function TopBar({  }: TopBarProps) {
 		}
 	};
 
+	const handleLogout = async () => {
+		try {
+			await firebaseController.logout();
+		} finally {
+			navigate("/");
+		}
+	};
+
 	return (
 		<header className={styles.topBar}>
 			<Link className={styles.homeLink} to="/">
@@ -90,7 +99,7 @@ export function TopBar({  }: TopBarProps) {
 						{firebaseController.isCurrentUserAdmin() && (
 							<Link className={styles.adminButton} to="/admin">Admin</Link>
 						)}
-						<button className={styles.logoutButton} onClick={() => firebaseController.logout()}>Изход</button>
+						<button className={styles.logoutButton} onClick={handleLogout}>Изход</button>
 					</>
 					:
 					<>
