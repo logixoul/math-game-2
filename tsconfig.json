@@ -12,6 +12,7 @@
 	  "noImplicitReturns": true,
 	  "noFallthroughCasesInSwitch": true*/
 	  "strict": true,
+	  "lib": ["dom", "es2019"],
 	},
-	"include": ["./src/**/*"]
+	"include": ["./src/**/*"],
   }

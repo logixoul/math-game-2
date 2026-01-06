@@ -25,8 +25,9 @@ export function GameSessionRoute() {
 	const { gameTypeKey } = useParams<{ gameTypeKey: string }>();
 	const decodedKey = decodeURIComponent(gameTypeKey!);
 	const gameType = useMemo(() => {
-		const gameTypes = GameTypes.getAvailableGameTypes();
-		return (gameTypes.fifthGrade.concat(gameTypes.sixthGrade)).find(
+		const gameTypesCategorized = GameTypes.getAvailableGameTypes();
+		const gameTypes = Object.values(gameTypesCategorized).flat();
+		return gameTypes.find(
 			(type) => type.persistencyKey === decodedKey
 		);
 	}, [decodedKey]);
