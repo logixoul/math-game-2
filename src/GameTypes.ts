@@ -409,6 +409,22 @@ function ensureNegativeNumbersHaveParens(n : number) {
 
 //export type GameTypeCtor = new () => GameType;
 
+export class MultiplicationGameTypeTmpAlex extends GameType{
+    constructor(uiLabel: string) {
+        super(uiLabel);
+    }
+
+    get persistencyKey(): string {
+        return "multiplicationTmpAlex.v1";
+    }
+
+    createRandomPrompt(): Prompt {
+        const a = util.randomInt(-20, 20);
+        const b = util.randomInt(-20, 20);
+        return new Prompt(`${a} × ${b}`, a * b, `${this.persistencyKey}:${a}:${b}`);
+    }
+}
+
 export type GameTypeList = {
     fifthGrade : GameType[]
     sixthGrade : GameType[]
@@ -432,6 +448,7 @@ export function getAvailableGameTypes(): GameTypeList {
             new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
             new KrisHomework_4_1_2026_GameType_1("Крис домашно (събиране и изваждане)"),
             new KrisHomework_4_1_2026_GameType_2("Крис домашно (умножение и деление)"),
+            new MultiplicationGameTypeTmpAlex("Алекс 06.01.2026")
         ]
     };
 }

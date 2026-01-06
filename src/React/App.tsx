@@ -6,8 +6,10 @@ import { PageLayout } from "./PageLayout";
 import { AuthWall } from "./AuthWall";
 
 export function App() {
+	const basePath = new URL(document.baseURI).pathname;
+	const routerBase = basePath.endsWith("/") ? basePath : `${basePath}/`;
 	return (
-		<BrowserRouter>
+		<BrowserRouter basename={routerBase}>
 			<Routes>
 				<Route element={<PageLayout />}>
 					<Route element={<AuthWall />}>
