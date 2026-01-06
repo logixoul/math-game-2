@@ -1,0 +1,131 @@
+.page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.backLink {
+    color: #1f7a8c;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.userId {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.55);
+}
+
+.primaryButton {
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: none;
+    background: #1f7a8c;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.primaryButton:hover {
+    background: #166070;
+}
+
+.assignmentsList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.assignmentCard {
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.assignmentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.nameInput {
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 6px 8px;
+    border-radius: 6px;
+    flex: 1;
+}
+
+.assignmentActions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.secondaryButton {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background: #f5f7f8;
+    color: #0f172a;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.secondaryButton:hover {
+    background: #e8eff2;
+}
+
+.dangerButton {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(120, 0, 0, 0.3);
+    background: #ffeaea;
+    color: #7a0000;
+    cursor: pointer;
+}
+
+.fieldRow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fieldLabel {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.textInput {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.textArea {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    min-height: 140px;
+    font-family: "Courier New", monospace;
+}
+
+.parseError {
+    font-size: 12px;
+    color: #a11b1b;
+}

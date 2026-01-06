@@ -58,3 +58,8 @@
 	background-size: contain;
 	margin: 1em;
 }
+
+.assignmentDue {
+	font-size: 12px;
+	color: rgba(0, 0, 0, 0.6);
+}

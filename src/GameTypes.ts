@@ -1,5 +1,16 @@
 import * as util from './util';
 
+export type AssignmentGameTypeSpec = {
+    key: string;
+    params?: Record<string, unknown>;
+    probability: number;
+};
+
+export type AssignmentGameTypeParseResult = {
+    specs: AssignmentGameTypeSpec[];
+    error?: string;
+};
+
 export class Prompt {
     failedAttempts: number;
 
@@ -425,6 +436,129 @@ export class MultiplicationGameTypeTmpAlex extends GameType{
     }
 }
 
+type WeightedGameType = {
+    gameType: GameType;
+    weight: number;
+};
+
+export class WeightedAssignmentGameType extends GameType {
+    constructor(
+        uiLabel: string,
+        private readonly persistencyKeyValue: string,
+        private readonly weightedGameTypes: WeightedGameType[]
+    ) {
+        super(uiLabel);
+    }
+
+    get persistencyKey(): string {
+        return this.persistencyKeyValue;
+    }
+
+    createRandomPrompt(): Prompt {
+        if (this.weightedGameTypes.length === 0) {
+            throw new Error("No game types available for assignment");
+        }
+        const total = this.weightedGameTypes.reduce((sum, entry) => sum + entry.weight, 0);
+        const roll = Math.random() * Math.max(1, total);
+        let running = 0;
+        for (const entry of this.weightedGameTypes) {
+            running += entry.weight;
+            if (roll <= running) {
+                return entry.gameType.createRandomPrompt();
+            }
+        }
+        return this.weightedGameTypes[this.weightedGameTypes.length - 1].gameType.createRandomPrompt();
+    }
+}
+
+export function parseAssignmentGameTypes(jsonText: string): AssignmentGameTypeParseResult {
+    if (!jsonText.trim()) {
+        return { specs: [], error: "Empty JSON" };
+    }
+    try {
+        const parsed = JSON.parse(jsonText);
+        if (!Array.isArray(parsed)) {
+            return { specs: [], error: "JSON must be an array" };
+        }
+        const specs = parsed.map((entry) => {
+            const key = String(entry?.key ?? "");
+            const probability = Number(entry?.probability ?? 0);
+            const params = (entry?.params ?? {}) as Record<string, unknown>;
+            return { key, probability, params } satisfies AssignmentGameTypeSpec;
+        });
+        return { specs };
+    } catch (error: any) {
+        return { specs: [], error: error?.message ?? "Invalid JSON" };
+    }
+}
+
+export function createAssignmentGameType(
+    assignmentId: string,
+    uiLabel: string,
+    specs: AssignmentGameTypeSpec[]
+): GameType | null {
+    const weightedGameTypes: WeightedGameType[] = [];
+    for (const spec of specs) {
+        const gameType = createGameTypeFromSpec(spec);
+        if (!gameType) {
+            continue;
+        }
+        weightedGameTypes.push({
+            gameType,
+            weight: Number.isFinite(spec.probability) ? spec.probability : 0,
+        });
+    }
+    if (weightedGameTypes.length === 0) {
+        return null;
+    }
+    return new WeightedAssignmentGameType(
+        uiLabel,
+        `assignment:${assignmentId}`,
+        weightedGameTypes
+    );
+}
+
+function createGameTypeFromSpec(spec: AssignmentGameTypeSpec): GameType | null {
+    const params = spec.params ?? {};
+    const rangeMin = Number((params as any).rangeMin ?? 0);
+    const rangeMax = Number((params as any).rangeMax ?? 0);
+    const range = new Range(rangeMin, rangeMax);
+    switch (spec.key) {
+        case "additionFifthGrade.v1":
+            return new AdditionFifthGradeGameType("", rangeMax);
+        case "additionSixthGrade.v1":
+            return new AdditionSixthGradeGameType("", range);
+        case "subtractionFifthGrade.v1":
+            return new SubtractionFifthGradeGameType("", rangeMax);
+        case "subtractionSixthGrade.v1":
+            return new SubtractionSixthGradeGameType("", range);
+        case "multiplication.v1":
+            return new MultiplicationGameType("", range);
+        case "division.v1":
+            return new DivisionGameType("", range);
+        case "BracketExpansion.v1": {
+            const nestingLevel = Number((params as any).nestingLevel ?? 0);
+            const innerMin = Number((params as any).innerRangeMin ?? -12);
+            const innerMax = Number((params as any).innerRangeMax ?? 12);
+            return new BracketExpansion(
+                "",
+                nestingLevel,
+                `assignment.bracketExpansion.${nestingLevel}`,
+                range,
+                new Range(innerMin, innerMax)
+            );
+        }
+        case "bracketExpansion.nesting0.v1":
+            return new BracketExpansionNesting0GameType("");
+        case "bracketExpansion.nesting1.v1":
+            return new BracketExpansionNesting1GameType("");
+        case "bracketExpansion.nesting2.v1":
+            return new BracketExpansionNesting2GameType("");
+        default:
+            return null;
+    }
+}
+
 export type GameTypeList = {
     fifthGrade : GameType[]
     sixthGrade : GameType[]
@@ -447,11 +581,7 @@ export function getAvailableGameTypes(): GameTypeList {
             new BracketExpansionNesting1GameType("Разкриване на скоби"),
             new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
         ],
-        homework: [
-            new KaloyanHomework_28_12_2025_GameType("Калоян от 28.12.2025"),
-            new KrisHomework_4_1_2026_GameType_1("Крис от 04.01.2026 (събиране и изваждане)"),
-            new KrisHomework_4_1_2026_GameType_2("Крис от 04.01.2026 (умножение и деление)"),
-            new MultiplicationGameTypeTmpAlex("Алекс от 06.01.2026")
-        ]
+        homework: []
     };
 }
+

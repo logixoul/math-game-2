@@ -4,6 +4,10 @@ import { GameSessionRoute } from "./GameSessionPage";
 import { ErrorPage } from "./ErrorPage";
 import { PageLayout } from "./PageLayout";
 import { AuthWall } from "./AuthWall";
+import { AdminDashboardPage } from "./AdminDashboardPage";
+import { UserAdminPage } from "./UserAdminPage";
+import { AssignmentAttempts } from "./AssignmentAttempts";
+import { AssignmentSessionRoute } from "./AssignmentSessionRoute";
 
 export function App() {
 	const basePath = new URL(document.baseURI).pathname;
@@ -13,12 +17,16 @@ export function App() {
 			<Routes>
 				<Route element={<PageLayout />}>
 					<Route element={<AuthWall />}>
-						<Route path="/" element={<DashboardPage />} />
-						<Route path="/game/" element={<ErrorPage />} />
-						<Route path="/game/:gameTypeKey" element={<GameSessionRoute />} />
-					</Route>
+					<Route path="/" element={<DashboardPage />} />
+					<Route path="/game/" element={<ErrorPage />} />
+					<Route path="/game/:gameTypeKey" element={<GameSessionRoute />} />
+					<Route path="/assignment/:assignmentId" element={<AssignmentSessionRoute />} />
+					<Route path="/admin" element={<AdminDashboardPage />} />
+					<Route path="/admin/users/:uid" element={<UserAdminPage />} />
+					<Route path="/admin/users/:uid/assignments/:assignmentId/attempts" element={<AssignmentAttempts />} />
 				</Route>
-			</Routes>
-		</BrowserRouter>
+			</Route>
+		</Routes>
+	</BrowserRouter>
 	);
 }

@@ -9,9 +9,11 @@ import { ErrorPage } from "./ErrorPage";
 import { MessageLog, Message } from "./MessageLog";
 import { attachWakeLock } from "./WakeLock";
 import styles from "./GameSessionPage.module.css";
+import { firebaseController } from "../FirebaseController";
 
 type GameSessionPageProps = {
 	gameType: GameTypes.GameType;
+	assignmentId?: string;
 };
 
 type ProgressSnapshot = {
@@ -40,9 +42,11 @@ export function GameSessionRoute() {
 
 export function GameSessionPage({
 	gameType,
+	assignmentId,
 }: GameSessionPageProps) {
 	const sessionRef = useRef<GameSession | null>(null);
 	const logRef = useRef<HTMLDivElement | null>(null);
+	const hasRecordedAttemptRef = useRef(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [progress, setProgress] = useState<ProgressSnapshot>({
 		// todo: fix zeros?
@@ -92,6 +96,10 @@ export function GameSessionPage({
 			},
 			onWin: (resultStats) => {
 				setSessionComplete(true);
+				if (assignmentId && !hasRecordedAttemptRef.current) {
+					hasRecordedAttemptRef.current = true;
+					firebaseController.recordAssignmentAttempt(assignmentId, resultStats, "win").catch(() => { });
+				}
 				const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
 				const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
 				setMessages((prev) => [
@@ -104,7 +112,7 @@ export function GameSessionPage({
 				]);
 			},
 		};
-	}, []);
+	}, [assignmentId]);
 	function getSession(): GameSession {
 		const s = sessionRef.current;
 		if (!s) throw new Error("Session not initialized");
@@ -162,6 +170,10 @@ export function GameSessionPage({
 				timedOutRef.current = true;
 				setSessionComplete(true);
 				const stats = session.getResultStats();
+				if (assignmentId && !hasRecordedAttemptRef.current) {
+					hasRecordedAttemptRef.current = true;
+					firebaseController.recordAssignmentAttempt(assignmentId, stats, "timeout").catch(() => { });
+				}
 				setMessages((prev) => [
 					...prev,
 					{ text: "Край на тренировката - честито! (времето изтече 🙂 )", color: "green", isBold: true },

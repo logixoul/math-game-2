@@ -4,6 +4,28 @@ import * as FirebaseAuth from "firebase/auth";
 import * as Firestore from "firebase/firestore";
 import { ResultStats } from "./ResultStats";
 
+export type UserSummary = {
+    uid: string;
+    email?: string | null;
+    displayName?: string | null;
+};
+
+export type AssignmentRecord = {
+    id: string;
+    name: string;
+    dueText: string;
+    isActive: boolean;
+    version: number;
+    gameTypesJson: string;
+};
+
+export type AssignmentAttempt = {
+    id: string;
+    createdAt?: Firestore.Timestamp | null;
+    completionReason: "win" | "timeout";
+    resultStats: ResultStats;
+};
+
 export type UnlockStatus =
     | { status: "signed_out" }
     | { status: "locked" }
@@ -48,6 +70,9 @@ export class FirebaseController {
                 unlockStatus: { status: "unlocked" }
             };
             this.notifyListeners();
+            if (user) {
+                this.ensureUserDoc(user).catch(() => { });
+            }
         });
     }
 
@@ -111,6 +136,23 @@ export class FirebaseController {
     }
 
     private readonly ADMIN_UID = "Cp7CZeiruTgp38UIifYZDYhuvkI3";
+    isCurrentUserAdmin(): boolean {
+        return this.auth.currentUser?.uid === this.ADMIN_UID;
+    }
+
+    private async ensureUserDoc(user: FirebaseAuth.User): Promise<void> {
+        const userRef = Firestore.doc(this.db, "users", user.uid);
+        await Firestore.setDoc(
+            userRef,
+            {
+                uid: user.uid,
+                email: user.email ?? null,
+                displayName: user.displayName ?? null,
+                lastLoginAt: Firestore.serverTimestamp(),
+            },
+            { merge: true }
+        );
+    }
 
     async generateUnlockCodeSingleUse(): Promise<string> {
         const user = this.auth.currentUser;
@@ -184,6 +226,125 @@ export class FirebaseController {
             return { status: "unlocked", unlockedWithCode: data.unlockedWithCode };
         }
         return { status: "locked" };
+    }
+
+    onUsersChanged(cb: (users: UserSummary[]) => void): () => void {
+        const usersRef = Firestore.collection(this.db, "users");
+        return Firestore.onSnapshot(usersRef, (snap) => {
+            const users = snap.docs.map((doc) => {
+                const data = doc.data() as any;
+                return {
+                    uid: doc.id,
+                    email: data.email ?? null,
+                    displayName: data.displayName ?? null,
+                } satisfies UserSummary;
+            });
+            cb(users);
+        });
+    }
+
+    onAssignmentsChanged(uid: string, cb: (assignments: AssignmentRecord[]) => void): () => void {
+        const assignmentsRef = Firestore.collection(this.db, "users", uid, "assignments");
+        return Firestore.onSnapshot(assignmentsRef, (snap) => {
+            const assignments = snap.docs.map((doc) => {
+                const data = doc.data() as any;
+                return {
+                    id: doc.id,
+                    name: String(data.name ?? ""),
+                    dueText: String(data.dueText ?? ""),
+                    isActive: Boolean(data.isActive ?? false),
+                    version: Number(data.version ?? 1),
+                    gameTypesJson: String(data.gameTypesJson ?? "[]"),
+                } satisfies AssignmentRecord;
+            });
+            cb(assignments);
+        });
+    }
+
+    onAssignmentChanged(uid: string, assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
+        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
+        return Firestore.onSnapshot(assignmentRef, (snap) => {
+            if (!snap.exists()) {
+                cb(null);
+                return;
+            }
+            const data = snap.data() as any;
+            cb({
+                id: snap.id,
+                name: String(data.name ?? ""),
+                dueText: String(data.dueText ?? ""),
+                isActive: Boolean(data.isActive ?? false),
+                version: Number(data.version ?? 1),
+                gameTypesJson: String(data.gameTypesJson ?? "[]"),
+            });
+        });
+    }
+
+    async createAssignment(uid: string, defaults?: Partial<AssignmentRecord>): Promise<string> {
+        const assignmentId = crypto.randomUUID();
+        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
+        await Firestore.setDoc(assignmentRef, {
+            name: defaults?.name ?? "New assignment",
+            dueText: defaults?.dueText ?? "",
+            isActive: defaults?.isActive ?? true,
+            version: defaults?.version ?? 1,
+            gameTypesJson: defaults?.gameTypesJson ?? "[]",
+            createdAt: Firestore.serverTimestamp(),
+            updatedAt: Firestore.serverTimestamp(),
+        });
+        return assignmentId;
+    }
+
+    async updateAssignment(uid: string, assignmentId: string, update: Partial<AssignmentRecord>): Promise<void> {
+        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
+        await Firestore.setDoc(
+            assignmentRef,
+            {
+                ...update,
+                updatedAt: Firestore.serverTimestamp(),
+            },
+            { merge: true }
+        );
+    }
+
+    async deleteAssignment(uid: string, assignmentId: string): Promise<void> {
+        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
+        await Firestore.deleteDoc(assignmentRef);
+    }
+
+    onAssignmentAttemptsChanged(
+        uid: string,
+        assignmentId: string,
+        cb: (attempts: AssignmentAttempt[]) => void
+    ): () => void {
+        const attemptsRef = Firestore.collection(this.db, "users", uid, "assignments", assignmentId, "attempts");
+        return Firestore.onSnapshot(attemptsRef, (snap) => {
+            const attempts = snap.docs.map((doc) => {
+                const data = doc.data() as any;
+                return {
+                    id: doc.id,
+                    createdAt: data.createdAt ?? null,
+                    completionReason: data.completionReason ?? "win",
+                    resultStats: data.resultStats as ResultStats,
+                } satisfies AssignmentAttempt;
+            });
+            cb(attempts);
+        });
+    }
+
+    async recordAssignmentAttempt(
+        assignmentId: string,
+        resultStats: ResultStats,
+        completionReason: "win" | "timeout"
+    ): Promise<void> {
+        const user = this.auth.currentUser;
+        if (!user) return;
+        const attemptsRef = Firestore.collection(this.db, "users", user.uid, "assignments", assignmentId, "attempts");
+        await Firestore.addDoc(attemptsRef, {
+            resultStats,
+            completionReason,
+            createdAt: Firestore.serverTimestamp(),
+        });
     }
 
     /** Live listener (nice UX): call unsubscribe() when leaving the page */
