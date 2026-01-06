@@ -17,6 +17,7 @@ export type AssignmentRecord = {
     isActive: boolean;
     version: number;
     gameTypesJson: string;
+    createdAt?: Firestore.Timestamp | null;
 };
 
 export type AssignmentAttempt = {
@@ -257,6 +258,7 @@ export class FirebaseController {
                     isActive: Boolean(data.isActive ?? false),
                     version: Number(data.version ?? 1),
                     gameTypesJson: String(data.gameTypesJson ?? "[]"),
+                    createdAt: data.createdAt ?? null,
                 } satisfies AssignmentRecord;
             });
             cb(assignments);
@@ -296,6 +298,7 @@ export class FirebaseController {
                 isActive: Boolean(data.isActive ?? false),
                 version: Number(data.version ?? 1),
                 gameTypesJson: String(data.gameTypesJson ?? "[]"),
+                createdAt: data.createdAt ?? null,
             });
         });
     }
