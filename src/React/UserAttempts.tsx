@@ -11,6 +11,14 @@ type AttemptGroup = {
     attempts: AssignmentAttempt[];
 };
 
+function formatDuration(totalSeconds: number) {
+    const clampedSeconds = Math.max(0, Math.round(totalSeconds));
+    const hours = Math.floor(clampedSeconds / 3600);
+    const minutes = Math.floor((clampedSeconds % 3600) / 60);
+    const seconds = clampedSeconds % 60;
+    return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+}
+
 export function UserAttempts() {
     const { uid } = useParams<{ uid: string }>();
     const snapshot = useFirebaseSnapshot();
@@ -92,7 +100,7 @@ export function UserAttempts() {
                                     <tr>
                                         <th>Played</th>
                                         <th>Reason</th>
-                                        <th>Time (s)</th>
+                                        <th>Time</th>
                                         <th>Accuracy</th>
                                         <th>Points</th>
                                         <th>Problems</th>
@@ -108,7 +116,7 @@ export function UserAttempts() {
                                             <tr key={attempt.id}>
                                                 <td>{formatted}</td>
                                                 <td>{attempt.completionReason}</td>
-                                                <td>{Math.round(stats.timeElapsedMs / 1000)}</td>
+                                            <td>{formatDuration(stats.timeElapsedMs / 1000)}</td>
                                                 <td>{stats.percentCorrectOnFirstTry}%</td>
                                                 <td>{stats.pointsTowardWin}</td>
                                                 <td>{stats.problemsAttempted}</td>
