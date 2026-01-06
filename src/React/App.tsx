@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { DashboardPage } from "./DashboardPage";
 import { GameSessionRoute } from "./GameSessionPage";
 import { ErrorPage } from "./ErrorPage";
@@ -10,10 +10,9 @@ import { AssignmentAttempts } from "./AssignmentAttempts";
 import { AssignmentSessionRoute } from "./AssignmentSessionRoute";
 
 export function App() {
-	const basePath = new URL(document.baseURI).pathname;
-	const routerBase = basePath.endsWith("/") ? basePath : `${basePath}/`;
 	return (
-		<BrowserRouter basename={routerBase}>
+		<HashRouter>
+			{/* HashRouter avoids basename issues across root/subpath deployments. */}
 			<Routes>
 				<Route element={<PageLayout />}>
 					<Route element={<AuthWall />}>
@@ -27,6 +26,6 @@ export function App() {
 				</Route>
 			</Route>
 		</Routes>
-	</BrowserRouter>
+		</HashRouter>
 	);
 }
