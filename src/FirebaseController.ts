@@ -24,6 +24,8 @@ export type AssignmentAttempt = {
     createdAt?: Firestore.Timestamp | null;
     completionReason: "win" | "timeout";
     resultStats: ResultStats;
+    assignmentId?: string | null;
+    attemptType?: "assignment" | "free_practice";
 };
 
 export type UnlockStatus =
@@ -261,6 +263,24 @@ export class FirebaseController {
         });
     }
 
+    onUserAttemptsChanged(uid: string, cb: (attempts: AssignmentAttempt[]) => void): () => void {
+        const attemptsRef = Firestore.collection(this.db, "users", uid, "attempts");
+        return Firestore.onSnapshot(attemptsRef, (snap) => {
+            const attempts = snap.docs.map((doc) => {
+                const data = doc.data() as any;
+                return {
+                    id: doc.id,
+                    createdAt: data.createdAt ?? null,
+                    completionReason: data.completionReason ?? "win",
+                    resultStats: data.resultStats as ResultStats,
+                    assignmentId: data.assignmentId ?? null,
+                    attemptType: data.attemptType ?? null,
+                } satisfies AssignmentAttempt;
+            });
+            cb(attempts);
+        });
+    }
+
     onAssignmentChanged(uid: string, assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
         const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
         return Firestore.onSnapshot(assignmentRef, (snap) => {
@@ -317,8 +337,12 @@ export class FirebaseController {
         assignmentId: string,
         cb: (attempts: AssignmentAttempt[]) => void
     ): () => void {
-        const attemptsRef = Firestore.collection(this.db, "users", uid, "assignments", assignmentId, "attempts");
-        return Firestore.onSnapshot(attemptsRef, (snap) => {
+        const attemptsRef = Firestore.collection(this.db, "users", uid, "attempts");
+        const attemptsQuery = Firestore.query(
+            attemptsRef,
+            Firestore.where("assignmentId", "==", assignmentId)
+        );
+        return Firestore.onSnapshot(attemptsQuery, (snap) => {
             const attempts = snap.docs.map((doc) => {
                 const data = doc.data() as any;
                 return {
@@ -326,23 +350,27 @@ export class FirebaseController {
                     createdAt: data.createdAt ?? null,
                     completionReason: data.completionReason ?? "win",
                     resultStats: data.resultStats as ResultStats,
+                    assignmentId: data.assignmentId ?? null,
+                    attemptType: data.attemptType ?? null,
                 } satisfies AssignmentAttempt;
             });
             cb(attempts);
         });
     }
 
-    async recordAssignmentAttempt(
-        assignmentId: string,
+    async recordAttempt(
+        assignmentId: string | null | undefined,
         resultStats: ResultStats,
         completionReason: "win" | "timeout"
     ): Promise<void> {
         const user = this.auth.currentUser;
         if (!user) return;
-        const attemptsRef = Firestore.collection(this.db, "users", user.uid, "assignments", assignmentId, "attempts");
+        const attemptsRef = Firestore.collection(this.db, "users", user.uid, "attempts");
         await Firestore.addDoc(attemptsRef, {
             resultStats,
             completionReason,
+            assignmentId: assignmentId ?? null,
+            attemptType: assignmentId ? "assignment" : "free_practice",
             createdAt: Firestore.serverTimestamp(),
         });
     }

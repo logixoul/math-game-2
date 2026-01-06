@@ -40,7 +40,12 @@ export function UserAdminPage() {
                     <h2>User assignments</h2>
                     <div className={styles.userId}>UID: {uid}</div>
                 </div>
-                <button className={styles.primaryButton} onClick={handleCreate}>Create assignment</button>
+                <div className={styles.headerActions}>
+                    <Link className={styles.secondaryButton} to={`/admin/users/${uid}/attempts`}>
+                        Attempts
+                    </Link>
+                    <button className={styles.primaryButton} onClick={handleCreate}>Create assignment</button>
+                </div>
             </div>
 
             <div className={styles.assignmentsList}>
@@ -110,12 +115,6 @@ function AssignmentEditor({ uid, assignment }: AssignmentEditorProps) {
                     }}
                 />
                 <div className={styles.assignmentActions}>
-                    <Link
-                        className={styles.secondaryButton}
-                        to={`/admin/users/${uid}/assignments/${assignment.id}/attempts`}
-                    >
-                        Attempts
-                    </Link>
                     <button className={styles.secondaryButton} onClick={handleSave} disabled={isSaving}>
                         Save
                     </button>

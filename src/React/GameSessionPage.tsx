@@ -96,9 +96,9 @@ export function GameSessionPage({
 			},
 			onWin: (resultStats) => {
 				setSessionComplete(true);
-				if (assignmentId && !hasRecordedAttemptRef.current) {
+				if (!hasRecordedAttemptRef.current) {
 					hasRecordedAttemptRef.current = true;
-					firebaseController.recordAssignmentAttempt(assignmentId, resultStats, "win").catch(() => { });
+					firebaseController.recordAttempt(assignmentId, resultStats, "win").catch(() => { });
 				}
 				const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
 				const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
@@ -170,9 +170,9 @@ export function GameSessionPage({
 				timedOutRef.current = true;
 				setSessionComplete(true);
 				const stats = session.getResultStats();
-				if (assignmentId && !hasRecordedAttemptRef.current) {
+				if (!hasRecordedAttemptRef.current) {
 					hasRecordedAttemptRef.current = true;
-					firebaseController.recordAssignmentAttempt(assignmentId, stats, "timeout").catch(() => { });
+					firebaseController.recordAttempt(assignmentId, stats, "timeout").catch(() => { });
 				}
 				setMessages((prev) => [
 					...prev,

@@ -29,7 +29,7 @@ export class GameSession {
     
     readonly pointsRequiredToWin: number = 20;
     readonly minProblemsAttemptedToWin: number = 20;
-    readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
+    readonly maxSessionDurationMs: number = 2000; // 10 minutes
     
     constructor(gamePage : GameSessionUI, gameType: GameType) {
         this.gamePage = gamePage;

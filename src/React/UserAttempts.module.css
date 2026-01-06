@@ -18,6 +18,17 @@
     gap: 12px;
 }
 
+.attemptGroup {
+    display: grid;
+    gap: 10px;
+}
+
+.groupHeader {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
 .attemptCard {
     padding: 14px;
     border-radius: 10px;

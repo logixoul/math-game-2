@@ -6,7 +6,7 @@ import { PageLayout } from "./PageLayout";
 import { AuthWall } from "./AuthWall";
 import { AdminDashboardPage } from "./AdminDashboardPage";
 import { UserAdminPage } from "./UserAdminPage";
-import { AssignmentAttempts } from "./AssignmentAttempts";
+import { UserAttempts } from "./UserAttempts";
 import { AssignmentSessionRoute } from "./AssignmentSessionRoute";
 
 export function App() {
@@ -22,7 +22,7 @@ export function App() {
 					<Route path="/assignment/:assignmentId" element={<AssignmentSessionRoute />} />
 					<Route path="/admin" element={<AdminDashboardPage />} />
 					<Route path="/admin/users/:uid" element={<UserAdminPage />} />
-					<Route path="/admin/users/:uid/assignments/:assignmentId/attempts" element={<AssignmentAttempts />} />
+					<Route path="/admin/users/:uid/attempts" element={<UserAttempts />} />
 				</Route>
 			</Route>
 		</Routes>
