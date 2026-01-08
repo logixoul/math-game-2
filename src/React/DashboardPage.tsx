@@ -42,10 +42,8 @@ export function DashboardPage() {
 		<div className={styles.dashboardContainer}>
 			<h2>Привет!</h2>
 			<p className={styles.subtitle}>Готов ли си?</p>
-			{createSection("Свободна тренировка - 5кл.", gameTypes.fifthGrade)}
-			{createSection("Свободна тренировка - 6кл.", gameTypes.sixthGrade)}
 			<section className={styles.section}>
-				<h3>Твоето домашно</h3>
+				<h3>За домашно за теб</h3>
 				<ul className={styles.gameList}>
 					{assignments.filter((assignment) => assignment.isActive).map((assignment) => (
 						<li
@@ -64,6 +62,8 @@ export function DashboardPage() {
 					)}
 				</ul>
 			</section>
+			{createSection("Тренировка 5кл.", gameTypes.fifthGrade)}
+			{createSection("Тренировка 6кл.", gameTypes.sixthGrade)}
 		</div>
 	);
 }
