@@ -9,10 +9,6 @@ export function DashboardPage() {
 	const gameTypes = useMemo(() => GameTypes.getAvailableGameTypes(), []);
 	const firebaseState = useFirebaseSnapshot();
 	const [assignments, setAssignments] = useState<AssignmentRecord[]>([]);
-	const formatDate = (value?: Date | null) => {
-		if (!value) return "unknown date";
-		return value.toLocaleDateString("bg-BG");
-	};
 
 	useEffect(() => {
 		if (!firebaseState.user) {
@@ -44,20 +40,19 @@ export function DashboardPage() {
 			<section className={styles.section}>
 				<h3>За домашно за теб</h3>
 				<ul className={styles.gameList}>
-					{assignments.filter((assignment) => assignment.isActive).map((assignment) => (
+					{assignments.map((assignment) => (
 						<li
 							key={assignment.id}
 							className={styles.gameCard}
 							onClick={() => navigate("/assignment/" + assignment.id)}
 						>
 							<div>
-								<b>{assignment.name.trim() ? assignment.name : "<без име>"}</b><br></br> (от {formatDate(assignment.createdAt?.toDate?.())})
+								<b>{assignment.name.trim() ? assignment.name : "<без име>"}</b>
 							</div>
-							{assignment.dueText && <div className={styles.assignmentDue}>{assignment.dueText}</div>}
 						</li>
 					))}
-					{assignments.filter((assignment) => assignment.isActive).length === 0 && (
-						<li className={styles.gameCard}>No active assignments.</li>
+					{assignments.length === 0 && (
+						<li className={styles.gameCard}>No assignments.</li>
 					)}
 				</ul>
 			</section>

@@ -7,11 +7,7 @@ import { ResultStats } from "./ResultStats";
 export type AssignmentRecord = {
     id: string;
     name: string;
-    dueText: string;
-    isActive: boolean;
-    version: number;
     gameTypesJson: string;
-    createdAt?: Firestore.Timestamp | null;
 };
 
 export type FirebaseState = {
@@ -139,11 +135,7 @@ export class FirebaseController {
                 return {
                     id: doc.id,
                     name: String(data.name ?? ""),
-                    dueText: String(data.dueText ?? ""),
-                    isActive: Boolean(data.isActive ?? false),
-                    version: Number(data.version ?? 1),
                     gameTypesJson: String(data.gameTypesJson ?? "[]"),
-                    createdAt: data.createdAt ?? null,
                 } satisfies AssignmentRecord;
             });
             cb(assignments);
@@ -162,11 +154,7 @@ export class FirebaseController {
             cb({
                 id: snap.id,
                 name: String(data.name ?? ""),
-                dueText: String(data.dueText ?? ""),
-                isActive: Boolean(data.isActive ?? false),
-                version: Number(data.version ?? 1),
                 gameTypesJson: String(data.gameTypesJson ?? "[]"),
-                createdAt: data.createdAt ?? null,
             });
         });
     }
