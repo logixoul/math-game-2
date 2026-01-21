@@ -4,12 +4,6 @@ import * as FirebaseAuth from "firebase/auth";
 import * as Firestore from "firebase/firestore";
 import { ResultStats } from "./ResultStats";
 
-export type UserSummary = {
-    uid: string;
-    email?: string | null;
-    displayName?: string | null;
-};
-
 export type AssignmentRecord = {
     id: string;
     name: string;
@@ -18,15 +12,6 @@ export type AssignmentRecord = {
     version: number;
     gameTypesJson: string;
     createdAt?: Firestore.Timestamp | null;
-};
-
-export type AssignmentAttempt = {
-    id: string;
-    createdAt?: Firestore.Timestamp | null;
-    completionReason: "win" | "timeout";
-    resultStats: ResultStats;
-    assignmentId?: string | null;
-    attemptType?: "assignment" | "free_practice";
 };
 
 export type UnlockStatus =
@@ -138,11 +123,6 @@ export class FirebaseController {
         });
     }
 
-    private readonly ADMIN_UID = "Cp7CZeiruTgp38UIifYZDYhuvkI3";
-    isCurrentUserAdmin(): boolean {
-        return this.auth.currentUser?.uid === this.ADMIN_UID;
-    }
-
     private async ensureUserDoc(user: FirebaseAuth.User): Promise<void> {
         const userRef = Firestore.doc(this.db, "users", user.uid);
         await Firestore.setDoc(
@@ -155,26 +135,6 @@ export class FirebaseController {
             },
             { merge: true }
         );
-    }
-
-    async generateUnlockCodeSingleUse(): Promise<string> {
-        const user = this.auth.currentUser;
-        if (!user) throw new Error("Login first");
-        if (user.uid !== this.ADMIN_UID) throw new Error("Not admin");
-
-        // Simple readable code. You can change format as you like.
-        const code = crypto.randomUUID().slice(0, 8).toUpperCase(); // e.g. "A1B2C3D4"
-        const codeRef = Firestore.doc(this.db, "unlockCodes", code);
-
-        await Firestore.setDoc(codeRef, {
-            usesLeft: 1,
-            createdAt: Firestore.serverTimestamp(),
-            createdByUid: user.uid,
-            redeemedByUid: null,
-            redeemedAt: null,
-        });
-
-        return code;
     }
 
     async redeemUnlockCode(codeRaw: string): Promise<void> {
@@ -231,21 +191,6 @@ export class FirebaseController {
         return { status: "locked" };
     }
 
-    onUsersChanged(cb: (users: UserSummary[]) => void): () => void {
-        const usersRef = Firestore.collection(this.db, "users");
-        return Firestore.onSnapshot(usersRef, (snap) => {
-            const users = snap.docs.map((doc) => {
-                const data = doc.data() as any;
-                return {
-                    uid: doc.id,
-                    email: data.email ?? null,
-                    displayName: data.displayName ?? null,
-                } satisfies UserSummary;
-            });
-            cb(users);
-        });
-    }
-
     // legacy function
     onAssignmentsChanged(uid: string, cb: (assignments: AssignmentRecord[]) => void): () => void {
         const assignmentsRef = Firestore.collection(this.db, "users", uid, "assignments");
@@ -267,25 +212,6 @@ export class FirebaseController {
     }
 
     // legacy function
-    onUserAttemptsChanged(uid: string, cb: (attempts: AssignmentAttempt[]) => void): () => void {
-        const attemptsRef = Firestore.collection(this.db, "users", uid, "attempts");
-        return Firestore.onSnapshot(attemptsRef, (snap) => {
-            const attempts = snap.docs.map((doc) => {
-                const data = doc.data() as any;
-                return {
-                    id: doc.id,
-                    createdAt: data.createdAt ?? null,
-                    completionReason: data.completionReason ?? "win",
-                    resultStats: data.resultStats as ResultStats,
-                    assignmentId: data.assignmentId ?? null,
-                    attemptType: data.attemptType ?? null,
-                } satisfies AssignmentAttempt;
-            });
-            cb(attempts);
-        });
-    }
-
-    // legacy function
     onAssignmentChanged(uid: string, assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
         const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
         return Firestore.onSnapshot(assignmentRef, (snap) => {
@@ -303,65 +229,6 @@ export class FirebaseController {
                 gameTypesJson: String(data.gameTypesJson ?? "[]"),
                 createdAt: data.createdAt ?? null,
             });
-        });
-    }
-
-    async createAssignment(uid: string, defaults?: Partial<AssignmentRecord>): Promise<string> {
-        const assignmentId = crypto.randomUUID();
-        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
-        await Firestore.setDoc(assignmentRef, {
-            name: defaults?.name ?? "New assignment",
-            dueText: defaults?.dueText ?? "",
-            isActive: defaults?.isActive ?? true,
-            version: defaults?.version ?? 1,
-            gameTypesJson: defaults?.gameTypesJson ?? "[]",
-            createdAt: Firestore.serverTimestamp(),
-            updatedAt: Firestore.serverTimestamp(),
-        });
-        return assignmentId;
-    }
-
-    async updateAssignment(uid: string, assignmentId: string, update: Partial<AssignmentRecord>): Promise<void> {
-        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
-        await Firestore.setDoc(
-            assignmentRef,
-            {
-                ...update,
-                updatedAt: Firestore.serverTimestamp(),
-            },
-            { merge: true }
-        );
-    }
-
-    async deleteAssignment(uid: string, assignmentId: string): Promise<void> {
-        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
-        await Firestore.deleteDoc(assignmentRef);
-    }
-
-    // legacy function
-    onAssignmentAttemptsChanged(
-        uid: string,
-        assignmentId: string,
-        cb: (attempts: AssignmentAttempt[]) => void
-    ): () => void {
-        const attemptsRef = Firestore.collection(this.db, "users", uid, "attempts");
-        const attemptsQuery = Firestore.query(
-            attemptsRef,
-            Firestore.where("assignmentId", "==", assignmentId)
-        );
-        return Firestore.onSnapshot(attemptsQuery, (snap) => {
-            const attempts = snap.docs.map((doc) => {
-                const data = doc.data() as any;
-                return {
-                    id: doc.id,
-                    createdAt: data.createdAt ?? null,
-                    completionReason: data.completionReason ?? "win",
-                    resultStats: data.resultStats as ResultStats,
-                    assignmentId: data.assignmentId ?? null,
-                    attemptType: data.attemptType ?? null,
-                } satisfies AssignmentAttempt;
-            });
-            cb(attempts);
         });
     }
 

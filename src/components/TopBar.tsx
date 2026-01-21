@@ -96,9 +96,6 @@ export function TopBar({  }: TopBarProps) {
 			<div className={styles.loginStatus}>{
 				firebaseState.user ?
 					<>
-						{firebaseController.isCurrentUserAdmin() && (
-							<Link className={styles.adminButton} to="/admin">Admin</Link>
-						)}
 						<button className={styles.logoutButton} onClick={handleLogout}>Изход</button>
 					</>
 					:
