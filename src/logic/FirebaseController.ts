@@ -14,14 +14,8 @@ export type AssignmentRecord = {
     createdAt?: Firestore.Timestamp | null;
 };
 
-export type UnlockStatus =
-    | { status: "signed_out" }
-    | { status: "locked" }
-    | { status: "unlocked"; unlockedWithCode?: string }
-
 export type FirebaseState = {
     user: FirebaseAuth.User | null;
-    unlockStatus: UnlockStatus;
 };
 
 type Listener = () => void;
@@ -32,8 +26,7 @@ export class FirebaseController {
     private listeners = new Set<Listener>();
 
     private state: FirebaseState = {
-        user: null,
-        unlockStatus: { status: "signed_out" }
+        user: null
     };
 
     static #firebaseConfig = {
@@ -54,8 +47,7 @@ export class FirebaseController {
 
         FirebaseAuth.onAuthStateChanged(this.auth, (user) => {
             this.state = {
-                user: user,
-                unlockStatus: { status: "unlocked" }
+                user: user
             };
             this.notifyListeners();
             if (user) {
@@ -137,59 +129,6 @@ export class FirebaseController {
         );
     }
 
-    async redeemUnlockCode(codeRaw: string): Promise<void> {
-        const user = this.auth.currentUser;
-        if (!user) throw new Error("Login first");
-
-        const code = codeRaw.trim().toUpperCase();
-        if (!code) throw new Error("Empty code");
-
-        const codeRef = Firestore.doc(this.db, "unlockCodes", code);
-        const userRef = Firestore.doc(this.db, "users", user.uid);
-
-        await Firestore.runTransaction(this.db, async (tx) => {
-            const codeSnap = await tx.get(codeRef);
-            if (!codeSnap.exists()) throw new Error("Invalid code");
-
-            const data = codeSnap.data() as any;
-            const usesLeft = Number(data.usesLeft ?? 0);
-            if (usesLeft <= 0) throw new Error("This code has already been used.");
-
-            // Consume the code
-            tx.update(codeRef, {
-                usesLeft: usesLeft - 1,
-                redeemedByUid: user.uid,
-                redeemedAt: Firestore.serverTimestamp(),
-            });
-
-            // Mark the user as unlocked
-            tx.set(
-                userRef,
-                {
-                    unlocked: true,
-                    unlockedWithCode: code,
-                    unlockedAt: Firestore.serverTimestamp(),
-                },
-                { merge: true }
-            );
-        });
-    }
-
-    async getUnlockStatus(): Promise<UnlockStatus> {
-        const user = this.auth.currentUser;
-        if (!user) return { status: "signed_out" };
-
-        const userRef = Firestore.doc(this.db, "users", user.uid);
-        const snap = await Firestore.getDoc(userRef);
-
-        if (!snap.exists()) return { status: "locked" };
-
-        const data = snap.data() as { unlocked?: boolean; unlockedWithCode?: string };
-        if (data.unlocked === true) {
-            return { status: "unlocked", unlockedWithCode: data.unlockedWithCode };
-        }
-        return { status: "locked" };
-    }
 
     // legacy function
     onAssignmentsChanged(uid: string, cb: (assignments: AssignmentRecord[]) => void): () => void {
@@ -249,34 +188,6 @@ export class FirebaseController {
         });
     }
 
-    /** Live listener (nice UX): call unsubscribe() when leaving the page */
-    onUnlockStatusChanged(cb: (s: UnlockStatus) => void): () => void {
-        const user = this.auth.currentUser;
-        if (!user) {
-            cb({ status: "signed_out" });
-            return () => { };
-        }
-
-        const userRef = Firestore.doc(this.db, "users", user.uid);
-        return Firestore.onSnapshot(
-            userRef,
-            (snap) => {
-                if (!snap.exists()) {
-                    cb({ status: "locked" });
-                    return;
-                }
-                const data = snap.data() as { unlocked?: boolean; unlockedWithCode?: string };
-                cb(data.unlocked === true
-                    ? { status: "unlocked", unlockedWithCode: data.unlockedWithCode }
-                    : { status: "locked" }
-                );
-            },
-            (_err) => {
-                // If rules block read, you’ll land here.
-                cb({ status: "locked" });
-            }
-        );
-    }
 }
 
 export const firebaseController = new FirebaseController();
