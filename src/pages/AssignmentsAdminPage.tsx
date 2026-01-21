@@ -1,42 +1,48 @@
-import { useState, useEffect } from "react";
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { useState, useEffect, useRef } from "react";
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, onSnapshot } from "firebase/firestore";
 import { AssignmentRecord, db } from "@/logic/FirebaseController";
 import styles from "./AssignmentsAdminPage.module.css";
 
 type AssignmentsAdminPageProps = {
-    
+
 };
 
 export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
     const [data, setData] = useState<AssignmentRecord[]>([]);
     const [name, setName] = useState("");
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
-        fetchAssignments();
+        const assignmentsRef = collection(db, "assignments");
+        const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
+            const assignments = snapshot.docs.map((doc) => ({
+                id: doc.id, ...doc.data()
+            } as AssignmentRecord));
+            setData(assignments);
+        });
+        return () => unsubscribe();
     }, []);
 
-    const fetchAssignments = async () => {
-        const querySnapshot = await getDocs(collection(db, "assignments"));
-        setData(querySnapshot.docs.map(doc => ({
-            id: doc.id, ...doc.data()
-        } as AssignmentRecord)));
-    };
-
     const handleCreate = async () => {
-        await addDoc(collection(db, "assignments"), { name });
+        await addDoc(collection(db, "assignments"), {
+            name, spec: "[]",
+        });
         setName("");
-        fetchAssignments();
     };
 
-    const handleSave = async (id : string) => {
+    const handleSave = async (formData : FormData) => {
+        const id = formData.get("id") as string;
+        const name = formData.get("name") as string;
+        const spec = formData.get("spec") as string;
         const assignmentRef = doc(db, "assignments", id);
-        await updateDoc(assignmentRef, { name });
-        fetchAssignments();
+        await updateDoc(assignmentRef, {
+            name: name,
+            spec: spec
+        });
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDeleteById = async (id: string) => {
         await deleteDoc(doc(db, "assignments", id));
-        fetchAssignments();
     };
 
     return (
@@ -51,22 +57,31 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
             <button onClick={handleCreate}>Add</button>
 
             <ul>
-                {data.map((assignment) => (
+                {data.map((assignment) =>
                     <li key={assignment.id}>
-                        <input
-                            type="text"
-                            value={assignment.name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Enter name"
-                        />
-                        <br/>
-                        <textarea className={styles.textarea} rows={10} cols={50}>
-                            {assignment.spec}
-                        </textarea>
-                        <button onClick={() => handleSave(assignment.id)}>Save</button>
-                        <button onClick={() => handleDelete(assignment.id)}>Delete</button>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSave(new FormData(e.currentTarget));
+                            }}
+                            >
+
+                            <input type="hidden" name="id" value={assignment.id} />
+                            <input
+                                type="text"
+                                name="name"
+                                defaultValue={assignment.name}
+                                placeholder="Enter name"
+                            />
+                            <br />
+                            <textarea name="spec" className={styles.textarea} rows={10} cols={50} defaultValue={ assignment.spec } />
+                            <button type="submit">Save</button>
+                            <button type="button" onClick={() => handleDeleteById(assignment.id)}>
+                                Delete
+                            </button>
+                        </form>
                     </li>
-                ))}
+                )}
             </ul>
         </div>
     );
