@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { firebaseController, useFirebaseSnapshot } from "../FirebaseController";
+import { firebaseController, useFirebaseSnapshot } from "@/logic/FirebaseController";
 
 export function AuthWall() {
     const snapshot = useFirebaseSnapshot();

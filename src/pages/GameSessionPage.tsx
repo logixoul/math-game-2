@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import * as GameTypes from "../GameTypes";
-import { GameSession, GameSessionUI } from "../GameSession";
-import * as util from "../util";
-import { KeyPad } from "./KeyPad";
-import { TopBar } from "./TopBar";
+import * as GameTypes from "@/logic/GameTypes";
+import { GameSession, GameSessionUI } from "@/logic/GameSession";
+import * as util from "@/logic/util";
+import { KeyPad } from "@/components/KeyPad";
+import { TopBar } from "@/components/TopBar";
 import { ErrorPage } from "./ErrorPage";
-import { MessageLog, Message } from "./MessageLog";
-import { attachWakeLock } from "./WakeLock";
+import { MessageLog, Message } from "@/components/MessageLog";
+import { attachWakeLock } from "@/React/WakeLock";
 import styles from "./GameSessionPage.module.css";
-import { firebaseController } from "../FirebaseController";
+import { firebaseController } from "@/logic/FirebaseController";
 
 type GameSessionPageProps = {
 	gameType: GameTypes.GameType;

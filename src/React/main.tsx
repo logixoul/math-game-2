@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./global.css";
-import { QuickDebugLogger } from "../QuickDebugLogger";
+import { QuickDebugLogger } from "../logic/QuickDebugLogger";
 
 const qdl = QuickDebugLogger.instance;
 qdl.beginListeningForErrors();

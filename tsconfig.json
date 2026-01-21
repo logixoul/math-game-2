@@ -1,6 +1,10 @@
 {
 	"compilerOptions": {
+	  "baseUrl": "./src",
 	  "allowJs": true,
+	  "paths": {
+	    "@/*": ["*"]
+	  },
 	  "target": "es2017",
 	  "module": "ESNext",
 	  "moduleResolution": "Bundler",

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { AssignmentRecord, firebaseController, useFirebaseSnapshot } from "../FirebaseController";
-import { parseAssignmentGameTypes } from "../GameTypes";
+import { AssignmentRecord, firebaseController, useFirebaseSnapshot } from "@/logic/FirebaseController";
+import { parseAssignmentGameTypes } from "@/logic/GameTypes";
 import styles from "./UserAdminPage.module.css";
 import { ErrorPage } from "./ErrorPage";
 

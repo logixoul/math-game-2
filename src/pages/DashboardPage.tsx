@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TopBar } from "./TopBar";
+import { TopBar } from "@/components/TopBar";
 import styles from "./DashboardPage.module.css";
-import * as GameTypes from "../GameTypes";
-import { AssignmentRecord, firebaseController, useFirebaseSnapshot } from "../FirebaseController";
+import * as GameTypes from "@/logic/GameTypes";
+import { AssignmentRecord, firebaseController, useFirebaseSnapshot } from "@/logic/FirebaseController";
 
 export function DashboardPage() {
 	const navigate = useNavigate();

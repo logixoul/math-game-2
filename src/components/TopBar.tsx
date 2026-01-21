@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./TopBar.module.css";
-import { useFirebaseSnapshot, firebaseController } from "../FirebaseController";
+import { useFirebaseSnapshot, firebaseController } from "@/logic/FirebaseController";
 import { Popup } from "./Popup";
 
 type TopBarProps = {

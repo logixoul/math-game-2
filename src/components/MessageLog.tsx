@@ -1,6 +1,6 @@
 import { RefObject, useMemo, useState } from "react";
-import * as util from "../util";
-import styles from "./GameSessionPage.module.css";
+import * as util from "@/logic/util";
+import styles from "@/pages/GameSessionPage.module.css";
 
 export type Message = {
 	text: string;

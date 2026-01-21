@@ -1,4 +1,5 @@
 import * as util from './util';
+import { BigNumber } from 'bignumber.js'
 
 export type AssignmentGameTypeSpec = {
     key: string;
@@ -21,6 +22,20 @@ export class Prompt {
 
 const MAX_RECENT_PROMPTS_LENGTH = 10;
 const NUM_POSTPONEMENT_TURNS = 10;
+
+function integerPowerOfTen(power: number) {
+    let result = 1;
+    if(power > 0) {
+        for(let i = 0; i < power; i++) {
+            result *= 10;
+        }
+    } else if(power < 0) {
+        for(let i = 0; i < -power; i++) {
+            result /= 10;
+        }
+    }
+    return result;
+}
 
 class PromptPostponement {
     constructor(public readonly prompt : Prompt, public turnsRemaining : number) {
@@ -119,7 +134,7 @@ export class MultiplicationGameType extends GameType {
 }
 
 export class DivisionGameType extends GameType {
-    constructor(uiLabel: string, private range : Range) {
+    constructor(uiLabel: string, private range : Range, private expRange : Range) {
         super(uiLabel);
     }
 
@@ -128,13 +143,15 @@ export class DivisionGameType extends GameType {
     }
 
     createRandomPrompt(): Prompt {
-        let a : number;
-        let b : number
+        const expA = util.randomInt(-2, 2);
+        const expB = util.randomInt(-2, 2);
+
+        const a = new BigNumber(util.randomInt(this.range.min, this.range.max)).multipliedBy(integerPowerOfTen(expA));
+        let b;
         do {
-            a = util.randomInt(this.range.min, this.range.max);
-            b = util.randomInt(this.range.min, this.range.max);
-        } while (b === 0);
-        const divisee = a * b;
+            b = new BigNumber(util.randomInt(this.range.min, this.range.max)).multipliedBy(integerPowerOfTen(expB));
+        } while (b.isZero());
+        const divisee = a.multipliedBy(b);
         const divisor = b;
         const divisorStr = ensureNegativeNumbersHaveParens(divisor);
         return new Prompt(`${divisee} : ${divisorStr}`, a, `${this.persistencyKey}:${divisee}:${divisor}`);
@@ -411,8 +428,9 @@ export class BracketExpansionNesting2GameType extends BracketExpansion {
     }
 }
 
-function ensureNegativeNumbersHaveParens(n : number) {
-    if(n < 0)
+function ensureNegativeNumbersHaveParens(n : BigNumber | number) {
+    n = new BigNumber(n);
+    if(n.isLessThan(0))
         return `(${n})`
     else
         return `${n}`
@@ -522,7 +540,10 @@ function createGameTypeFromSpec(spec: AssignmentGameTypeSpec): GameType | null {
     const params = spec.params ?? {};
     const rangeMin = Number((params as any).rangeMin ?? 0);
     const rangeMax = Number((params as any).rangeMax ?? 0);
+    const expRangeMin = Number((params as any).expRangeMin ?? 0);
+    const expRangeMax = Number((params as any).expRangeMax ?? 0);
     const range = new Range(rangeMin, rangeMax);
+    const expRange = new Range(expRangeMin, expRangeMax);
     switch (spec.key) {
         case "additionFifthGrade.v1":
             return new AdditionFifthGradeGameType("", rangeMax);
@@ -535,7 +556,7 @@ function createGameTypeFromSpec(spec: AssignmentGameTypeSpec): GameType | null {
         case "multiplication.v1":
             return new MultiplicationGameType("", range);
         case "division.v1":
-            return new DivisionGameType("", range);
+            return new DivisionGameType("", range, expRange);
         case "BracketExpansion.v1": {
             const nestingLevel = Number((params as any).nestingLevel ?? 0);
             const innerMin = Number((params as any).innerRangeMin ?? -12);
@@ -571,7 +592,7 @@ export function getAvailableGameTypes(): GameTypeList {
             new AdditionFifthGradeGameType("Събиране 5кл", 100),
             new SubtractionFifthGradeGameType("Изваждане 5кл", 100),
             new MultiplicationGameType("Умножение 5кл", new Range(0, 10)),
-            new DivisionGameType("Деление 5кл", new Range(0, 10)),
+            new DivisionGameType("Деление 5кл", new Range(0, 10), new Range(0, 0)),
         ],
         sixthGrade: [
             new AdditionSixthGradeGameType("Събиране 6кл", new Range(-40, 40)),
@@ -580,6 +601,9 @@ export function getAvailableGameTypes(): GameTypeList {
             new BracketExpansionNesting0GameType("-1 + 2 - 3 + 90"),
             new BracketExpansionNesting1GameType("Разкриване на скоби"),
             new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
+            new KrisHomework_4_1_2026_GameType_1("Крис 1"),
+            new KrisHomework_4_1_2026_GameType_2("Крис 2"),
+            new KaloyanHomework_28_12_2025_GameType("Калоян 1")
         ],
         homework: []
     };

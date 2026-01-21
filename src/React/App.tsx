@@ -1,13 +1,13 @@
 import { HashRouter, Route, Routes } from "react-router-dom";
-import { DashboardPage } from "./DashboardPage";
-import { GameSessionRoute } from "./GameSessionPage";
-import { ErrorPage } from "./ErrorPage";
-import { PageLayout } from "./PageLayout";
-import { AuthWall } from "./AuthWall";
-import { AdminDashboardPage } from "./AdminDashboardPage";
-import { UserAdminPage } from "./UserAdminPage";
-import { UserAttempts } from "./UserAttempts";
-import { AssignmentSessionRoute } from "./AssignmentSessionRoute";
+import { DashboardPage } from "@/pages/DashboardPage";
+import { GameSessionRoute } from "@/pages/GameSessionPage";
+import { ErrorPage } from "@/pages/ErrorPage";
+import { PageLayout } from "@/React/PageLayout";
+import { AuthWall } from "@/pages/AuthWall";
+import { AdminDashboardPage } from "@/pages/AdminDashboardPage";
+import { UserAdminPage } from "@/pages/UserAdminPage";
+import { UserAttempts } from "@/pages/UserAttempts";
+import { AssignmentSessionRoute } from "@/pages/AssignmentSessionRoute";
 
 export function App() {
 	return (

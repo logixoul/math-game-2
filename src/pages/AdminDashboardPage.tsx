@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { firebaseController, UserSummary, useFirebaseSnapshot } from "../FirebaseController";
+import { firebaseController, UserSummary, useFirebaseSnapshot } from "@/logic/FirebaseController";
 import styles from "./AdminDashboardPage.module.css";
 import { ErrorPage } from "./ErrorPage";
 

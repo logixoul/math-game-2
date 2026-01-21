@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { TopBar } from "./TopBar";
+import { TopBar } from "@/components/TopBar";
 import styles from "./PageLayout.module.css";
 
 type PageLayoutProps = {
