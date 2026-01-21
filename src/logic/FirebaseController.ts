@@ -246,6 +246,7 @@ export class FirebaseController {
         });
     }
 
+    // legacy function
     onAssignmentsChanged(uid: string, cb: (assignments: AssignmentRecord[]) => void): () => void {
         const assignmentsRef = Firestore.collection(this.db, "users", uid, "assignments");
         return Firestore.onSnapshot(assignmentsRef, (snap) => {
@@ -265,6 +266,7 @@ export class FirebaseController {
         });
     }
 
+    // legacy function
     onUserAttemptsChanged(uid: string, cb: (attempts: AssignmentAttempt[]) => void): () => void {
         const attemptsRef = Firestore.collection(this.db, "users", uid, "attempts");
         return Firestore.onSnapshot(attemptsRef, (snap) => {
@@ -283,6 +285,7 @@ export class FirebaseController {
         });
     }
 
+    // legacy function
     onAssignmentChanged(uid: string, assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
         const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
         return Firestore.onSnapshot(assignmentRef, (snap) => {
@@ -335,6 +338,7 @@ export class FirebaseController {
         await Firestore.deleteDoc(assignmentRef);
     }
 
+    // legacy function
     onAssignmentAttemptsChanged(
         uid: string,
         assignmentId: string,

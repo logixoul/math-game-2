@@ -1,5 +1,6 @@
 import type { FirebaseController } from './FirebaseController';
-import { GameType, Prompt, PromptScheduler } from './GameTypes';
+import { GameType, Prompt } from './GameTypes';
+import { PromptScheduler } from './PromptScheduler';
 import { ResultStats } from './ResultStats';
 
 export type GameSessionUI = {

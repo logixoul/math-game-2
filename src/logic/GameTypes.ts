@@ -1,3 +1,4 @@
+import { gameTypeRegistry } from './GameTypeRegistry';
 import * as util from './util';
 import { BigNumber } from 'bignumber.js'
 
@@ -15,13 +16,10 @@ export type AssignmentGameTypeParseResult = {
 export class Prompt {
     failedAttempts: number;
 
-    constructor(public readonly text: string, public readonly answer: number, public readonly id : string) {
+    constructor(public readonly text: string, public readonly answer: number) {
         this.failedAttempts = 0;
     }
 }
-
-const MAX_RECENT_PROMPTS_LENGTH = 10;
-const NUM_POSTPONEMENT_TURNS = 10;
 
 function integerPowerOfTen(power: number) {
     let result = 1;
@@ -37,76 +35,11 @@ function integerPowerOfTen(power: number) {
     return result;
 }
 
-class PromptPostponement {
-    constructor(public readonly prompt : Prompt, public turnsRemaining : number) {
-    }
-}
-
-export class PromptScheduler {
-    private recentPrompts : Prompt[] = []; // queue
-    private postponedPrompts : PromptPostponement[] = [];
-
-    constructor(private readonly gameType : GameType) {
-    }
-
-    postponePrompt(promptToPostpone: Prompt): void {
-        const existing = this.postponedPrompts.find(postponedPrompt =>
-            postponedPrompt.prompt.id === promptToPostpone.id);
-        if (existing) {
-            existing.turnsRemaining = NUM_POSTPONEMENT_TURNS;
-        } else {
-            this.postponedPrompts.push(new PromptPostponement(promptToPostpone, NUM_POSTPONEMENT_TURNS));
-        }
-    }
-
-    rememberPrompt(prompt: Prompt) {
-        this.recentPrompts.push(prompt);
-        if(this.recentPrompts.length > MAX_RECENT_PROMPTS_LENGTH)
-            this.recentPrompts.shift();
-    }
-
-    updateTurnsRemainingCounters() {
-        for(const postponedPrompt of this.postponedPrompts) {
-            postponedPrompt.turnsRemaining = Math.max(0, postponedPrompt.turnsRemaining - 1);
-        }
-    }
-
-    *generatePrompts(): Generator<Prompt, void, unknown> {
-        while (true) {
-            // One "turn" has passed since last prompt was completed
-            this.updateTurnsRemainingCounters();
-
-            // Serve a due postponed prompt if available
-            const dueIndex = this.postponedPrompts.findIndex(p => p.turnsRemaining === 0);
-            if (dueIndex !== -1) {
-                const [due] = this.postponedPrompts.splice(dueIndex, 1);
-                this.rememberPrompt(due.prompt);
-                yield due.prompt;
-                continue;
-            }
-
-            // Otherwise serve a new prompt (avoid recent repeats and postponeds)
-            const postponedKeys = new Set(this.postponedPrompts.map(p => p.prompt.id));
-            let newPrompt: Prompt;
-            do {
-                newPrompt = this.gameType.createRandomPrompt();
-            } while (
-                this.recentPrompts.some(p => p.id === newPrompt.id) ||
-                postponedKeys.has(newPrompt.id));
-
-            this.rememberPrompt(newPrompt);
-            yield newPrompt;
-        }
-    }
-}
-
 export abstract class GameType {
     constructor(public readonly uiLabel: string) {
     }
 
     abstract createRandomPrompt() : Prompt;
-
-    abstract get persistencyKey(): string;
 }
 
 export class Range { // inclusive (includes both ends of the range)
@@ -121,30 +54,23 @@ export class MultiplicationGameType extends GameType {
         super(uiLabel);
     }
 
-    get persistencyKey(): string {
-        return "multiplication.v1";
-    }
-
     createRandomPrompt(): Prompt {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${a} × ${bStr}`, a * b, `${this.persistencyKey}:${a}:${b}`);
+        return new Prompt(`${a} × ${bStr}`, a * b);
     }
 }
+gameTypeRegistry.register(MultiplicationGameType, "Multiplication.v1");
 
 export class DivisionGameType extends GameType {
     constructor(uiLabel: string, private range : Range, private expRange : Range) {
         super(uiLabel);
     }
 
-    get persistencyKey(): string {
-        return "division.v1";
-    }
-
     createRandomPrompt(): Prompt {
-        const expA = util.randomInt(-2, 2);
-        const expB = util.randomInt(-2, 2);
+        const expA = util.randomInt(this.expRange.min, this.expRange.max);
+        const expB = util.randomInt(this.expRange.min, this.expRange.max);
 
         const a = new BigNumber(util.randomInt(this.range.min, this.range.max)).multipliedBy(integerPowerOfTen(expA));
         let b;
@@ -154,73 +80,64 @@ export class DivisionGameType extends GameType {
         const divisee = a.multipliedBy(b);
         const divisor = b;
         const divisorStr = ensureNegativeNumbersHaveParens(divisor);
-        return new Prompt(`${divisee} : ${divisorStr}`, a, `${this.persistencyKey}:${divisee}:${divisor}`);
+        return new Prompt(`${divisee} : ${divisorStr}`, a);
     }
 }
+gameTypeRegistry.register(DivisionGameType, "Division.v1");
 
 export class SubtractionFifthGradeGameType extends GameType {
     constructor(uiLabel: string, private rangeMax : number) {
         super(uiLabel);
     }
 
-    get persistencyKey(): string {
-        return "subtractionFifthGrade.v1";
-    }
-
     createRandomPrompt(): Prompt {
         const a = util.randomInt(0, this.rangeMax);
         const b = util.randomInt(0, a);
-        return new Prompt(`${a} - ${b}`, a - b,  `${this.persistencyKey}:${a}:${b}`);
+        return new Prompt(`${a} - ${b}`, a - b);
     }
 }
+gameTypeRegistry.register(SubtractionFifthGradeGameType, "SubtractionFifthGrade.v1");
+
 
 export class SubtractionSixthGradeGameType extends GameType {
     constructor(uiLabel: string, private range : Range) {
         super(uiLabel);
-    }
 
-    get persistencyKey(): string {
-        return "subtractionSixthGrade.v1";
     }
 
     createRandomPrompt(): Prompt {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
         const bStr = ensureNegativeNumbersHaveParens(b)
-        return new Prompt(`${a} - ${bStr}`, a - b,  `${this.persistencyKey}:${a}:${b}`);
+        return new Prompt(`${a} - ${bStr}`, a - b);
     }
 }
+gameTypeRegistry.register(SubtractionSixthGradeGameType, "SubtractionSixthGrade.v1");
 
 export class AdditionFifthGradeGameType extends GameType {
     createRandomPrompt(): Prompt {
         const a = util.randomInt(0, this.rangeMax);
         const b = util.randomInt(0, this.rangeMax);
-        return new Prompt(`${a} + ${b}`, a + b, `${this.persistencyKey}:${a}:${b}`);
+        return new Prompt(`${a} + ${b}`, a + b);
     }
     constructor(uiLabel: string, private rangeMax : number) {
         super(uiLabel);
     }
-
-    get persistencyKey(): string {
-        return "additionFifthGrade.v1";
-    }
 }
+gameTypeRegistry.register(AdditionFifthGradeGameType, "AdditionFifthGrade.v1");
 
 export class AdditionSixthGradeGameType extends GameType {
     createRandomPrompt(): Prompt {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${a} + ${bStr}`, a + b, `${this.persistencyKey}:${a}:${b}`);
+        return new Prompt(`${a} + ${bStr}`, a + b);
     }
     constructor(uiLabel: string, private range : Range) {
         super(uiLabel);
     }
-
-    get persistencyKey(): string {
-        return "additionSixthGrade.v1";
-    }
 }
+gameTypeRegistry.register(AdditionSixthGradeGameType, "AdditionSixthGrade.v1");
 
 export class KaloyanHomework_28_12_2025_GameType extends GameType {
     readonly mul = new MultiplicationGameType("", new Range(-10, 10));
@@ -235,11 +152,8 @@ export class KaloyanHomework_28_12_2025_GameType extends GameType {
     constructor(uiLabel: string) {
         super(uiLabel);
     }
-
-    get persistencyKey(): string {
-        return "KaloyanHomework_28_12_2025_GameType.v1";
-    }
 }
+gameTypeRegistry.register(KaloyanHomework_28_12_2025_GameType, "KaloyanHomework_28_12_2025.v1");
 
 export class KrisHomework_4_1_2026_GameType_1 extends GameType {
     readonly add = new AdditionSixthGradeGameType("", new Range(-40, 40));
@@ -252,11 +166,8 @@ export class KrisHomework_4_1_2026_GameType_1 extends GameType {
     constructor(uiLabel: string) {
         super(uiLabel);
     }
-
-    get persistencyKey(): string {
-        return "kris1";
-    }
 }
+gameTypeRegistry.register(KrisHomework_4_1_2026_GameType_1, "KrisHomework_4_1_2026-1.v1");
 
 export class KrisHomework_4_1_2026_GameType_2 extends GameType {
     readonly mul = new MultiplicationGameType("", new Range(0, 10));
@@ -269,25 +180,17 @@ export class KrisHomework_4_1_2026_GameType_2 extends GameType {
     constructor(uiLabel: string) {
         super(uiLabel);
     }
-
-    get persistencyKey(): string {
-        return "kris2";
-    }
 }
+gameTypeRegistry.register(KrisHomework_4_1_2026_GameType_2, "KrisHomework_4_1_2026-2.v1");
 
 export class BracketExpansion extends GameType {
     constructor(
         uiLabel: string,
         private nestingLevel: number,
-        private persistencyKeyValue: string,
         private outerRange: Range = new Range(1, 20),
         private innerRange: Range = new Range(-12, 12)
     ) {
         super(uiLabel);
-    }
-
-    get persistencyKey(): string {
-        return this.persistencyKeyValue;
     }
 
     createRandomPrompt(): Prompt {
@@ -301,7 +204,7 @@ export class BracketExpansion extends GameType {
             4,
             this.outerRange
         );
-        return new Prompt(`${expression.text}`, expression.value, `${this.persistencyKey}:${expression.text}`);
+        return new Prompt(`${expression.text}`, expression.value);
     }
 
     private buildExpression(
@@ -412,21 +315,24 @@ export class BracketExpansion extends GameType {
 
 export class BracketExpansionNesting0GameType extends BracketExpansion {
     constructor(uiLabel: string) {
-        super(uiLabel, 0, "bracketExpansion.nesting0.v1");
+        super(uiLabel, 0);
     }
 }
+gameTypeRegistry.register(BracketExpansionNesting0GameType, "BracketExpansionNesting0.v1");
 
 export class BracketExpansionNesting1GameType extends BracketExpansion {
     constructor(uiLabel: string) {
-        super(uiLabel, 1, "bracketExpansion.nesting1.v1");
+        super(uiLabel, 1);
     }
 }
+gameTypeRegistry.register(BracketExpansionNesting1GameType, "BracketExpansionNesting1.v1");
 
 export class BracketExpansionNesting2GameType extends BracketExpansion {
     constructor(uiLabel: string) {
-        super(uiLabel, 2, "bracketExpansion.nesting2.v1");
+        super(uiLabel, 2);
     }
 }
+gameTypeRegistry.register(BracketExpansionNesting2GameType, "BracketExpansionNesting2.v1");
 
 function ensureNegativeNumbersHaveParens(n : BigNumber | number) {
     n = new BigNumber(n);
@@ -436,23 +342,18 @@ function ensureNegativeNumbersHaveParens(n : BigNumber | number) {
         return `${n}`
 }
 
-//export type GameTypeCtor = new () => GameType;
-
-export class MultiplicationGameTypeTmpAlex extends GameType{
+export class MultiplicationTmpAlexGameType extends GameType{
     constructor(uiLabel: string) {
         super(uiLabel);
-    }
-
-    get persistencyKey(): string {
-        return "multiplicationTmpAlex.v1";
     }
 
     createRandomPrompt(): Prompt {
         const a = util.randomInt(-20, 20);
         const b = util.randomInt(-20, 20);
-        return new Prompt(`${a} × ${b}`, a * b, `${this.persistencyKey}:${a}:${b}`);
+        return new Prompt(`${a} × ${b}`, a * b);
     }
 }
+gameTypeRegistry.register(MultiplicationTmpAlexGameType, "MultiplicationTmpAlex.v1");
 
 type WeightedGameType = {
     gameType: GameType;
@@ -466,10 +367,6 @@ export class WeightedAssignmentGameType extends GameType {
         private readonly weightedGameTypes: WeightedGameType[]
     ) {
         super(uiLabel);
-    }
-
-    get persistencyKey(): string {
-        return this.persistencyKeyValue;
     }
 
     createRandomPrompt(): Prompt {
@@ -545,35 +442,23 @@ function createGameTypeFromSpec(spec: AssignmentGameTypeSpec): GameType | null {
     const range = new Range(rangeMin, rangeMax);
     const expRange = new Range(expRangeMin, expRangeMax);
     switch (spec.key) {
-        case "additionFifthGrade.v1":
+        case "AdditionFifthGrade.v1":
             return new AdditionFifthGradeGameType("", rangeMax);
-        case "additionSixthGrade.v1":
+        case "AdditionSixthGrade.v1":
             return new AdditionSixthGradeGameType("", range);
-        case "subtractionFifthGrade.v1":
+        case "SubtractionFifthGrade.v1":
             return new SubtractionFifthGradeGameType("", rangeMax);
-        case "subtractionSixthGrade.v1":
+        case "SubtractionSixthGrade.v1":
             return new SubtractionSixthGradeGameType("", range);
-        case "multiplication.v1":
+        case "Multiplication.v1":
             return new MultiplicationGameType("", range);
-        case "division.v1":
+        case "Division.v1":
             return new DivisionGameType("", range, expRange);
-        case "BracketExpansion.v1": {
-            const nestingLevel = Number((params as any).nestingLevel ?? 0);
-            const innerMin = Number((params as any).innerRangeMin ?? -12);
-            const innerMax = Number((params as any).innerRangeMax ?? 12);
-            return new BracketExpansion(
-                "",
-                nestingLevel,
-                `assignment.bracketExpansion.${nestingLevel}`,
-                range,
-                new Range(innerMin, innerMax)
-            );
-        }
-        case "bracketExpansion.nesting0.v1":
+        case "BracketExpansion.nesting0.v1":
             return new BracketExpansionNesting0GameType("");
-        case "bracketExpansion.nesting1.v1":
+        case "BracketExpansion.nesting1.v1":
             return new BracketExpansionNesting1GameType("");
-        case "bracketExpansion.nesting2.v1":
+        case "BracketExpansion.nesting2.v1":
             return new BracketExpansionNesting2GameType("");
         default:
             return null;
