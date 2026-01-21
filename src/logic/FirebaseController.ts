@@ -6,6 +6,7 @@ import { ResultStats } from "./ResultStats";
 
 export type AssignmentRecord = {
     id: string;
+    uid: string;
     name: string;
     gameTypesJson: string;
 };
@@ -126,14 +127,14 @@ export class FirebaseController {
     }
 
 
-    // legacy function
-    onAssignmentsChanged(uid: string, cb: (assignments: AssignmentRecord[]) => void): () => void {
-        const assignmentsRef = Firestore.collection(this.db, "users", uid, "assignments");
+    onAssignmentsChanged(cb: (assignments: AssignmentRecord[]) => void): () => void {
+        const assignmentsRef = Firestore.collection(this.db, "assignments");
         return Firestore.onSnapshot(assignmentsRef, (snap) => {
             const assignments = snap.docs.map((doc) => {
                 const data = doc.data() as any;
                 return {
                     id: doc.id,
+                    uid: String(data.uid ?? ""),
                     name: String(data.name ?? ""),
                     gameTypesJson: String(data.gameTypesJson ?? "[]"),
                 } satisfies AssignmentRecord;
@@ -142,9 +143,8 @@ export class FirebaseController {
         });
     }
 
-    // legacy function
-    onAssignmentChanged(uid: string, assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
-        const assignmentRef = Firestore.doc(this.db, "users", uid, "assignments", assignmentId);
+    onAssignmentChanged(assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
+        const assignmentRef = Firestore.doc(this.db, "assignments", assignmentId);
         return Firestore.onSnapshot(assignmentRef, (snap) => {
             if (!snap.exists()) {
                 cb(null);
@@ -153,6 +153,7 @@ export class FirebaseController {
             const data = snap.data() as any;
             cb({
                 id: snap.id,
+                uid: String(data.uid ?? ""),
                 name: String(data.name ?? ""),
                 gameTypesJson: String(data.gameTypesJson ?? "[]"),
             });

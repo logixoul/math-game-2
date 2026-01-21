@@ -19,7 +19,6 @@ export function AssignmentSessionRoute() {
         }
         setIsLoading(true);
         const unsubscribe = firebaseController.onAssignmentChanged(
-            snapshot.user.uid,
             assignmentId,
             (nextAssignment) => {
                 setAssignment(nextAssignment);

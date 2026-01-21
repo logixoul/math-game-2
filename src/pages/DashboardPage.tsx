@@ -15,7 +15,7 @@ export function DashboardPage() {
 			setAssignments([]);
 			return;
 		}
-		const unsubscribe = firebaseController.onAssignmentsChanged(firebaseState.user.uid, setAssignments);
+		const unsubscribe = firebaseController.onAssignmentsChanged(setAssignments);
 		return () => unsubscribe();
 	}, [firebaseState.user]);
 
@@ -38,7 +38,7 @@ export function DashboardPage() {
 			<h2>Привет!</h2>
 			<p className={styles.subtitle}>Готов ли си?</p>
 			<section className={styles.section}>
-				<h3>За домашно за теб</h3>
+				<h3>New-style assignments</h3>
 				<ul className={styles.gameList}>
 					{assignments.map((assignment) => (
 						<li
