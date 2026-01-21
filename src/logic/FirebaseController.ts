@@ -8,7 +8,7 @@ export type AssignmentRecord = {
     id: string;
     uid: string;
     name: string;
-    gameTypesJson: string;
+    spec: string;
 };
 
 export type FirebaseState = {
@@ -114,6 +114,7 @@ export class FirebaseController {
 
     private async ensureUserDoc(user: FirebaseAuth.User): Promise<void> {
         const userRef = Firestore.doc(this.db, "users", user.uid);
+        
         await Firestore.setDoc(
             userRef,
             {
@@ -136,7 +137,7 @@ export class FirebaseController {
                     id: doc.id,
                     uid: String(data.uid ?? ""),
                     name: String(data.name ?? ""),
-                    gameTypesJson: String(data.gameTypesJson ?? "[]"),
+                    spec: String(data.spec ?? "[]"),
                 } satisfies AssignmentRecord;
             });
             cb(assignments);
@@ -155,7 +156,7 @@ export class FirebaseController {
                 id: snap.id,
                 uid: String(data.uid ?? ""),
                 name: String(data.name ?? ""),
-                gameTypesJson: String(data.gameTypesJson ?? "[]"),
+                spec: String(data.spec ?? "[]"),
             });
         });
     }
@@ -189,3 +190,5 @@ export function useFirebaseSnapshot() {
         firebaseController.getSnapshot.bind(firebaseController)
     );
 }
+
+export const db = firebaseController['db']; // TODO: better way to export Firestore instance

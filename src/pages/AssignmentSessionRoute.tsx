@@ -30,7 +30,7 @@ export function AssignmentSessionRoute() {
 
     const gameType = useMemo(() => {
         if (!assignment) return null;
-        const parsed = parseAssignmentGameTypes(assignment.gameTypesJson);
+        const parsed = parseAssignmentGameTypes(assignment.spec);
         if (parsed.error) return null;
         return createAssignmentGameType(assignment.id, assignment.name, parsed.specs);
     }, [assignment]);

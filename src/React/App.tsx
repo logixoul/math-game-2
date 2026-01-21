@@ -5,6 +5,7 @@ import { ErrorPage } from "@/pages/ErrorPage";
 import { PageLayout } from "@/React/PageLayout";
 import { AuthWall } from "@/pages/AuthWall";
 import { AssignmentSessionRoute } from "@/pages/AssignmentSessionRoute";
+import { AssignmentsAdminPage } from "@/pages/AssignmentsAdminPage";
 
 export function App() {
 	return (
@@ -17,6 +18,7 @@ export function App() {
 					<Route path="/game/" element={<ErrorPage />} />
 					<Route path="/game/:gameTypeKey" element={<GameSessionRoute />} />
 					<Route path="/assignment/:assignmentId" element={<AssignmentSessionRoute />} />
+					<Route path="/admin/assignments/" element={<AssignmentsAdminPage />} />
 				</Route>
 			</Route>
 		</Routes>
