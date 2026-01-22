@@ -44,8 +44,10 @@ export function DashboardPage() {
 		<div className={styles.dashboardContainer}>
 			<h2>Привет!</h2>
 			<p className={styles.subtitle}>Готов ли си?</p>
-			{createSection("5кл", "Тренировка 5кл.")}
-			{createSection("6кл", "Тренировка 6кл.")}
+			<div className={styles.sectionsContainer}>
+				{createSection("5кл", "Тренировка 5кл.")}
+				{createSection("6кл", "Тренировка 6кл.")}
+			</div>
 		</div>
 	);
 }

@@ -6,6 +6,14 @@
 	padding: 24px;
 }
 
+.sectionsContainer {
+	display: flex;
+	flex-direction: row;
+	gap: 2em;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
 .gameList {
 	list-style-type: none;
 	padding-inline-start: 0;
