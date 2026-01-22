@@ -15,9 +15,11 @@ export type AssignmentSpecParseResult = {
 
 export class Prompt {
     failedAttempts: number;
+    public readonly answer: BigNumber;
 
-    constructor(public readonly text: string, public readonly answer: number) {
+    constructor(public readonly text: string, answer: number | BigNumber) {
         this.failedAttempts = 0;
+        this.answer = new BigNumber(answer);
     }
 }
 
@@ -69,18 +71,23 @@ export class DivisionGameType extends GameType {
     }
 
     createRandomPrompt(): Prompt {
-        const expA = util.randomInt(this.expRange.min, this.expRange.max);
-        const expB = util.randomInt(this.expRange.min, this.expRange.max);
+        const expDivisee = util.randomInt(this.expRange.min, this.expRange.max);
+        const expDivisor = util.randomInt(this.expRange.min, this.expRange.max);
 
-        const a = new BigNumber(util.randomInt(this.range.min, this.range.max)).multipliedBy(integerPowerOfTen(expA));
+        const a = util.randomInt(this.range.min, this.range.max);
         let b;
         do {
-            b = new BigNumber(util.randomInt(this.range.min, this.range.max)).multipliedBy(integerPowerOfTen(expB));
-        } while (b.isZero());
-        const divisee = a.multipliedBy(b);
+            b = util.randomInt(this.range.min, this.range.max);
+        } while (b == 0);
+        const divisee = a * b;
         const divisor = b;
+
+        const diviseeRaised = new BigNumber(divisee).shiftedBy(expDivisee);
+        const divisorRaised = new BigNumber(divisor).shiftedBy(expDivisor);
+        const aFinal = diviseeRaised.dividedBy(divisorRaised);
+
         const divisorStr = ensureNegativeNumbersHaveParens(divisor);
-        return new Prompt(`${divisee} : ${divisorStr}`, a);
+        return new Prompt(`${divisee} : ${divisorStr}`, aFinal.toNumber());
     }
 }
 gameTypeRegistry.register(DivisionGameType, "Division.v1");
@@ -126,22 +133,6 @@ export class AdditionGameType extends GameType {
     }
 }
 gameTypeRegistry.register(AdditionGameType, "Addition.v1");
-
-export class KaloyanHomework_28_12_2025_GameType extends GameType {
-    readonly mul = new MultiplicationGameType("", new Range(-10, 10));
-    readonly div = new DivisionGameType("", new Range(-10, 10), new Range(0, 0));
-    readonly add = new AdditionGameType("", new Range(-40, 40));
-    readonly sub = new SubtractionSixthGradeGameType("", new Range(-40, 40));
-
-    createRandomPrompt(): Prompt {
-        const randomIndex : number = util.randomInt(0, 3);
-        return [this.mul,this.div,this.add,this.sub][randomIndex].createRandomPrompt();
-    }
-    constructor(uiLabel: string) {
-        super(uiLabel);
-    }
-}
-gameTypeRegistry.register(KaloyanHomework_28_12_2025_GameType, "KaloyanHomework_28_12_2025.v1");
 
 export class KrisHomework_4_1_2026_GameType_1 extends GameType {
     readonly add = new AdditionGameType("", new Range(-40, 40));
@@ -474,7 +465,6 @@ export function getAvailableGameTypes(): GameTypeList {
             new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
             new KrisHomework_4_1_2026_GameType_1("Крис 1"),
             new KrisHomework_4_1_2026_GameType_2("Крис 2"),
-            new KaloyanHomework_28_12_2025_GameType("Калоян 1")
         ],
         homework: []
     };

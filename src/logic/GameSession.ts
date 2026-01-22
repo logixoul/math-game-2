@@ -2,6 +2,7 @@ import type { FirebaseController } from './FirebaseController';
 import { GameType, Prompt } from './GameTypes';
 import { PromptScheduler } from './PromptScheduler';
 import { ResultStats } from './ResultStats';
+import { BigNumber } from 'bignumber.js';
 
 export type GameSessionUI = {
     updateProgressIndicator: () => void;
@@ -82,8 +83,14 @@ export class GameSession {
         const withinTimeLimit: boolean = (Date.now() - this.gameStartTimestamp) <= this.maxSessionDurationMs;
         return enoughPoints && enoughAnswered && withinTimeLimit;
     }
-    onUserAnswered(userAnswer: number): void {
-        if(userAnswer === this.currentPrompt.answer) {
+    onUserAnswered(userAnswerText: string): void {
+        const userAnswer = new BigNumber(userAnswerText);
+        if (userAnswer.isNaN()) {
+            this.gamePage.informUser("Това не е число!", "black", true);
+            this.gamePage.showPrompt();
+            return;
+        }
+        if(userAnswer.isEqualTo(this.currentPrompt.answer)) {
             this.pointsTowardWin++;
             this.maxReachedPointsTowardWin = Math.max(this.pointsTowardWin, this.maxReachedPointsTowardWin);
 

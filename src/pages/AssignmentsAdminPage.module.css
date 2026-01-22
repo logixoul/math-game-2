@@ -3,6 +3,8 @@ textarea {
     min-width: 50dvh;
 }
 
-li {
-    list-style-type: none;
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }

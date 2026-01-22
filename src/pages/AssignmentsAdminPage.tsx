@@ -34,7 +34,7 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
             <h2>Assignments</h2>
             <button onClick={handleCreate}>Add</button>
 
-            <ul>
+            <ul className={styles.list}>
                 {data.map((assignment) =>
                     <li key={assignment.id}>
                         <AssignmentEditForm assignment={assignment} />

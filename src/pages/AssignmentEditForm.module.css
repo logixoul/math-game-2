@@ -1,10 +1,11 @@
 .collapsedAssignment {
-    margin: 2em !important;
+    margin: 1em !important;
     display: block;
 }
 
 .collapsedAssignment button {
     margin-left: 1em;
+    margin-right: 1em;
     width: 3em;
     border-radius: 1.5em;
 }
@@ -14,4 +15,9 @@ form {
     background: #cccccc;
     border: 1px solid gray;
     padding: 1em;
+}
+
+.extraData {
+    color: gray;
+    font-size: 0.9em;
 }

@@ -10,6 +10,7 @@ import { MessageLog, Message } from "@/components/MessageLog";
 import { attachWakeLock } from "@/React/WakeLock";
 import styles from "./GameSessionPage.module.css";
 import { firebaseController } from "@/logic/FirebaseController";
+import { BigNumber } from "bignumber.js";
 
 type GameSessionPageProps = {
 	gameType: GameTypes.GameType;
@@ -210,9 +211,7 @@ export function GameSessionPage({
 	const submitAnswer = (text: string) => {
 		const session = getSession();
 		if (sessionComplete) return;
-		const numeric = Number.parseInt(text, 10);
-		if (Number.isNaN(numeric)) return;
-
+		
 		setMessages((prev) => {
 			if (activePromptIndex === null) return prev;
 			return prev.map((message, index) =>
@@ -222,7 +221,7 @@ export function GameSessionPage({
 			);
 		});
 		setCurrentAnswer("");
-		session.onUserAnswered(numeric);
+		session.onUserAnswered(text);
 	};
 
 	const handleKeypadOk = () => {
