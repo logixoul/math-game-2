@@ -12,10 +12,10 @@ export function DashboardPage() {
 	useEffect(() => {
 		const assignmentsRef = collection(db, "assignments");
 		const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
-			const assignments = snapshot.docs.map((doc) => ({
+			let assignments = snapshot.docs.map((doc) => ({
 				id: doc.id, ...doc.data()
 			} as AssignmentRecord))
-
+			assignments = assignments.sort((a, b) => a.index - b.index);
 			setAssignments(assignments);
 		});
 		return () => unsubscribe();

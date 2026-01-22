@@ -13,9 +13,10 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
     useEffect(() => {
         const assignmentsRef = collection(db, "assignments");
         const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
-            const assignments = snapshot.docs.map((doc) => ({
+            let assignments = snapshot.docs.map((doc) => ({
                 id: doc.id, ...doc.data()
             } as AssignmentRecord));
+            assignments = assignments.sort((a, b) => a.index - b.index);
             setData(assignments);
         });
         return () => unsubscribe();
@@ -30,11 +31,15 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
     const handleSave = async (formData : FormData) => {
         const id = formData.get("id") as string;
         const name = formData.get("name") as string;
+        const category = formData.get("category") as string;
+        const index = formData.get("index") as string;
         const spec = formData.get("spec") as string;
         const assignmentRef = doc(db, "assignments", id);
         await updateDoc(assignmentRef, {
             name: name,
-            spec: spec
+            category: category,
+            spec: spec,
+            index: Number(index),
         });
     };
 
@@ -58,12 +63,9 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
                             >
 
                             <input type="hidden" name="id" value={assignment.id} />
-                            <input
-                                type="text"
-                                name="name"
-                                defaultValue={assignment.name}
-                                placeholder="Enter name"
-                            />
+                            <input type="text" name="name" defaultValue={assignment.name} placeholder="Name"/>
+                            <input type="text" name="category" defaultValue={assignment.category} placeholder="Category" />
+                            <input type="text" name="index" defaultValue={assignment.index} placeholder="Index" />
                             <br />
                             <textarea name="spec" className={styles.textarea} rows={10} cols={50} defaultValue={ assignment.spec } />
                             <button type="submit">Save</button>

@@ -2,14 +2,14 @@ import { gameTypeRegistry } from './GameTypeRegistry';
 import * as util from './util';
 import { BigNumber } from 'bignumber.js'
 
-export type AssignmentGameTypeSpec = {
+export type AssignmentPartSpec = {
     key: string;
     params?: Record<string, unknown>;
     probability: number;
 };
 
-export type AssignmentGameTypeParseResult = {
-    specs: AssignmentGameTypeSpec[];
+export type AssignmentSpecParseResult = {
+    specs: AssignmentPartSpec[];
     error?: string;
 };
 
@@ -374,7 +374,7 @@ export class WeightedAssignmentGameType extends GameType {
     }
 }
 
-export function parseAssignmentGameTypes(jsonText: string): AssignmentGameTypeParseResult {
+export function parseAssignmentGameTypes(jsonText: string): AssignmentSpecParseResult {
     if (!jsonText.trim()) {
         return { specs: [], error: "Empty JSON" };
     }
@@ -385,9 +385,9 @@ export function parseAssignmentGameTypes(jsonText: string): AssignmentGameTypePa
         }
         const specs = parsed.map((entry) => {
             const key = String(entry?.key ?? "");
-            const probability = Number(entry?.probability ?? 0);
+            const probability = Number(entry?.probability ?? 1);
             const params = (entry?.params ?? {}) as Record<string, unknown>;
-            return { key, probability, params } satisfies AssignmentGameTypeSpec;
+            return { key, probability, params } satisfies AssignmentPartSpec;
         });
         return { specs };
     } catch (error: any) {
@@ -398,7 +398,7 @@ export function parseAssignmentGameTypes(jsonText: string): AssignmentGameTypePa
 export function createAssignmentGameType(
     assignmentId: string,
     uiLabel: string,
-    specs: AssignmentGameTypeSpec[]
+    specs: AssignmentPartSpec[]
 ): GameType | null {
     const weightedGameTypes: WeightedGameType[] = [];
     for (const spec of specs) {
@@ -421,7 +421,7 @@ export function createAssignmentGameType(
     );
 }
 
-function createGameTypeFromSpec(spec: AssignmentGameTypeSpec): GameType | null {
+function createGameTypeFromSpec(spec: AssignmentPartSpec): GameType | null {
     const params = spec.params ?? {};
     const rangeMin = Number((params as any).rangeMin ?? 0);
     const rangeMax = Number((params as any).rangeMax ?? 0);

@@ -10,6 +10,7 @@ export type AssignmentRecord = {
     name: string;
     spec: string;
     category: string;
+    index: number;
 };
 
 export type FirebaseState = {
