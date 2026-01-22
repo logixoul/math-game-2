@@ -86,8 +86,8 @@ export class DivisionGameType extends GameType {
         const divisorRaised = new BigNumber(divisor).shiftedBy(expDivisor);
         const aFinal = diviseeRaised.dividedBy(divisorRaised);
 
-        const divisorStr = ensureNegativeNumbersHaveParens(divisor);
-        return new Prompt(`${divisee} : ${divisorStr}`, aFinal.toNumber());
+        const divisorRaisedStr = ensureNegativeNumbersHaveParens(divisorRaised);
+        return new Prompt(`${diviseeRaised} : ${divisorRaisedStr}`, aFinal.toNumber());
     }
 }
 gameTypeRegistry.register(DivisionGameType, "Division.v1");

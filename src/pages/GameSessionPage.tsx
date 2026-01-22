@@ -24,23 +24,6 @@ type ProgressSnapshot = {
 	minProblemsAttemptedToWin: number;
 };
 
-export function GameSessionRoute() {
-	const { gameTypeKey } = useParams<{ gameTypeKey: string }>();
-	const decodedKey = decodeURIComponent(gameTypeKey!);
-	const gameType = useMemo(() => {
-		const gameTypesCategorized = GameTypes.getAvailableGameTypes();
-		const gameTypes = Object.values(gameTypesCategorized).flat();
-		return gameTypes.find(
-			(type) => type.persistencyKey === decodedKey
-		);
-	}, [decodedKey]);
-	if(!gameType) {
-		return <ErrorPage></ErrorPage>;
-	}
-
-	return <GameSessionPage gameType={gameType} />;
-}
-
 export function GameSessionPage({
 	gameType,
 	assignmentId,
