@@ -134,34 +134,6 @@ export class AdditionGameType extends GameType {
 }
 gameTypeRegistry.register(AdditionGameType, "Addition.v1");
 
-export class KrisHomework_4_1_2026_GameType_1 extends GameType {
-    readonly add = new AdditionGameType("", new Range(-40, 40));
-    readonly sub = new SubtractionSixthGradeGameType("", new Range(-40, 40));
-
-    createRandomPrompt(): Prompt {
-        const randomIndex : number = util.randomInt(0, 1);
-        return [this.add,this.sub][randomIndex].createRandomPrompt();
-    }
-    constructor(uiLabel: string) {
-        super(uiLabel);
-    }
-}
-gameTypeRegistry.register(KrisHomework_4_1_2026_GameType_1, "KrisHomework_4_1_2026-1.v1");
-
-export class KrisHomework_4_1_2026_GameType_2 extends GameType {
-    readonly mul = new MultiplicationGameType("", new Range(0, 10));
-    readonly div = new DivisionGameType("", new Range(0, 10));
-
-    createRandomPrompt(): Prompt {
-        const randomIndex : number = util.randomInt(0, 1);
-        return [this.mul,this.div][randomIndex].createRandomPrompt();
-    }
-    constructor(uiLabel: string) {
-        super(uiLabel);
-    }
-}
-gameTypeRegistry.register(KrisHomework_4_1_2026_GameType_2, "KrisHomework_4_1_2026-2.v1");
-
 export class BracketExpansion extends GameType {
     constructor(
         uiLabel: string,
@@ -463,8 +435,6 @@ export function getAvailableGameTypes(): GameTypeList {
             new BracketExpansionNesting0GameType("-1 + 2 - 3 + 90"),
             new BracketExpansionNesting1GameType("Разкриване на скоби"),
             new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
-            new KrisHomework_4_1_2026_GameType_1("Крис 1"),
-            new KrisHomework_4_1_2026_GameType_2("Крис 2"),
         ],
         homework: []
     };

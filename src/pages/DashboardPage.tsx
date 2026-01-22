@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
-import { AssignmentRecord, db, useFirebaseSnapshot } from "@/logic/FirebaseController";
+import { AssignmentRecord, auth, db, firebaseController, useFirebaseSnapshot } from "@/logic/FirebaseController";
 import { collection, onSnapshot } from "firebase/firestore";
 
 export function DashboardPage() {
 	const navigate = useNavigate();
 	
 	const [assignments, setAssignments] = useState<AssignmentRecord[]>([]);
+	const [isAdmin, setIsAdmin] = useState(false);
 
 	useEffect(() => {
 		const assignmentsRef = collection(db, "assignments");
@@ -17,6 +18,12 @@ export function DashboardPage() {
 			} as AssignmentRecord))
 			assignments = assignments.sort((a, b) => a.index - b.index);
 			setAssignments(assignments);
+		});
+		return () => unsubscribe();
+	}, []);
+	useEffect(() => {
+		const unsubscribe = auth.onAuthStateChanged((user) => {
+			setIsAdmin(firebaseController.isAdmin());
 		});
 		return () => unsubscribe();
 	}, []);
@@ -44,6 +51,9 @@ export function DashboardPage() {
 		<div className={styles.dashboardContainer}>
 			<h2>Привет!</h2>
 			<p className={styles.subtitle}>Готов ли си?</p>
+			{
+				isAdmin && <button onClick={() => navigate("/admin/assignments/")}>Edit assignments (admin)</button>
+			}
 			<div className={styles.sectionsContainer}>
 				{createSection("5кл", "Тренировка 5кл.")}
 				{createSection("6кл", "Тренировка 6кл.")}

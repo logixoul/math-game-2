@@ -1,50 +1,41 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { firebaseController, useFirebaseSnapshot, AssignmentRecord } from "@/logic/FirebaseController";
+import { firebaseController, AssignmentRecord } from "@/logic/FirebaseController";
 import { createAssignmentGameType, parseAssignmentGameTypes } from "@/logic/GameTypes";
 import { GameSessionPage } from "./GameSessionPage";
 import { ErrorPage } from "./ErrorPage";
 
 export function AssignmentSessionRoute() {
     const { assignmentId } = useParams<{ assignmentId: string }>();
-    const snapshot = useFirebaseSnapshot();
     const [assignment, setAssignment] = useState<AssignmentRecord | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-        if (!snapshot.user || !assignmentId) {
+        if (!assignmentId) {
             setAssignment(null);
-            setIsLoading(false);
             return;
         }
-        setIsLoading(true);
         const unsubscribe = firebaseController.onAssignmentChanged(
             assignmentId,
             (nextAssignment) => {
                 setAssignment(nextAssignment);
-                setIsLoading(false);
             }
         );
         return () => unsubscribe();
-    }, [assignmentId, snapshot.user]);
+    }, [assignmentId]);
 
     const gameType = useMemo(() => {
         if (!assignment) return null;
         const parsed = parseAssignmentGameTypes(assignment.spec);
-        if (parsed.error) return null;
+        if (parsed.error) {
+            setErrorMessage("Error parsing assignment spec: " + parsed.error);
+            return null;
+        }
         return createAssignmentGameType(assignment.id, assignment.name, parsed.specs);
     }, [assignment]);
 
-    if (!snapshot.user) {
-        return <ErrorPage />;
-    }
-
-    if (isLoading) {
-        return <div>Loading assignment...</div>;
-    }
-
     if (!assignment || !gameType) {
-        return <ErrorPage />;
+        return <ErrorPage message={errorMessage}/>;
     }
 
     return <GameSessionPage gameType={gameType} assignmentId={assignment.id} />;

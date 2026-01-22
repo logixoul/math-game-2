@@ -1,10 +1,15 @@
 import styles from "./ErrorPage.module.css";
 
-export function ErrorPage() {
+type ErrorPageProps = {
+    message: string;
+};
+
+export function ErrorPage({ message }: ErrorPageProps) {
     return (
         <div className={styles.page + " page"}>
             <main className={styles.content}>
-                Страницата не е намерена! 😮
+                <p>Нещо се обърка! 😮</p>
+                <p>Съобщение за грешка: {message}</p>
             </main>
         </div>);
 }

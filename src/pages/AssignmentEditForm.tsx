@@ -1,20 +1,43 @@
 import { AssignmentRecord, db } from "@/logic/FirebaseController";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import styles from "./AssignmentEditForm.module.css";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { set } from "bignumber.js";
 
 type AssignmentEditFormProps = {
     assignment: AssignmentRecord;
+    isCollapsedInitially: boolean;
+    onCloned?: (newAssignmentId: string) => void;
 };
 
 export function AssignmentEditForm(props: AssignmentEditFormProps) {
-    const { assignment } = props;
+    const { assignment, isCollapsedInitially, onCloned } = props;
+    const [ isCollapsed, setIsCollapsed ] = useState(isCollapsedInitially);
 
-    const [ collapsed, setCollapsed ] = useState(true);
+    const formRef = useRef<HTMLFormElement | null>(null);
+    
+    useEffect(() => {
+        if(!isCollapsed) {
+            scrollIntoViewIfNeeded(formRef.current!);
+        }
+    }, [isCollapsed]);
+
+    const scrollIntoViewIfNeeded = (target : HTMLElement) => {
+        // Target is outside the viewport from the bottom
+        if (target.getBoundingClientRect().bottom > window.innerHeight) {
+            //  The bottom of the target will be aligned to the bottom of the visible area of the scrollable ancestor.
+            target.scrollIntoView({ block: "end", inline: "nearest", behavior: "smooth" });
+        }
+
+        // Target is outside the view from the top
+        if (target.getBoundingClientRect().top < 0) {
+            // The top of the target will be aligned to the top of the visible area of the scrollable ancestor
+            target.scrollIntoView({ block: "start", inline: "nearest", behavior: "smooth" });
+        }
+    };
 
     const handleSave = async (formData: FormData) => {
-        setCollapsed(true);
+        setIsCollapsed(true);
 
         const id = formData.get("id") as string;
         const name = formData.get("name") as string;
@@ -39,22 +62,34 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
     };
 
     const handleDeleteById = async (id: string) => {
-        setCollapsed(true);
+        setIsCollapsed(true);
         await deleteDoc(doc(db, "assignments", id));
+    };
+
+    const handleClone = async (assignment: AssignmentRecord) => {
+        const newAssignment = {
+            name: "",
+            spec: assignment.spec,
+            category: assignment.category,
+            index: assignment.index + 100,
+        };
+
+        await addDoc(collection(db, "assignments"), newAssignment);
     };
 
     return (
         <div className={styles.collapsedAssignment}>
-            <button className={styles.expandButton} onClick={() => setCollapsed(!collapsed)}>
-                {collapsed ? "+" : "-"}
+            <button className={styles.expandButton} onClick={() => setIsCollapsed(!isCollapsed)}>
+                {isCollapsed ? "+" : "-"}
             </button>
-            {collapsed?(
+            {isCollapsed?(
                 <>
                     {assignment.name} 
                     <span className={styles.extraData}> (Index = {assignment.index}; Category = {assignment.category})</span>
                 </>
             ) : (
                 <form
+                    ref={formRef}
                     onSubmit={(e) => {
                         e.preventDefault();
                         handleSave(new FormData(e.currentTarget));
@@ -76,6 +111,9 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
                     </button>
                 </form>
             )}
+            <button className={styles.formButton} onClick={() => handleClone(assignment)}>
+                Clone
+            </button>
         </div>
     );
 }

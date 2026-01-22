@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, onSnapshot } from "firebase/firestore";
-import { AssignmentRecord, db } from "@/logic/FirebaseController";
+import { AssignmentRecord, db, firebaseController } from "@/logic/FirebaseController";
 import styles from "./AssignmentsAdminPage.module.css";
 import { AssignmentEditForm } from "./AssignmentEditForm";
 
@@ -9,7 +9,9 @@ type AssignmentsAdminPageProps = {
 };
 
 export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
-    const [data, setData] = useState<AssignmentRecord[]>([]);
+    const [assignments, setAssignments] = useState<AssignmentRecord[]>([]);
+    const bottomRef = useRef<HTMLDivElement | null>(null);
+    const [latestAddedId, setLatestAddedId] = useState<string | null>(null);
 
     useEffect(() => {
         const assignmentsRef = collection(db, "assignments");
@@ -18,17 +20,24 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
                 id: doc.id, ...doc.data()
             } as AssignmentRecord));
             assignments = assignments.sort((a, b) => a.index - b.index);
-            setData(assignments);
+            setAssignments(assignments);
         });
         return () => unsubscribe();
     }, []);
-
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [latestAddedId]);
     const handleCreate = async () => {
-        const maxIndex = data.reduce((max, a) => Math.max(max, a.index), 0);
-        await addDoc(collection(db, "assignments"), {
-            name: "", spec: "[]", category: "", index: maxIndex + 100,
+        const maxIndex = assignments.reduce((max, a) => Math.max(max, a.index), 0);
+        const docRef = await addDoc(collection(db, "assignments"), {
+            name: "", spec: "[]", category: "Домашни", index: maxIndex + 100,
         });
+        setLatestAddedId(docRef.id);
     };
+
+    if (!firebaseController.isAdmin()) {
+        return <div>Тази страница е само за администратори.</div>;
+    }
 
     return (
         <div>
@@ -36,12 +45,15 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
             <button onClick={handleCreate}>Add</button>
 
             <ul className={styles.list}>
-                {data.map((assignment) =>
+                {assignments.map((assignment) =>
                     <li key={assignment.id}>
-                        <AssignmentEditForm assignment={assignment} />
+                        <AssignmentEditForm
+                            assignment={assignment}
+                            isCollapsedInitially={latestAddedId !== assignment.id} />
                     </li>
                 )}
             </ul>
+            <div ref={bottomRef} />
         </div>
     );
 }

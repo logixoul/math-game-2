@@ -129,6 +129,11 @@ export class FirebaseController {
         );
     }
 
+    isAdmin(): boolean {
+        const user = this.auth.currentUser;
+        if (!user) return false;
+        return user.email === "logixoul@gmail.com";
+    }
 
     onAssignmentChanged(assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
         const assignmentRef = doc(this.db, "assignments", assignmentId);
@@ -172,3 +177,4 @@ export function useFirebaseSnapshot() {
 }
 
 export const db = firebaseController['db']; // TODO: better way to export Firestore instance
+export const auth = firebaseController['auth']; // TODO: better way to export Auth instance
