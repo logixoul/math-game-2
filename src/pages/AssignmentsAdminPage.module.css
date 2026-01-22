@@ -2,3 +2,7 @@ textarea {
     font-family: monospace;
     min-width: 50dvh;
 }
+
+li {
+    list-style-type: none;
+}

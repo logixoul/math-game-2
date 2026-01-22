@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, onSnapshot } from "firebase/firestore";
 import { AssignmentRecord, db } from "@/logic/FirebaseController";
 import styles from "./AssignmentsAdminPage.module.css";
+import { AssignmentEditForm } from "./AssignmentEditForm";
 
 type AssignmentsAdminPageProps = {
 
@@ -28,25 +29,6 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
         });
     };
 
-    const handleSave = async (formData : FormData) => {
-        const id = formData.get("id") as string;
-        const name = formData.get("name") as string;
-        const category = formData.get("category") as string;
-        const index = formData.get("index") as string;
-        const spec = formData.get("spec") as string;
-        const assignmentRef = doc(db, "assignments", id);
-        await updateDoc(assignmentRef, {
-            name: name,
-            category: category,
-            spec: spec,
-            index: Number(index),
-        });
-    };
-
-    const handleDeleteById = async (id: string) => {
-        await deleteDoc(doc(db, "assignments", id));
-    };
-
     return (
         <div>
             <h2>Assignments</h2>
@@ -55,24 +37,7 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
             <ul>
                 {data.map((assignment) =>
                     <li key={assignment.id}>
-                        <form
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                handleSave(new FormData(e.currentTarget));
-                            }}
-                            >
-
-                            <input type="hidden" name="id" value={assignment.id} />
-                            <input type="text" name="name" defaultValue={assignment.name} placeholder="Name"/>
-                            <input type="text" name="category" defaultValue={assignment.category} placeholder="Category" />
-                            <input type="text" name="index" defaultValue={assignment.index} placeholder="Index" />
-                            <br />
-                            <textarea name="spec" className={styles.textarea} rows={10} cols={50} defaultValue={ assignment.spec } />
-                            <button type="submit">Save</button>
-                            <button type="button" onClick={() => handleDeleteById(assignment.id)}>
-                                Delete
-                            </button>
-                        </form>
+                        <AssignmentEditForm assignment={assignment} />
                     </li>
                 )}
             </ul>
