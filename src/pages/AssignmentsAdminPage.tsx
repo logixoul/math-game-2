@@ -24,8 +24,9 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
     }, []);
 
     const handleCreate = async () => {
+        const maxIndex = data.reduce((max, a) => Math.max(max, a.index), 0);
         await addDoc(collection(db, "assignments"), {
-            name: "", spec: "[]",
+            name: "", spec: "[]", category: "", index: maxIndex + 100,
         });
     };
 

@@ -1,20 +1,28 @@
 .collapsedAssignment {
     margin: 1em !important;
-    display: block;
+    display: flex;
+    flex-direction: row;
 }
 
-.collapsedAssignment button {
+.expandButton {
     margin-left: 1em;
     margin-right: 1em;
     width: 3em;
+    height: 3em;
     border-radius: 1.5em;
 }
 
+.formButton {
+    margin-top: 1em;
+    margin-right: 1em;
+    padding: 1em 1em;
+}
+
 form {
-    margin: 2em !important;
-    background: #cccccc;
+    background: #eeeeee;
     border: 1px solid gray;
     padding: 1em;
+    /*display: inline-block;*/
 }
 
 .extraData {

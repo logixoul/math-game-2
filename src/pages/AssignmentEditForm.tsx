@@ -45,16 +45,15 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 
     return (
         <div className={styles.collapsedAssignment}>
-            <button onClick={() => setCollapsed(!collapsed)}>
+            <button className={styles.expandButton} onClick={() => setCollapsed(!collapsed)}>
                 {collapsed ? "+" : "-"}
             </button>
             {collapsed?(
-            <>
-                {assignment.name} 
-                <span className={styles.extraData}> (Index = {assignment.index}; Category = {assignment.category})</span>
-            </>
-            ) :
-            (
+                <>
+                    {assignment.name} 
+                    <span className={styles.extraData}> (Index = {assignment.index}; Category = {assignment.category})</span>
+                </>
+            ) : (
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -71,8 +70,8 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
                     <br />
                     <label htmlFor="spec">Spec (JSON):</label>
                     <textarea name="spec" className={styles.textarea} rows={10} cols={50} defaultValue={assignment.spec} />
-                    <button type="submit">Save</button>
-                    <button type="button" onClick={() => handleDeleteById(assignment.id)}>
+                    <button className={styles.formButton} type="submit">Save</button>
+                    <button className={styles.formButton} type="button" onClick={() => handleDeleteById(assignment.id)}>
                         Delete
                     </button>
                 </form>
