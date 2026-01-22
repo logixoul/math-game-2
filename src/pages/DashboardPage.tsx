@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
-import * as GameTypes from "@/logic/GameTypes";
-import { AssignmentRecord, db, firebaseController, useFirebaseSnapshot } from "@/logic/FirebaseController";
+import { AssignmentRecord, db, useFirebaseSnapshot } from "@/logic/FirebaseController";
 import { collection, onSnapshot } from "firebase/firestore";
 
 export function DashboardPage() {
 	const navigate = useNavigate();
 	
-	const firebaseState = useFirebaseSnapshot();
 	const [assignments, setAssignments] = useState<AssignmentRecord[]>([]);
 
 	useEffect(() => {
@@ -21,13 +19,10 @@ export function DashboardPage() {
 			setAssignments(assignments);
 		});
 		return () => unsubscribe();
-	}, [firebaseState.user]);
-
-	const groupedAssignments = Object.groupBy(assignments, (a) => a.category || "uncategorized");
-	console.log(groupedAssignments);
+	}, []);
 
 	const createSection = (category: string, title: string) => {
-		const theseAssignments = groupedAssignments[category];
+		const theseAssignments = assignments.filter(a => a.category === category);
 		return (
 			<section className={styles.section}>
 				<h3>{title}</h3>
