@@ -9,8 +9,6 @@ type AssignmentsAdminPageProps = {
 
 export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
     const [data, setData] = useState<AssignmentRecord[]>([]);
-    const [name, setName] = useState("");
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         const assignmentsRef = collection(db, "assignments");
@@ -25,9 +23,8 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
 
     const handleCreate = async () => {
         await addDoc(collection(db, "assignments"), {
-            name, spec: "[]",
+            name: "", spec: "[]",
         });
-        setName("");
     };
 
     const handleSave = async (formData : FormData) => {
@@ -48,12 +45,6 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
     return (
         <div>
             <h2>Assignments</h2>
-            <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter name"
-            />
             <button onClick={handleCreate}>Add</button>
 
             <ul>

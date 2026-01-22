@@ -1,7 +1,7 @@
 ﻿import { useSyncExternalStore } from "react";
-import * as FirebaseApp from "firebase/app";
-import * as FirebaseAuth from "firebase/auth";
-import * as Firestore from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { User, Auth, getAuth, setPersistence, browserLocalPersistence, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "firebase/auth";
+import { Firestore as Firestore_1, getFirestore, doc, setDoc, serverTimestamp, collection, onSnapshot, addDoc } from "firebase/firestore";
 import { ResultStats } from "./ResultStats";
 
 export type AssignmentRecord = {
@@ -9,17 +9,18 @@ export type AssignmentRecord = {
     uid: string;
     name: string;
     spec: string;
+    category: string;
 };
 
 export type FirebaseState = {
-    user: FirebaseAuth.User | null;
+    user: User | null;
 };
 
 type Listener = () => void;
 
 export class FirebaseController {
-    private auth!: FirebaseAuth.Auth;
-    private db!: Firestore.Firestore;
+    private auth!: Auth;
+    private db!: Firestore_1;
     private listeners = new Set<Listener>();
 
     private state: FirebaseState = {
@@ -36,13 +37,13 @@ export class FirebaseController {
         measurementId: "G-X632E2E31S"
     };
     async init(): Promise<void> {
-        const app = FirebaseApp.initializeApp(FirebaseController.#firebaseConfig);
-        this.auth = FirebaseAuth.getAuth(app);
-        this.db   = Firestore.getFirestore(app);
+        const app = initializeApp(FirebaseController.#firebaseConfig);
+        this.auth = getAuth(app);
+        this.db   = getFirestore(app);
 
-        await FirebaseAuth.setPersistence(this.auth, FirebaseAuth.browserLocalPersistence);
+        await setPersistence(this.auth, browserLocalPersistence);
 
-        FirebaseAuth.onAuthStateChanged(this.auth, (user) => {
+        onAuthStateChanged(this.auth, (user) => {
             this.state = {
                 user: user
             };
@@ -71,8 +72,8 @@ export class FirebaseController {
     }
 
     async login(): Promise<void> {
-        const provider = new FirebaseAuth.GoogleAuthProvider();
-        await FirebaseAuth.signInWithPopup(this.auth, provider);
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(this.auth, provider);
     }
 
     async loginWithEmailPassword(emailRaw: string, passwordRaw: string): Promise<void> {
@@ -80,84 +81,62 @@ export class FirebaseController {
         const password = passwordRaw.trim();
         if (!email || !password) throw new Error("Email and password required");
 
-        await FirebaseAuth.signInWithEmailAndPassword(this.auth, email, password);
+        await signInWithEmailAndPassword(this.auth, email, password);
     }
 
     async signupWithEmailPassword(emailRaw: string, passwordRaw: string): Promise<void> {
         const email = emailRaw.trim();
         const password = passwordRaw.trim();
         if (!email || !password) throw new Error("Email and password required");
-        await FirebaseAuth.createUserWithEmailAndPassword(this.auth, email, password);
+        await createUserWithEmailAndPassword(this.auth, email, password);
     }
 
     async sendPasswordReset(emailRaw: string): Promise<void> {
         const email = emailRaw.trim();
         if (!email) throw new Error("Email required");
-        await FirebaseAuth.sendPasswordResetEmail(this.auth, email);
+        await sendPasswordResetEmail(this.auth, email);
     }
 
     async logout(): Promise<void> {
-        await FirebaseAuth.signOut(this.auth);
+        await signOut(this.auth);
     }
 
     async onGameEnd(resultStats: ResultStats): Promise<void> {
         const user = this.auth.currentUser;
         if (!user) return alert("Login first!");
 
-        const personalBestsRef = Firestore.doc(this.db, "users", user.uid, "personalBests", "summary");
+        const personalBestsRef = doc(this.db, "users", user.uid, "personalBests", "summary");
 
-        await Firestore.setDoc(personalBestsRef, {
+        await setDoc(personalBestsRef, {
             stats: resultStats,
             timestamp: Date.now()
         });
     }
 
-    private async ensureUserDoc(user: FirebaseAuth.User): Promise<void> {
-        const userRef = Firestore.doc(this.db, "users", user.uid);
+    private async ensureUserDoc(user: User): Promise<void> {
+        const userRef = doc(this.db, "users", user.uid);
         
-        await Firestore.setDoc(
+        await setDoc(
             userRef,
             {
                 uid: user.uid,
                 email: user.email ?? null,
                 displayName: user.displayName ?? null,
-                lastLoginAt: Firestore.serverTimestamp(),
+                lastLoginAt: serverTimestamp(),
             },
             { merge: true }
         );
     }
 
 
-    onAssignmentsChanged(cb: (assignments: AssignmentRecord[]) => void): () => void {
-        const assignmentsRef = Firestore.collection(this.db, "assignments");
-        return Firestore.onSnapshot(assignmentsRef, (snap) => {
-            const assignments = snap.docs.map((doc) => {
-                const data = doc.data() as any;
-                return {
-                    id: doc.id,
-                    uid: String(data.uid ?? ""),
-                    name: String(data.name ?? ""),
-                    spec: String(data.spec ?? "[]"),
-                } satisfies AssignmentRecord;
-            });
-            cb(assignments);
-        });
-    }
-
     onAssignmentChanged(assignmentId: string, cb: (assignment: AssignmentRecord | null) => void): () => void {
-        const assignmentRef = Firestore.doc(this.db, "assignments", assignmentId);
-        return Firestore.onSnapshot(assignmentRef, (snap) => {
+        const assignmentRef = doc(this.db, "assignments", assignmentId);
+        return onSnapshot(assignmentRef, (snap) => {
             if (!snap.exists()) {
                 cb(null);
                 return;
             }
-            const data = snap.data() as any;
-            cb({
-                id: snap.id,
-                uid: String(data.uid ?? ""),
-                name: String(data.name ?? ""),
-                spec: String(data.spec ?? "[]"),
-            });
+            cb({ id: snap.id, ...snap.data() } as AssignmentRecord);
         });
     }
 
@@ -168,13 +147,13 @@ export class FirebaseController {
     ): Promise<void> {
         const user = this.auth.currentUser;
         if (!user) return;
-        const attemptsRef = Firestore.collection(this.db, "users", user.uid, "attempts");
-        await Firestore.addDoc(attemptsRef, {
+        const attemptsRef = collection(this.db, "users", user.uid, "attempts");
+        await addDoc(attemptsRef, {
             resultStats,
             completionReason,
             assignmentId: assignmentId ?? null,
             attemptType: assignmentId ? "assignment" : "free_practice",
-            createdAt: Firestore.serverTimestamp(),
+            createdAt: serverTimestamp(),
         });
     }
 

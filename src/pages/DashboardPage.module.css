@@ -57,6 +57,8 @@
 	background: url("/assets/gradbg.png") no-repeat;
 	background-size: contain;
 	margin: 1em;
+	padding-left: 2em;
+	padding-right: 2em;
 }
 
 .assignmentDue {

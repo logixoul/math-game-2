@@ -2,62 +2,55 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
 import * as GameTypes from "@/logic/GameTypes";
-import { AssignmentRecord, firebaseController, useFirebaseSnapshot } from "@/logic/FirebaseController";
+import { AssignmentRecord, db, firebaseController, useFirebaseSnapshot } from "@/logic/FirebaseController";
+import { collection, onSnapshot } from "firebase/firestore";
 
 export function DashboardPage() {
 	const navigate = useNavigate();
-	const gameTypes = useMemo(() => GameTypes.getAvailableGameTypes(), []);
+	
 	const firebaseState = useFirebaseSnapshot();
 	const [assignments, setAssignments] = useState<AssignmentRecord[]>([]);
 
 	useEffect(() => {
-		if (!firebaseState.user) {
-			setAssignments([]);
-			return;
-		}
-		const unsubscribe = firebaseController.onAssignmentsChanged(setAssignments);
+		const assignmentsRef = collection(db, "assignments");
+		const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
+			const assignments = snapshot.docs.map((doc) => ({
+				id: doc.id, ...doc.data()
+			} as AssignmentRecord))
+
+			setAssignments(assignments);
+		});
 		return () => unsubscribe();
 	}, [firebaseState.user]);
 
-	const createSection = (title:string, gameTypesSingleCategory : GameTypes.GameType[]) =>
-		<section className={styles.section}>
-			<h3>{title}</h3>
-			<ul className={styles.gameList}>
-				{gameTypesSingleCategory.map((gameType) => (
-					<li key={gameType.persistencyKey} className={styles.gameCard} onClick={() =>
-								navigate(`/game/${encodeURIComponent(gameType.persistencyKey)}`)
-							}>{gameType.uiLabel}
-					</li>
-				))}
-			</ul>
-		</section>
-	;
+	const groupedAssignments = Object.groupBy(assignments, (a) => a.category || "uncategorized");
+	console.log(groupedAssignments);
+
+	const createSection = (category: string, title: string) => {
+		const theseAssignments = groupedAssignments[category];
+		return (
+			<section className={styles.section}>
+				<h3>{title}</h3>
+				<ul className={styles.gameList}>
+					{
+						theseAssignments?.map(a =>
+						<li key={a.id} className={styles.gameCard} onClick={() =>
+								navigate(`/assignment/${a.id}`)
+							}>{a.name}
+						</li>
+						)
+					}
+				</ul>
+			</section>
+		);
+	};
 
 	return (
 		<div className={styles.dashboardContainer}>
 			<h2>Привет!</h2>
 			<p className={styles.subtitle}>Готов ли си?</p>
-			<section className={styles.section}>
-				<h3>New-style assignments</h3>
-				<ul className={styles.gameList}>
-					{assignments.map((assignment) => (
-						<li
-							key={assignment.id}
-							className={styles.gameCard}
-							onClick={() => navigate("/assignment/" + assignment.id)}
-						>
-							<div>
-								<b>{assignment.name.trim() ? assignment.name : "<без име>"}</b>
-							</div>
-						</li>
-					))}
-					{assignments.length === 0 && (
-						<li className={styles.gameCard}>No assignments.</li>
-					)}
-				</ul>
-			</section>
-			{createSection("Тренировка 5кл.", gameTypes.fifthGrade)}
-			{createSection("Тренировка 6кл.", gameTypes.sixthGrade)}
+			{createSection("5кл", "Тренировка 5кл.")}
+			{createSection("6кл", "Тренировка 6кл.")}
 		</div>
 	);
 }
