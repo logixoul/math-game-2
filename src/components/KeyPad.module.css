@@ -18,7 +18,7 @@
 	box-shadow: 0px 3px 1px #00000010;
 	border: 1px solid #ffffff40;
 	outline: 1px solid #00000018;
-	background: #ffffff40;
+	background: #fff4;
 	backdrop-filter: blur(5px);
 	border-radius: 6px;
 	font-size: 1.5em;
@@ -40,10 +40,12 @@
 }
 
 .keypadButtonOk {
-	background: linear-gradient(180deg, #1f7a8c, #0d343c);
+	background: linear-gradient(180deg, #fff8, #fff0), #338c61;
+	box-shadow: inset 0px 2px 1px #ffffff60,
+		0px 3px 1px #00000030;
 	color: #ffffff;
 	border-color: #1f7a8c;
-	border-radius: 12px;
+	border-radius: 16px;
 }
 
 .keypadButtonReveal {
