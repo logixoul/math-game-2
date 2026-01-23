@@ -1,3 +1,4 @@
 .isDown {
     background-color: lightblue !important;
+    transform: translateY(2px);
 }

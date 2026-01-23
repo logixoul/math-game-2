@@ -95,7 +95,7 @@ export class GameSession {
             this.pointsTowardWin++;
             this.maxReachedPointsTowardWin = Math.max(this.pointsTowardWin, this.maxReachedPointsTowardWin);
 
-            this.gamePage.informUser("✅ Точно така!", "#00c000");
+            this.gamePage.informUser("Точно така!", "#00c000");
             if(this.winConditionsMet()) {
                 this.problemsAttempted++;
                 this.gamePage.updateProgressIndicator();
@@ -118,7 +118,7 @@ export class GameSession {
             this.errorCount++;
             this.gamePage.updateProgressIndicator();
             this.gamePage.updateSessionTimeIndicator();
-            this.gamePage.informUser("❌ Пробвай пак.", "white");
+            this.gamePage.informUser("Пробвай пак.", "#ff4020");
             this.gamePage.showPrompt();
             this.currentPrompt.failedAttempts++;
         }
