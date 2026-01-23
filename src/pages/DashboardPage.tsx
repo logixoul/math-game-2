@@ -48,16 +48,18 @@ export function DashboardPage() {
 	};
 
 	return (
-		<div className={styles.dashboardContainer}>
-			<h2>Привет!</h2>
-			<p className={styles.subtitle}>Готов ли си?</p>
-			{
-				isAdmin && <button onClick={() => navigate("/admin/assignments/")}>Edit assignments (admin)</button>
-			}
-			<div className={styles.sectionsContainer}>
-				{createSection("5кл", "Тренировка 5кл.")}
-				{createSection("6кл", "Тренировка 6кл.")}
-				{createSection("Домашни", "Домашни")}
+		<div className="scrollablePage">
+			<div className={styles.dashboardContainer}>
+				<h2>Привет!</h2>
+				<p className={styles.subtitle}>Готов ли си?</p>
+				{
+					isAdmin && <button onClick={() => navigate("/admin/assignments/")}>Edit assignments (admin)</button>
+				}
+				<div className={styles.sectionsContainer}>
+					{createSection("5кл", "Тренировка 5кл.")}
+					{createSection("6кл", "Тренировка 6кл.")}
+					{createSection("Домашни", "Домашни")}
+				</div>
 			</div>
 		</div>
 	);

@@ -15,12 +15,27 @@ html, body {
 	overscroll-behavior: none; 
 }
 
-.page {
+#react-root {
 	background: url("/assets/bg1.png") no-repeat;
-	sbackground: linear-gradient(90deg, #D4F1C5 0%, #E8F5E8 20%, #F0F8E8 40%, #FFF9E6 60%, #FFE5B4 80%, #FFDAB9 100%);
-    background-size: cover;
+	background-size: cover;
 	background-attachment: fixed;
-	min-height: 100dvh;
+	height: 100dvh;
+	max-height: 100dvh;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
+}
+
+.scrollablePage {
+	flex: 1;
+
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	overflow-y: auto;
+	padding-top: var(--topbar-height, 0px) !important;
+}
+
+.canGoBehindTopBar {
+	padding-top: var(--topbar-height, 0px) !important;
 }

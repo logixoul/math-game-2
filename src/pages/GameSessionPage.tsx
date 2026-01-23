@@ -75,7 +75,7 @@ export function GameSessionPage({
 					setActivePromptIndex(nextIndex);
 					return [
 						...prev,
-						{ text: `${prompt.text} = `, color: "black", isPrompt: true },
+						{ text: `${prompt.text} = `, color: "white", isPrompt: true },
 					];
 				});
 				setCurrentAnswer("");
@@ -93,7 +93,7 @@ export function GameSessionPage({
 					{ text: "КЪРТИШ! ПОБЕДА! 🥳\nМоля направи скрийншот и ми го пратѝ.", color: "green", isBold: true },
 					{
 						text: `Отне ти ${minutes} мин ${seconds} сек. Познал си ${resultStats.percentCorrectOnFirstTry}% от първи опит.`,
-						color: "black",
+						color: "white",
 					},
 				]);
 			},
@@ -103,11 +103,6 @@ export function GameSessionPage({
 		const s = sessionRef.current;
 		if (!s) throw new Error("Session not initialized");
 		return s;
-	}
-	function getLog(): HTMLDivElement {
-		const log = logRef.current;
-		if (!log) throw new Error("Log not initialized");
-		return log;
 	}
 	function syncProgressFromGameSession() {
 		const session = getSession();
@@ -167,19 +162,19 @@ export function GameSessionPage({
 					{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 					{
 						text: `Ти игра "${gameTypeByKey.get(stats.gameTypeKey)?.uiLabel ?? stats.gameTypeKey}".`,
-						color: "black",
+						color: "white",
 					},
 					{
 						text: `Точки: ${stats.pointsTowardWin}.`,
-						color: "black",
+						color: "white",
 					},
 					{
 						text: `Максимални достигнати точки: ${stats.maxReachedPointsTowardWin}.`,
-						color: "black",
+						color: "white",
 					},
 					{
 						text: `Познати от първи опит: ${stats.percentCorrectOnFirstTry}%.`,
-						color: "black",
+						color: "white",
 					},
 				]);
 			}
@@ -190,8 +185,12 @@ export function GameSessionPage({
 	}, [sessionComplete, ui]);
 
 	useEffect(() => {
-		const log = getLog();
-		log.scrollTop = log.scrollHeight;
+		const log = logRef.current;
+		if (!log) return;
+		const rafId = window.requestAnimationFrame(() => {
+			log.scrollTo({ top: log.scrollHeight, behavior: "smooth" });
+		});
+		return () => window.cancelAnimationFrame(rafId);
 	}, [messages, currentAnswer]);
 
 	const submitAnswer = (text: string) => {
@@ -247,7 +246,7 @@ export function GameSessionPage({
 	}, [handleKeypadAppend, handleKeypadBackspace, handleKeypadOk]);
 
 	return (
-		<>
+		<div className={styles.gameSessionPage}>
 			{sessionComplete && (
 				<button
 					type="button"
@@ -294,7 +293,7 @@ export function GameSessionPage({
 				</div>
 
 			</div>
-		</>
+		</div>
 	);
 }
 

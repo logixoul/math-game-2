@@ -87,7 +87,7 @@ export class GameSession {
         userAnswerText = userAnswerText.replace(",", ".");
         const userAnswer = new BigNumber(userAnswerText);
         if (userAnswer.isNaN()) {
-            this.gamePage.informUser("Това не е число!", "black", true);
+            this.gamePage.informUser("Това не е число!", "white", true);
             this.gamePage.showPrompt();
             return;
         }
@@ -118,7 +118,7 @@ export class GameSession {
             this.errorCount++;
             this.gamePage.updateProgressIndicator();
             this.gamePage.updateSessionTimeIndicator();
-            this.gamePage.informUser("❌ Пробвай пак.", "black");
+            this.gamePage.informUser("❌ Пробвай пак.", "white");
             this.gamePage.showPrompt();
             this.currentPrompt.failedAttempts++;
         }

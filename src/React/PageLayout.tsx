@@ -7,11 +7,9 @@ type PageLayoutProps = {
 
 export function PageLayout({} : PageLayoutProps) {
     return (
-        <div className={"page"}>
+        <div className={styles.page}>
             <TopBar/>
-            <main className={styles.content}>
-                <Outlet />
-            </main>
+            <Outlet />
         </div>
     );
 }

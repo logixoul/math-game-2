@@ -1,6 +1,6 @@
 import { RefObject, useMemo, useState } from "react";
 import * as util from "@/logic/util";
-import styles from "@/pages/GameSessionPage.module.css";
+import styles from "./MessageLog.module.css";
 
 export type Message = {
 	text: string;
@@ -24,7 +24,7 @@ export function MessageLog({
 	logRef,
 }: MessageLogProps) {
 	return (
-		<div className={styles.messageLog} ref={logRef}>
+		<div className={`${styles.messageLog} canGoBehindTopBar`} ref={logRef}>
 			{messages.map((message, index) => (
 				<p
 					key={`${index}-${message.text}`}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, onSnapshot } from "firebase/firestore";
 import { AssignmentRecord, db, firebaseController } from "@/logic/FirebaseController";
 import styles from "./AssignmentsAdminPage.module.css";
-import { AssignmentEditForm } from "./AssignmentEditForm";
+import { AssignmentEditForm } from "@/components/AssignmentEditForm";
 
 type AssignmentsAdminPageProps = {
 
@@ -40,7 +40,7 @@ export function AssignmentsAdminPage(props: AssignmentsAdminPageProps) {
     }
 
     return (
-        <div>
+        <div className="scrollablePage">
             <h2>Assignments</h2>
             <button onClick={handleCreate}>Add</button>
 
