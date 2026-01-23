@@ -22,6 +22,7 @@ type ProgressSnapshot = {
 	problemsAttempted: number;
 	pointsRequiredToWin: number;
 	minProblemsAttemptedToWin: number;
+	errorCount: number;
 };
 
 export function GameSessionPage({
@@ -38,6 +39,7 @@ export function GameSessionPage({
 		problemsAttempted: 0,
 		pointsRequiredToWin: 0,
 		minProblemsAttemptedToWin: 0,
+		errorCount: 0,
 	});
 	const [minutesLeft, setMinutesLeft] = useState<number>(0);
 	const [sessionComplete, setSessionComplete] = useState(false);
@@ -114,6 +116,7 @@ export function GameSessionPage({
 			problemsAttempted: session.problemsAttempted,
 			pointsRequiredToWin: session.pointsRequiredToWin,
 			minProblemsAttemptedToWin: session.minProblemsAttemptedToWin,
+			errorCount: session.errorCount,
 		});
 	}
 	const startNewSession = (nextGameType: GameTypes.GameType) => {
@@ -229,7 +232,7 @@ export function GameSessionPage({
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
 			const parsedInt = parseInt(e.key, 10);
-			if(!Number.isNaN(parsedInt) || e.key == "-") {
+			if(!Number.isNaN(parsedInt) || e.key == "-" || e.key == "," ) {
 				handleKeypadAppend(e.key);
 			}
 			else if(e.key == "Enter") {
@@ -279,7 +282,9 @@ export function GameSessionPage({
 				<div className={styles.statusBar}>
 					<div className={styles.statusProgress}>
 						<div>
-							<b>Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}</b>.<br />
+							<span className={styles.pointsIndicator}>Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}</span>
+							&nbsp;&nbsp;|&nbsp;&nbsp;
+							<span className={styles.errorsIndicator}>Грешки: {progress.errorCount}</span><br />
 							За победа ти трябват още {progress.pointsRequiredToWin - progress.pointsTowardWin} точки и {progress.minProblemsAttemptedToWin - progress.problemsAttempted} пробвани задачи
 						</div>
 					</div>

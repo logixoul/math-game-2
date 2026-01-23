@@ -5,10 +5,12 @@
 	flex-wrap: wrap;
 	gap: 12px;
 	padding: 24px;
-	background: rgba(0, 0, 0, 0.76);
+	background: rgba(0, 0, 0, 0.26);
 	backdrop-filter: blur(4px);
 	color: #ffffff;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	
 }
 
 .logo {
@@ -37,6 +39,12 @@
 .logoImage {
 	display: block;
 	margin-right: 10px;
+	margin-left: -0.5em;
+	margin-top: -2em;
+	margin-bottom: -2em;
+	filtser: drop-shadow(0px 0px 18px rgba(0, 0, 0, 1.0));
+	width: 6.5em;
+	height: 6.5em;
 }
 
 .authButtons {

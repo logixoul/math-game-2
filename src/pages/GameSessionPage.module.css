@@ -60,7 +60,16 @@
 	flex-direction: column;
 	gap: 2px;
 	text-align: center;
+}
+
+.pointsIndicator {
+	font-weight: bold;
 	color: #0a8a00;
+}
+
+.errorsIndicator {
+	font-weight: bold;
+	color: #c80000;
 }
 
 .statusTimer {

@@ -16,9 +16,11 @@ html, body {
 }
 
 .page {
-	background: url("/assets/bodybg.png") no-repeat;
-    background-size:cover;
-	height: 100dvh;
+	background: url("/assets/bg1.png") no-repeat;
+	sbackground: linear-gradient(90deg, #D4F1C5 0%, #E8F5E8 20%, #F0F8E8 40%, #FFF9E6 60%, #FFE5B4 80%, #FFDAB9 100%);
+    background-size: cover;
+	background-attachment: fixed;
+	min-height: 100dvh;
 	display: flex;
 	flex-direction: column;
 }

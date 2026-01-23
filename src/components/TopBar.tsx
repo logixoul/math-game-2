@@ -88,7 +88,7 @@ export function TopBar({  }: TopBarProps) {
 	return (
 		<header className={styles.topBar}>
 			<Link className={styles.homeLink} to="/">
-				<img className={styles.logoImage} src="../assets/play-logo.png" width="40" height="40"></img>
+				<img className={styles.logoImage} src="../assets/play-logo.png" width="58" height="58"></img>
 				<div className={styles.logo}>
 					stefan play
 				</div>

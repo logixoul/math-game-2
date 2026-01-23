@@ -7,9 +7,12 @@ import { PageLayout } from "./PageLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { AssignmentSessionRoute } from "@/pages/AssignmentSessionRoute";
 import { AssignmentsAdminPage } from "@/pages/AssignmentsAdminPage";
+import { initGlobalFormattingSettings } from "@/logic/Formatting";
 
 const qdl = QuickDebugLogger.instance;
 qdl.beginListeningForErrors();
+
+initGlobalFormattingSettings();
 
 const container = document.getElementById("react-root");
 if (!container) {

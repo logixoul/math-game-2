@@ -1,3 +1,4 @@
+import { numberToString, ensureNegativeNumbersHaveParens } from './Formatting';
 import { gameTypeRegistry } from './GameTypeRegistry';
 import * as util from './util';
 import { BigNumber } from 'bignumber.js'
@@ -23,20 +24,6 @@ export class Prompt {
     }
 }
 
-function integerPowerOfTen(power: number) {
-    let result = 1;
-    if(power > 0) {
-        for(let i = 0; i < power; i++) {
-            result *= 10;
-        }
-    } else if(power < 0) {
-        for(let i = 0; i < -power; i++) {
-            result /= 10;
-        }
-    }
-    return result;
-}
-
 export abstract class GameType {
     constructor(public readonly uiLabel: string) {
     }
@@ -49,8 +36,6 @@ export class Range { // inclusive (includes both ends of the range)
     }
 }
 
-//function maybeAddSignAndOrParens
-
 export class MultiplicationGameType extends GameType {
     constructor(uiLabel: string, private range : Range) {
         super(uiLabel);
@@ -59,8 +44,9 @@ export class MultiplicationGameType extends GameType {
     createRandomPrompt(): Prompt {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
+        const aStr = numberToString(a);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${a} × ${bStr}`, a * b);
+        return new Prompt(`${aStr} × ${bStr}`, a * b);
     }
 }
 gameTypeRegistry.register(MultiplicationGameType, "Multiplication.v1");
@@ -86,8 +72,9 @@ export class DivisionGameType extends GameType {
         const divisorRaised = new BigNumber(divisor).shiftedBy(expDivisor);
         const aFinal = diviseeRaised.dividedBy(divisorRaised);
 
+        const diviseeRaisedStr = numberToString(diviseeRaised);
         const divisorRaisedStr = ensureNegativeNumbersHaveParens(divisorRaised);
-        return new Prompt(`${diviseeRaised} : ${divisorRaisedStr}`, aFinal.toNumber());
+        return new Prompt(`${diviseeRaisedStr} : ${divisorRaisedStr}`, aFinal);
     }
 }
 gameTypeRegistry.register(DivisionGameType, "Division.v1");
@@ -115,8 +102,9 @@ export class SubtractionSixthGradeGameType extends GameType {
     createRandomPrompt(): Prompt {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
-        const bStr = ensureNegativeNumbersHaveParens(b)
-        return new Prompt(`${a} - ${bStr}`, a - b);
+        const aStr = numberToString(a);
+        const bStr = ensureNegativeNumbersHaveParens(b);
+        return new Prompt(`${aStr} - ${bStr}`, a - b);
     }
 }
 gameTypeRegistry.register(SubtractionSixthGradeGameType, "SubtractionSixthGrade.v1");
@@ -125,8 +113,9 @@ export class AdditionGameType extends GameType {
     createRandomPrompt(): Prompt {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
+        const aStr = numberToString(a);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${a} + ${bStr}`, a + b);
+        return new Prompt(`${aStr} + ${bStr}`, a + b);
     }
     constructor(uiLabel: string, private range : Range) {
         super(uiLabel);
@@ -284,14 +273,6 @@ export class BracketExpansionNesting2GameType extends BracketExpansion {
     }
 }
 gameTypeRegistry.register(BracketExpansionNesting2GameType, "BracketExpansionNesting2.v1");
-
-function ensureNegativeNumbersHaveParens(n : BigNumber | number) {
-    n = new BigNumber(n);
-    if(n.isLessThan(0))
-        return `(${n})`
-    else
-        return `${n}`
-}
 
 export class MultiplicationTmpAlexGameType extends GameType{
     constructor(uiLabel: string) {

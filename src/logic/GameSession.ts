@@ -84,6 +84,7 @@ export class GameSession {
         return enoughPoints && enoughAnswered && withinTimeLimit;
     }
     onUserAnswered(userAnswerText: string): void {
+        userAnswerText = userAnswerText.replace(",", ".");
         const userAnswer = new BigNumber(userAnswerText);
         if (userAnswer.isNaN()) {
             this.gamePage.informUser("Това не е число!", "black", true);
@@ -113,9 +114,9 @@ export class GameSession {
         } else {
             this.numWrongAtFirstTry++;
             this.pointsTowardWin--;
-            this.gamePage.updateProgressIndicator();
 
             this.errorCount++;
+            this.gamePage.updateProgressIndicator();
             this.gamePage.updateSessionTimeIndicator();
             this.gamePage.informUser("❌ Пробвай пак.", "black");
             this.gamePage.showPrompt();

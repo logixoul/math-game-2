@@ -30,7 +30,7 @@ export function KeyPad({
 		{ type: "backspace" },
 		{ type: "append", label: "-" },
 		{ type: "append", label: "0" },
-		{ type: "empty" },
+		{ type: "append", label: "," },
 		{ type: "ok", label: "OK" },
 	] as const;
 
