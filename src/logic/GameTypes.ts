@@ -123,6 +123,20 @@ export class AdditionGameType extends GameType {
 }
 gameTypeRegistry.register(AdditionGameType, "Addition.v1");
 
+export class MulDiv10GameType extends GameType {
+    createRandomPrompt(): Prompt {
+        const a = util.randomInt(this.range.min, this.range.max);
+        const b = util.randomInt(this.range.min, this.range.max);
+        const aStr = numberToString(a);
+        const bStr = ensureNegativeNumbersHaveParens(b);
+        return new Prompt(`${aStr} + ${bStr}`, a + b);
+    }
+    constructor(uiLabel: string, private range: Range) {
+        super(uiLabel);
+    }
+}
+gameTypeRegistry.register(MulDiv10GameType, "MulDiv10.v1");
+
 export class BracketExpansion extends GameType {
     constructor(
         uiLabel: string,
