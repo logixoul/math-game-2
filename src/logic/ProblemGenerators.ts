@@ -1,5 +1,5 @@
 import { numberToString, ensureNegativeNumbersHaveParens } from './Formatting';
-import { gameTypeRegistry } from './GameTypeRegistry';
+import { problemGeneratorRegistry } from './ProblemGeneratorRegistry';
 import * as util from './util';
 import { BigNumber } from 'bignumber.js'
 
@@ -14,7 +14,7 @@ export type AssignmentSpecParseResult = {
     error?: string;
 };
 
-export class Prompt {
+export class Problem {
     failedAttempts: number;
     public readonly answer: BigNumber;
 
@@ -24,11 +24,13 @@ export class Prompt {
     }
 }
 
-export abstract class GameType {
+export abstract class ProblemGenerator {
+    public readonly persistencyKey!: string;
+
     constructor(public readonly uiLabel: string) {
     }
 
-    abstract createRandomPrompt() : Prompt;
+    abstract createRandomProblem() : Problem;
 }
 
 export class Range { // inclusive (includes both ends of the range)
@@ -36,27 +38,27 @@ export class Range { // inclusive (includes both ends of the range)
     }
 }
 
-export class MultiplicationGameType extends GameType {
+export class MultiplicationProblemGenerator extends ProblemGenerator {
     constructor(uiLabel: string, private range : Range) {
         super(uiLabel);
     }
 
-    createRandomPrompt(): Prompt {
+    createRandomProblem(): Problem {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
         const aStr = numberToString(a);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${aStr} × ${bStr}`, a * b);
+        return new Problem(`${aStr} × ${bStr}`, a * b);
     }
 }
-gameTypeRegistry.register(MultiplicationGameType, "Multiplication.v1");
+problemGeneratorRegistry.register(MultiplicationProblemGenerator, "Multiplication.v1");
 
-export class DivisionGameType extends GameType {
+export class DivisionProblemGenerator extends ProblemGenerator {
     constructor(uiLabel: string, private range : Range, private expRange : Range) {
         super(uiLabel);
     }
 
-    createRandomPrompt(): Prompt {
+    createRandomProblem(): Problem {
         const expDivisee = util.randomInt(this.expRange.min, this.expRange.max);
         const expDivisor = util.randomInt(this.expRange.min, this.expRange.max);
 
@@ -74,70 +76,70 @@ export class DivisionGameType extends GameType {
 
         const diviseeRaisedStr = numberToString(diviseeRaised);
         const divisorRaisedStr = ensureNegativeNumbersHaveParens(divisorRaised);
-        return new Prompt(`${diviseeRaisedStr} : ${divisorRaisedStr}`, aFinal);
+        return new Problem(`${diviseeRaisedStr} : ${divisorRaisedStr}`, aFinal);
     }
 }
-gameTypeRegistry.register(DivisionGameType, "Division.v1");
+problemGeneratorRegistry.register(DivisionProblemGenerator, "Division.v1");
 
-export class SubtractionFifthGradeGameType extends GameType {
+export class SubtractionFifthGradeProblemGenerator extends ProblemGenerator {
     constructor(uiLabel: string, private rangeMax : number) {
         super(uiLabel);
     }
 
-    createRandomPrompt(): Prompt {
+    createRandomProblem(): Problem {
         const a = util.randomInt(0, this.rangeMax);
         const b = util.randomInt(0, a);
-        return new Prompt(`${a} - ${b}`, a - b);
+        return new Problem(`${a} - ${b}`, a - b);
     }
 }
-gameTypeRegistry.register(SubtractionFifthGradeGameType, "SubtractionFifthGrade.v1");
+problemGeneratorRegistry.register(SubtractionFifthGradeProblemGenerator, "SubtractionFifthGrade.v1");
 
 
-export class SubtractionSixthGradeGameType extends GameType {
+export class SubtractionSixthGradeProblemGenerator extends ProblemGenerator {
     constructor(uiLabel: string, private range : Range) {
         super(uiLabel);
 
     }
 
-    createRandomPrompt(): Prompt {
+    createRandomProblem(): Problem {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
         const aStr = numberToString(a);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${aStr} - ${bStr}`, a - b);
+        return new Problem(`${aStr} - ${bStr}`, a - b);
     }
 }
-gameTypeRegistry.register(SubtractionSixthGradeGameType, "SubtractionSixthGrade.v1");
+problemGeneratorRegistry.register(SubtractionSixthGradeProblemGenerator, "SubtractionSixthGrade.v1");
 
-export class AdditionGameType extends GameType {
-    createRandomPrompt(): Prompt {
+export class AdditionProblemGenerator extends ProblemGenerator {
+    createRandomProblem(): Problem {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
         const aStr = numberToString(a);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${aStr} + ${bStr}`, a + b);
+        return new Problem(`${aStr} + ${bStr}`, a + b);
     }
     constructor(uiLabel: string, private range : Range) {
         super(uiLabel);
     }
 }
-gameTypeRegistry.register(AdditionGameType, "Addition.v1");
+problemGeneratorRegistry.register(AdditionProblemGenerator, "Addition.v1");
 
-export class MulDiv10GameType extends GameType {
-    createRandomPrompt(): Prompt {
+export class MulDiv10ProblemGenerator extends ProblemGenerator {
+    createRandomProblem(): Problem {
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
         const aStr = numberToString(a);
         const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Prompt(`${aStr} + ${bStr}`, a + b);
+        return new Problem(`${aStr} + ${bStr}`, a + b);
     }
     constructor(uiLabel: string, private range: Range) {
         super(uiLabel);
     }
 }
-gameTypeRegistry.register(MulDiv10GameType, "MulDiv10.v1");
+problemGeneratorRegistry.register(MulDiv10ProblemGenerator, "MulDiv10.v1");
 
-export class BracketExpansion extends GameType {
+export class BracketExpansion extends ProblemGenerator {
     constructor(
         uiLabel: string,
         private nestingLevel: number,
@@ -147,7 +149,7 @@ export class BracketExpansion extends GameType {
         super(uiLabel);
     }
 
-    createRandomPrompt(): Prompt {
+    createRandomProblem(): Problem {
         const forceNested = this.nestingLevel >= 2;
         const expression = this.buildExpression(
             this.nestingLevel,
@@ -158,7 +160,7 @@ export class BracketExpansion extends GameType {
             4,
             this.outerRange
         );
-        return new Prompt(`${expression.text}`, expression.value);
+        return new Problem(`${expression.text}`, expression.value);
     }
 
     private buildExpression(
@@ -267,72 +269,73 @@ export class BracketExpansion extends GameType {
     }
 }
 
-export class BracketExpansionNesting0GameType extends BracketExpansion {
+export class BracketExpansionNesting0ProblemGenerator extends BracketExpansion {
     constructor(uiLabel: string) {
         super(uiLabel, 0);
     }
 }
-gameTypeRegistry.register(BracketExpansionNesting0GameType, "BracketExpansionNesting0.v1");
+problemGeneratorRegistry.register(BracketExpansionNesting0ProblemGenerator, "BracketExpansionNesting0.v1");
 
-export class BracketExpansionNesting1GameType extends BracketExpansion {
+export class BracketExpansionNesting1ProblemGenerator extends BracketExpansion {
     constructor(uiLabel: string) {
         super(uiLabel, 1);
     }
 }
-gameTypeRegistry.register(BracketExpansionNesting1GameType, "BracketExpansionNesting1.v1");
+problemGeneratorRegistry.register(BracketExpansionNesting1ProblemGenerator, "BracketExpansionNesting1.v1");
 
-export class BracketExpansionNesting2GameType extends BracketExpansion {
+export class BracketExpansionNesting2ProblemGenerator extends BracketExpansion {
     constructor(uiLabel: string) {
         super(uiLabel, 2);
     }
 }
-gameTypeRegistry.register(BracketExpansionNesting2GameType, "BracketExpansionNesting2.v1");
+problemGeneratorRegistry.register(BracketExpansionNesting2ProblemGenerator, "BracketExpansionNesting2.v1");
 
-export class MultiplicationTmpAlexGameType extends GameType{
+export class MultiplicationTmpAlexProblemGenerator extends ProblemGenerator {
     constructor(uiLabel: string) {
         super(uiLabel);
     }
 
-    createRandomPrompt(): Prompt {
+    createRandomProblem(): Problem {
         const a = util.randomInt(-20, 20);
         const b = util.randomInt(-20, 20);
-        return new Prompt(`${a} × ${b}`, a * b);
+        return new Problem(`${a} × ${b}`, a * b);
     }
 }
-gameTypeRegistry.register(MultiplicationTmpAlexGameType, "MultiplicationTmpAlex.v1");
+problemGeneratorRegistry.register(MultiplicationTmpAlexProblemGenerator, "MultiplicationTmpAlex.v1");
 
-type WeightedGameType = {
-    gameType: GameType;
+type WeightedProblemGenerator = {
+    problemGenerator: ProblemGenerator;
     weight: number;
 };
 
-export class WeightedAssignmentGameType extends GameType {
+export class WeightedAssignmentProblemGenerator extends ProblemGenerator {
     constructor(
         uiLabel: string,
         private readonly persistencyKeyValue: string,
-        private readonly weightedGameTypes: WeightedGameType[]
+        private readonly weightedProblemGenerators: WeightedProblemGenerator[]
     ) {
         super(uiLabel);
+        this.persistencyKey = persistencyKeyValue;
     }
 
-    createRandomPrompt(): Prompt {
-        if (this.weightedGameTypes.length === 0) {
-            throw new Error("No game types available for assignment");
+    createRandomProblem(): Problem {
+        if (this.weightedProblemGenerators.length === 0) {
+            throw new Error("No problem generators available for assignment");
         }
-        const total = this.weightedGameTypes.reduce((sum, entry) => sum + entry.weight, 0);
+        const total = this.weightedProblemGenerators.reduce((sum, entry) => sum + entry.weight, 0);
         const roll = Math.random() * Math.max(1, total);
         let running = 0;
-        for (const entry of this.weightedGameTypes) {
+        for (const entry of this.weightedProblemGenerators) {
             running += entry.weight;
             if (roll <= running) {
-                return entry.gameType.createRandomPrompt();
+                return entry.problemGenerator.createRandomProblem();
             }
         }
-        return this.weightedGameTypes[this.weightedGameTypes.length - 1].gameType.createRandomPrompt();
+        return this.weightedProblemGenerators[this.weightedProblemGenerators.length - 1].problemGenerator.createRandomProblem();
     }
 }
 
-export function parseAssignmentGameTypes(jsonText: string): AssignmentSpecParseResult {
+export function parseAssignmentProblemGenerators(jsonText: string): AssignmentSpecParseResult {
     if (!jsonText.trim()) {
         return { specs: [], error: "Empty JSON" };
     }
@@ -348,88 +351,94 @@ export function parseAssignmentGameTypes(jsonText: string): AssignmentSpecParseR
             return { key, probability, params } satisfies AssignmentPartSpec;
         });
         return { specs };
-    } catch (error: any) {
-        return { specs: [], error: error?.message ?? "Invalid JSON" };
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { specs: [], error: message || "Invalid JSON" };
     }
 }
 
-export function createAssignmentGameType(
+export function createAssignmentProblemGenerator(
     assignmentId: string,
     uiLabel: string,
     specs: AssignmentPartSpec[]
-): GameType | null {
-    const weightedGameTypes: WeightedGameType[] = [];
+): ProblemGenerator | null {
+    const weightedProblemGenerators: WeightedProblemGenerator[] = [];
     for (const spec of specs) {
-        const gameType = createGameTypeFromSpec(spec);
-        if (!gameType) {
+        const problemGenerator = createProblemGeneratorFromSpec(spec);
+        if (!problemGenerator) {
             continue;
         }
-        weightedGameTypes.push({
-            gameType,
+        weightedProblemGenerators.push({
+            problemGenerator,
             weight: Number.isFinite(spec.probability) ? spec.probability : 0,
         });
     }
-    if (weightedGameTypes.length === 0) {
+    if (weightedProblemGenerators.length === 0) {
         return null;
     }
-    return new WeightedAssignmentGameType(
+    return new WeightedAssignmentProblemGenerator(
         uiLabel,
         `assignment:${assignmentId}`,
-        weightedGameTypes
+        weightedProblemGenerators
     );
 }
 
-function createGameTypeFromSpec(spec: AssignmentPartSpec): GameType | null {
+function createProblemGeneratorFromSpec(spec: AssignmentPartSpec): ProblemGenerator | null {
     const params = spec.params ?? {};
-    const rangeMin = Number((params as any).rangeMin ?? 0);
-    const rangeMax = Number((params as any).rangeMax ?? 0);
-    const expRangeMin = Number((params as any).expRangeMin ?? 0);
-    const expRangeMax = Number((params as any).expRangeMax ?? 0);
+    const readNumberParam = (key: string) => {
+        const raw = params[key];
+        const value = typeof raw === "number" ? raw : Number(raw);
+        return Number.isFinite(value) ? value : 0;
+    };
+    const rangeMin = readNumberParam("rangeMin");
+    const rangeMax = readNumberParam("rangeMax");
+    const expRangeMin = readNumberParam("expRangeMin");
+    const expRangeMax = readNumberParam("expRangeMax");
     const range = new Range(rangeMin, rangeMax);
     const expRange = new Range(expRangeMin, expRangeMax);
     switch (spec.key) {
         case "Addition.v1":
-            return new AdditionGameType("", range);
+            return new AdditionProblemGenerator("", range);
         case "SubtractionFifthGrade.v1":
-            return new SubtractionFifthGradeGameType("", rangeMax);
+            return new SubtractionFifthGradeProblemGenerator("", rangeMax);
         case "SubtractionSixthGrade.v1":
-            return new SubtractionSixthGradeGameType("", range);
+            return new SubtractionSixthGradeProblemGenerator("", range);
         case "Multiplication.v1":
-            return new MultiplicationGameType("", range);
+            return new MultiplicationProblemGenerator("", range);
         case "Division.v1":
-            return new DivisionGameType("", range, expRange);
+            return new DivisionProblemGenerator("", range, expRange);
         case "BracketExpansion.nesting0.v1":
-            return new BracketExpansionNesting0GameType("");
+            return new BracketExpansionNesting0ProblemGenerator("");
         case "BracketExpansion.nesting1.v1":
-            return new BracketExpansionNesting1GameType("");
+            return new BracketExpansionNesting1ProblemGenerator("");
         case "BracketExpansion.nesting2.v1":
-            return new BracketExpansionNesting2GameType("");
+            return new BracketExpansionNesting2ProblemGenerator("");
         default:
             return null;
     }
 }
 
-export type GameTypeList = {
-    fifthGrade : GameType[]
-    sixthGrade : GameType[]
-    homework : GameType[]
+export type ProblemGeneratorList = {
+    fifthGrade : ProblemGenerator[]
+    sixthGrade : ProblemGenerator[]
+    homework : ProblemGenerator[]
 }
 
-export function getAvailableGameTypes(): GameTypeList {
+export function getAvailableProblemGenerators(): ProblemGeneratorList {
     return {
         fifthGrade: [
-            new AdditionGameType("Събиране 5кл", 100),
-            new SubtractionFifthGradeGameType("Изваждане 5кл", 100),
-            new MultiplicationGameType("Умножение 5кл", new Range(0, 10)),
-            new DivisionGameType("Деление 5кл", new Range(0, 10), new Range(0, 0)),
+            new AdditionProblemGenerator("Събиране 5кл", new Range(0, 100)),
+            new SubtractionFifthGradeProblemGenerator("Изваждане 5кл", 100),
+            new MultiplicationProblemGenerator("Умножение 5кл", new Range(0, 10)),
+            new DivisionProblemGenerator("Деление 5кл", new Range(0, 10), new Range(0, 0)),
         ],
         sixthGrade: [
-            new AdditionGameType("Събиране 6кл", new Range(-40, 40)),
-            new SubtractionSixthGradeGameType("Изваждане 6кл", new Range(-40, 40)),
-            new MultiplicationGameType("Умножение 6кл", new Range(-10, 10)),
-            new BracketExpansionNesting0GameType("-1 + 2 - 3 + 90"),
-            new BracketExpansionNesting1GameType("Разкриване на скоби"),
-            new BracketExpansionNesting2GameType("Разкриване на скоби (вложени)"),
+            new AdditionProblemGenerator("Събиране 6кл", new Range(-40, 40)),
+            new SubtractionSixthGradeProblemGenerator("Изваждане 6кл", new Range(-40, 40)),
+            new MultiplicationProblemGenerator("Умножение 6кл", new Range(-10, 10)),
+            new BracketExpansionNesting0ProblemGenerator("-1 + 2 - 3 + 90"),
+            new BracketExpansionNesting1ProblemGenerator("Разкриване на скоби"),
+            new BracketExpansionNesting2ProblemGenerator("Разкриване на скоби (вложени)"),
         ],
         homework: []
     };

@@ -1,5 +1,5 @@
 export type ResultStats = {
-    gameTypeKey: string;
+    problemGeneratorKey: string;
     timeElapsedMs: number;
     percentCorrectOnFirstTry: number;
     pointsTowardWin: number;

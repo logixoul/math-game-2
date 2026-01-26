@@ -1,20 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { firebaseController, AssignmentRecord } from "@/logic/FirebaseController";
-import { createAssignmentGameType, parseAssignmentGameTypes } from "@/logic/GameTypes";
+import {
+	createAssignmentProblemGenerator,
+	parseAssignmentProblemGenerators,
+} from "@/logic/ProblemGenerators";
 import { GameSessionPage } from "./GameSessionPage";
 import { ErrorPage } from "./ErrorPage";
 
 export function AssignmentSessionRoute() {
     const { assignmentId } = useParams<{ assignmentId: string }>();
     const [assignment, setAssignment] = useState<AssignmentRecord | null>(null);
-    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-        if (!assignmentId) {
-            setAssignment(null);
-            return;
-        }
+        if (!assignmentId) return;
         const unsubscribe = firebaseController.onAssignmentChanged(
             assignmentId,
             (nextAssignment) => {
@@ -24,19 +23,24 @@ export function AssignmentSessionRoute() {
         return () => unsubscribe();
     }, [assignmentId]);
 
-    const gameType = useMemo(() => {
+    const parsed = useMemo(() => {
         if (!assignment) return null;
-        const parsed = parseAssignmentGameTypes(assignment.spec);
-        if (parsed.error) {
-            setErrorMessage("Error parsing assignment spec: " + parsed.error);
-            return null;
-        }
-        return createAssignmentGameType(assignment.id, assignment.name, parsed.specs);
+        return parseAssignmentProblemGenerators(assignment.spec);
     }, [assignment]);
 
-    if (!assignment || !gameType) {
+    const errorMessage = useMemo(() => {
+        if (!assignment || !parsed?.error) return "";
+        return "Error parsing assignment spec: " + parsed.error;
+    }, [assignment, parsed]);
+
+    const problemGenerator = useMemo(() => {
+        if (!assignment || !parsed || parsed.error) return null;
+        return createAssignmentProblemGenerator(assignment.id, assignment.name, parsed.specs);
+    }, [assignment, parsed]);
+
+    if (!assignment || !problemGenerator) {
         return <ErrorPage message={errorMessage}/>;
     }
 
-    return <GameSessionPage gameType={gameType} assignmentId={assignment.id} />;
+    return <GameSessionPage problemGenerator={problemGenerator} assignmentId={assignment.id} />;
 }

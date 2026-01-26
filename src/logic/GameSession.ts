@@ -1,12 +1,11 @@
-import type { FirebaseController } from './FirebaseController';
-import { GameType, Prompt } from './GameTypes';
-import { PromptScheduler } from './PromptScheduler';
+import { Problem, ProblemGenerator } from './ProblemGenerators';
+import { ProblemScheduler } from './ProblemScheduler';
 import { ResultStats } from './ResultStats';
 import { BigNumber } from 'bignumber.js';
 
 export type GameSessionUI = {
     updateProgressIndicator: () => void;
-    showPrompt: () => void;
+    showProblem: () => void;
     updateSessionTimeIndicator: () => void;
     informUser: (message: string, color: string, isBold?: boolean) => void;
     onWin: (resultStats: ResultStats) => void;
@@ -15,13 +14,13 @@ export type GameSessionUI = {
 export class GameSession {
     gamePage: GameSessionUI;
     errorCount: number;
-    gameType: GameType;
+    problemGenerator: ProblemGenerator;
     numCorrectAtFirstTry: number;
     numWrongAtFirstTry: number;
 
-    promptScheduler: PromptScheduler;
-    promptGenerator: Generator<Prompt, void, unknown>;
-    currentPrompt: Prompt;
+    problemScheduler: ProblemScheduler;
+    problemIterator: Generator<Problem, void, unknown>;
+    currentProblem: Problem;
     
     // from gpt suggestions (for winconditions):
     pointsTowardWin: number = 0;
@@ -33,15 +32,15 @@ export class GameSession {
     readonly minProblemsAttemptedToWin: number = 20;
     readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
     
-    constructor(gamePage : GameSessionUI, gameType: GameType) {
+    constructor(gamePage : GameSessionUI, problemGenerator: ProblemGenerator) {
         this.gamePage = gamePage;
         
         this.errorCount = 0;
-        this.gameType = gameType;
-        this.promptScheduler = new PromptScheduler(this.gameType);
+        this.problemGenerator = problemGenerator;
+        this.problemScheduler = new ProblemScheduler(this.problemGenerator);
 
-        this.promptGenerator = this.promptScheduler.generatePrompts();
-        this.currentPrompt = this.promptGenerator.next().value!;
+        this.problemIterator = this.problemScheduler.generateProblems();
+        this.currentProblem = this.problemIterator.next().value!;
 
         this.numCorrectAtFirstTry = 0;
         this.numWrongAtFirstTry = 0;
@@ -54,7 +53,7 @@ export class GameSession {
         const percentCorrectOnFirstTry = Math.round(100 * this.numCorrectAtFirstTry / total);
         const percentCorrectOnFirstTry_Safe = total == 0 ? 0 : percentCorrectOnFirstTry;
         return {
-            gameTypeKey: this.gameType.persistencyKey,
+            problemGeneratorKey: this.problemGenerator.persistencyKey,
             timeElapsedMs: timeElapsed,
             percentCorrectOnFirstTry: percentCorrectOnFirstTry_Safe,
             pointsTowardWin: this.pointsTowardWin,
@@ -69,13 +68,13 @@ export class GameSession {
     }
 
     nextQuestion(): void {
-        this.currentPrompt = this.gameType.createRandomPrompt();
+        this.currentProblem = this.problemGenerator.createRandomProblem();
         this.gamePage.updateProgressIndicator();
-        this.gamePage.showPrompt();
+        this.gamePage.showProblem();
     }
 
-    getCurrentPrompt(): Prompt {
-        return this.currentPrompt;
+    getCurrentProblem(): Problem {
+        return this.currentProblem;
     }
     winConditionsMet(): boolean {
         const enoughPoints: boolean = this.pointsTowardWin >= this.pointsRequiredToWin;
@@ -88,10 +87,10 @@ export class GameSession {
         const userAnswer = new BigNumber(userAnswerText);
         if (userAnswer.isNaN()) {
             this.gamePage.informUser("Това не е число!", "white", true);
-            this.gamePage.showPrompt();
+            this.gamePage.showProblem();
             return;
         }
-        if(userAnswer.isEqualTo(this.currentPrompt.answer)) {
+        if(userAnswer.isEqualTo(this.currentProblem.answer)) {
             this.pointsTowardWin++;
             this.maxReachedPointsTowardWin = Math.max(this.pointsTowardWin, this.maxReachedPointsTowardWin);
 
@@ -108,7 +107,7 @@ export class GameSession {
             this.problemsAttempted++;
             this.gamePage.updateProgressIndicator();
 
-            if(this.currentPrompt.failedAttempts === 0) {
+            if(this.currentProblem.failedAttempts === 0) {
                 this.numCorrectAtFirstTry++;
             }
         } else {
@@ -119,8 +118,8 @@ export class GameSession {
             this.gamePage.updateProgressIndicator();
             this.gamePage.updateSessionTimeIndicator();
             this.gamePage.informUser("Пробвай пак.", "#ff4020");
-            this.gamePage.showPrompt();
-            this.currentPrompt.failedAttempts++;
+            this.gamePage.showProblem();
+            this.currentProblem.failedAttempts++;
         }
     }
 
@@ -130,15 +129,15 @@ export class GameSession {
         this.problemsAttempted++;
         this.gamePage.updateProgressIndicator();
 
-        const answer = this.getCurrentPrompt().answer;
+        const answer = this.getCurrentProblem().answer;
         this.gamePage.informUser("Отговорът е "+answer+"", "#4ac");
         
-        this.promptScheduler.postponePrompt(this.currentPrompt);
+        this.problemScheduler.postponeProblem(this.currentProblem);
 
         this.errorCount++;
         this.gamePage.updateSessionTimeIndicator();
 
-        this.getCurrentPrompt().failedAttempts++;
+        this.getCurrentProblem().failedAttempts++;
         this.nextQuestion();
     }
 }

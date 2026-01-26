@@ -1,19 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import * as GameTypes from "@/logic/GameTypes";
+import * as ProblemGenerators from "@/logic/ProblemGenerators";
 import { GameSession, GameSessionUI } from "@/logic/GameSession";
 import * as util from "@/logic/util";
 import { KeyPad } from "@/components/KeyPad";
-import { TopBar } from "@/components/TopBar";
-import { ErrorPage } from "./ErrorPage";
 import { MessageLog, Message } from "@/components/MessageLog";
 import { attachWakeLock } from "@/React/WakeLock";
 import styles from "./GameSessionPage.module.css";
 import { firebaseController } from "@/logic/FirebaseController";
-import { BigNumber } from "bignumber.js";
+
+const getNow = () => Date.now();
 
 type GameSessionPageProps = {
-	gameType: GameTypes.GameType;
+	problemGenerator: ProblemGenerators.ProblemGenerator;
 	assignmentId?: string;
 };
 
@@ -26,7 +24,7 @@ type ProgressSnapshot = {
 };
 
 export function GameSessionPage({
-	gameType,
+	problemGenerator,
 	assignmentId,
 }: GameSessionPageProps) {
 	const sessionRef = useRef<GameSession | null>(null);
@@ -46,10 +44,12 @@ export function GameSessionPage({
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
 	const timedOutRef = useRef(false);
-	const gameTypeByKey = useMemo(() => {
-		const gameTypes = GameTypes.getAvailableGameTypes();
+	const problemGeneratorByKey = useMemo(() => {
+		const generators = ProblemGenerators.getAvailableProblemGenerators();
 		return new Map(
-			gameTypes.fifthGrade.concat(gameTypes.sixthGrade).map((type) => [type.persistencyKey, type])
+			generators.fifthGrade
+				.concat(generators.sixthGrade)
+				.map((generator) => [generator.persistencyKey, generator])
 		);
 	}, []);
 	const ui = useMemo<GameSessionUI>(() => {
@@ -64,12 +64,12 @@ export function GameSessionPage({
 				const session = getSession();
 				const msLeft =
 					session.maxSessionDurationMs -
-					(Date.now() - session.gameStartTimestamp);
+					(getNow() - session.gameStartTimestamp);
 				setMinutesLeft(Math.max(0, Math.ceil(msLeft / 60000)));
 			},
-			showPrompt: () => {
+			showProblem: () => {
 				const session = getSession();
-				const prompt = session.getCurrentPrompt();
+				const prompt = session.getCurrentProblem();
 				setMessages((prev) => {
 					const nextIndex = prev.length;
 					setActivePromptIndex(nextIndex);
@@ -114,26 +114,26 @@ export function GameSessionPage({
 			errorCount: session.errorCount,
 		});
 	}
-	const startNewSession = (nextGameType: GameTypes.GameType) => {
+	const startNewSession = (nextProblemGenerator: ProblemGenerators.ProblemGenerator) => {
 		setMessages([]);
 		setSessionComplete(false);
 		setCurrentAnswer("");
 		setActivePromptIndex(0);
 		timedOutRef.current = false;
 
-		const session = new GameSession(ui, nextGameType);
+		const session = new GameSession(ui, nextProblemGenerator);
 		sessionRef.current = session;
 
 		syncProgressFromGameSession();
 
 		ui.updateProgressIndicator();
 		ui.updateSessionTimeIndicator();
-		ui.showPrompt();
+		ui.showProblem();
 	};
 
 	useEffect(() => {
-		startNewSession(gameType);
-	}, [gameType, ui]);
+		startNewSession(problemGenerator);
+	}, [problemGenerator, ui]);
 
 	useEffect(() => {
 		const wakeLock = attachWakeLock();
@@ -147,7 +147,7 @@ export function GameSessionPage({
 			ui.updateSessionTimeIndicator();
 			const msLeft =
 				session.maxSessionDurationMs -
-				(Date.now() - session.gameStartTimestamp);
+				(getNow() - session.gameStartTimestamp);
 			if (msLeft <= 0 && !timedOutRef.current) {
 				timedOutRef.current = true;
 				setSessionComplete(true);
@@ -161,7 +161,7 @@ export function GameSessionPage({
 					{ text: "Край на тренировката - честито! (времето изтече 🙂 )", color: "green", isBold: true },
 					{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 					{
-						text: `Ти игра "${gameTypeByKey.get(stats.gameTypeKey)?.uiLabel ?? stats.gameTypeKey}".`,
+						text: `Ти игра "${problemGeneratorByKey.get(stats.problemGeneratorKey)?.uiLabel ?? stats.problemGeneratorKey}".`,
 						color: "white",
 					},
 					{
@@ -251,7 +251,7 @@ export function GameSessionPage({
 				<button
 					type="button"
 					className={styles.startOverButton}
-					onClick={() => startNewSession(gameType)}
+					onClick={() => startNewSession(problemGenerator)}
 				>
 					Отначало
 				</button>
