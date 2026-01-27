@@ -1,7 +1,7 @@
 import { ProblemGenerator } from "./ProblemGenerators";
 
 interface ProblemGeneratorCtor {
-    new (...args: unknown[]): ProblemGenerator;
+    new (...args: any[]): ProblemGenerator;
     prototype: ProblemGenerator;
 }
 
