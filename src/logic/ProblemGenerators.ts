@@ -39,39 +39,58 @@ export class Range { // inclusive (includes both ends of the range)
 }
 
 export class MultiplicationProblemGenerator extends ProblemGenerator {
-    constructor(uiLabel: string, private range : Range) {
+    constructor(uiLabel: string, private range: Range, private expRange: Range) {
         super(uiLabel);
     }
 
     createRandomProblem(): Problem {
+        const expA = util.randomInt(this.expRange.min, this.expRange.max);
+        const expB = util.randomInt(this.expRange.min, this.expRange.max);
+
         const a = util.randomInt(this.range.min, this.range.max);
         const b = util.randomInt(this.range.min, this.range.max);
-        const aStr = numberToString(a);
-        const bStr = ensureNegativeNumbersHaveParens(b);
-        return new Problem(`${aStr} × ${bStr}`, a * b);
+
+        const aRaised = new BigNumber(a).shiftedBy(expA);
+        const bRaised = new BigNumber(b).shiftedBy(expB);
+
+        const aRaisedStr = numberToString(aRaised);
+        const bRaisedStr = ensureNegativeNumbersHaveParens(bRaised);
+        return new Problem(`${aRaisedStr} × ${bRaisedStr}`, aRaised.multipliedBy(bRaised));
     }
 }
 problemGeneratorRegistry.register(MultiplicationProblemGenerator, "Multiplication.v1");
 
+// note: the generated divisee is always larger than the generated divisor, by design
 export class DivisionProblemGenerator extends ProblemGenerator {
-    constructor(uiLabel: string, private range : Range, private expRange : Range) {
+    constructor(uiLabel: string, private range : Range, private expRange : Range, private ensureAtLeastOneNonInteger : boolean) {
         super(uiLabel);
     }
 
     createRandomProblem(): Problem {
-        const expDivisee = util.randomInt(this.expRange.min, this.expRange.max);
-        const expDivisor = util.randomInt(this.expRange.min, this.expRange.max);
+        let diviseeRaised, divisorRaised;
+        while(true) {
+            const expDivisee = util.randomInt(this.expRange.min, this.expRange.max);
+            let expDivisor = util.randomInt(this.expRange.min, this.expRange.max);
+            expDivisor = Math.min(expDivisee, expDivisor);
 
-        const a = util.randomInt(this.range.min, this.range.max);
-        let b;
-        do {
-            b = util.randomInt(this.range.min, this.range.max);
-        } while (b == 0);
-        const divisee = a * b;
-        const divisor = b;
+            const a = util.randomInt(this.range.min, this.range.max);
+            let b;
+            do {
+                b = util.randomInt(this.range.min, this.range.max);
+            } while (b == 0);
+            const divisee = a * b;
+            const divisor = b;
 
-        const diviseeRaised = new BigNumber(divisee).shiftedBy(expDivisee);
-        const divisorRaised = new BigNumber(divisor).shiftedBy(expDivisor);
+            diviseeRaised = new BigNumber(divisee).shiftedBy(expDivisee);
+            divisorRaised = new BigNumber(divisor).shiftedBy(expDivisor);
+            if(this.ensureAtLeastOneNonInteger) {
+                if(diviseeRaised.isInteger() && divisorRaised.isInteger())
+                    continue;
+                else break;
+            } else {
+                break;
+            }
+        }
         const aFinal = diviseeRaised.dividedBy(divisorRaised);
 
         const diviseeRaisedStr = numberToString(diviseeRaised);
@@ -303,6 +322,24 @@ export class MultiplicationTmpAlexProblemGenerator extends ProblemGenerator {
 }
 problemGeneratorRegistry.register(MultiplicationTmpAlexProblemGenerator, "MultiplicationTmpAlex.v1");
 
+/*export class LinearEquationProblemGenerator extends ProblemGenerator {
+    constructor(uiLabel: string) {
+        super(uiLabel);
+    }
+
+    createRandomProblem(): Problem {
+        // todo: no zero
+        const a = util.randomInt(-20, 20);
+        const b = util.randomInt(-20, 20);
+        const ordering = util.randomInt(0, 2);
+        switch(ordering) {
+            case 0:
+                return new Problem(`${a}x`);
+        }
+    }
+}
+problemGeneratorRegistry.register(MultiplicationTmpAlexProblemGenerator, "MultiplicationTmpAlex.v1");*/
+
 type WeightedProblemGenerator = {
     problemGenerator: ProblemGenerator;
     weight: number;
@@ -390,10 +427,17 @@ function createProblemGeneratorFromSpec(spec: AssignmentPartSpec): ProblemGenera
         const value = typeof raw === "number" ? raw : Number(raw);
         return Number.isFinite(value) ? value : 0;
     };
+    const readBooleanParam = (key: string) => {
+        const raw = params[key];
+        if(typeof raw === "boolean")
+            return raw;
+        else return false;
+    };
     const rangeMin = readNumberParam("rangeMin");
     const rangeMax = readNumberParam("rangeMax");
     const expRangeMin = readNumberParam("expRangeMin");
     const expRangeMax = readNumberParam("expRangeMax");
+    const ensureAtLeastOneNonInteger = readBooleanParam("ensureAtLeastOneNonInteger");
     const range = new Range(rangeMin, rangeMax);
     const expRange = new Range(expRangeMin, expRangeMax);
     switch (spec.key) {
@@ -404,9 +448,9 @@ function createProblemGeneratorFromSpec(spec: AssignmentPartSpec): ProblemGenera
         case "SubtractionSixthGrade.v1":
             return new SubtractionSixthGradeProblemGenerator("", range);
         case "Multiplication.v1":
-            return new MultiplicationProblemGenerator("", range);
+            return new MultiplicationProblemGenerator("", range, expRange);
         case "Division.v1":
-            return new DivisionProblemGenerator("", range, expRange);
+            return new DivisionProblemGenerator("", range, expRange, ensureAtLeastOneNonInteger);
         case "BracketExpansion.nesting0.v1":
             return new BracketExpansionNesting0ProblemGenerator("");
         case "BracketExpansion.nesting1.v1":
@@ -417,30 +461,3 @@ function createProblemGeneratorFromSpec(spec: AssignmentPartSpec): ProblemGenera
             return null;
     }
 }
-
-export type ProblemGeneratorList = {
-    fifthGrade : ProblemGenerator[]
-    sixthGrade : ProblemGenerator[]
-    homework : ProblemGenerator[]
-}
-
-export function getAvailableProblemGenerators(): ProblemGeneratorList {
-    return {
-        fifthGrade: [
-            new AdditionProblemGenerator("Събиране 5кл", new Range(0, 100)),
-            new SubtractionFifthGradeProblemGenerator("Изваждане 5кл", 100),
-            new MultiplicationProblemGenerator("Умножение 5кл", new Range(0, 10)),
-            new DivisionProblemGenerator("Деление 5кл", new Range(0, 10), new Range(0, 0)),
-        ],
-        sixthGrade: [
-            new AdditionProblemGenerator("Събиране 6кл", new Range(-40, 40)),
-            new SubtractionSixthGradeProblemGenerator("Изваждане 6кл", new Range(-40, 40)),
-            new MultiplicationProblemGenerator("Умножение 6кл", new Range(-10, 10)),
-            new BracketExpansionNesting0ProblemGenerator("-1 + 2 - 3 + 90"),
-            new BracketExpansionNesting1ProblemGenerator("Разкриване на скоби"),
-            new BracketExpansionNesting2ProblemGenerator("Разкриване на скоби (вложени)"),
-        ],
-        homework: []
-    };
-}
-

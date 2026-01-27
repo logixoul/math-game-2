@@ -44,14 +44,6 @@ export function GameSessionPage({
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
 	const timedOutRef = useRef(false);
-	const problemGeneratorByKey = useMemo(() => {
-		const generators = ProblemGenerators.getAvailableProblemGenerators();
-		return new Map(
-			generators.fifthGrade
-				.concat(generators.sixthGrade)
-				.map((generator) => [generator.persistencyKey, generator])
-		);
-	}, []);
 	const ui = useMemo<GameSessionUI>(() => {
 		return {
 			informUser: (message, color, isBold) => {
@@ -161,7 +153,7 @@ export function GameSessionPage({
 					{ text: "Край на тренировката - честито! (времето изтече 🙂 )", color: "green", isBold: true },
 					{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 					{
-						text: `Ти игра "${problemGeneratorByKey.get(stats.problemGeneratorKey)?.uiLabel ?? stats.problemGeneratorKey}".`,
+						text: `Ти игра "${stats.problemGeneratorKey}".`,
 						color: "white",
 					},
 					{
