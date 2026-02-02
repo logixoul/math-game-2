@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
-import type { Problem, ProblemGenerator } from "./ProblemGenerators";
 import { ProblemScheduler } from "./ProblemScheduler.1";
+import type { Problem, ProblemGenerator } from "./Problems/ProblemGenerators";
 import type { ResultStats } from "./ResultStats";
 
 export type GameSessionUI = {

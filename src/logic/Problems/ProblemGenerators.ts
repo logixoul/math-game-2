@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
-import { ensureNegativeNumbersHaveParens, numberToString } from "./Formatting";
+import { ensureNegativeNumbersHaveParens, numberToString } from "../Formatting";
+import * as util from "../util";
 import { problemGeneratorRegistry } from "./ProblemGeneratorRegistry";
-import * as util from "./util";
 
 export type AssignmentPartSpec = {
 	key: string;
