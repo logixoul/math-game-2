@@ -24,14 +24,13 @@ export class ProblemGeneratorRegistry {
 
     public create(
         persistencyKey: string,
-        uiLabel: string,
         params: Record<string, unknown> = {}
     ): ProblemGenerator | null {
         const ctor = this.problemGeneratorMap.get(persistencyKey);
         if (!ctor) {
             return null;
         }
-        return new ctor(uiLabel, params);
+        return new ctor(params);
     }
 }
 
