@@ -1,11 +1,10 @@
 import {
-	type AssignmentRecord,
-	firebaseController,
-} from "@/logic/FirebaseController";
-import {
+	AssignmentRecord,
 	createAssignmentProblemGenerator,
 	parseAssignmentProblemGenerators,
-} from "@/logic/Problems/ProblemGenerators";
+} from "@/logic/assignments";
+import { db } from "@/logic/FirebaseController";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ErrorPage } from "./ErrorPage";
@@ -17,12 +16,16 @@ export function AssignmentSessionRoute() {
 
 	useEffect(() => {
 		if (!assignmentId) return;
-		const unsubscribe = firebaseController.onAssignmentChanged(
-			assignmentId,
-			(nextAssignment) => {
-				setAssignment(nextAssignment);
-			},
-		);
+
+		const assignmentRef = doc(db, "assignments", assignmentId);
+		const unsubscribe = onSnapshot(assignmentRef, (snap) => {
+			if (!snap.exists()) {
+				setAssignment(null);
+				return;
+			}
+			setAssignment({ id: snap.id, ...snap.data() } as AssignmentRecord);
+		});
+
 		return () => unsubscribe();
 	}, [assignmentId]);
 

@@ -1,18 +1,7 @@
-import { BigNumber } from "bignumber.js";
+import BigNumber from "bignumber.js";
 import { ensureNegativeNumbersHaveParens, numberToString } from "../Formatting";
 import * as util from "../util";
 import { problemGeneratorRegistry } from "./ProblemGeneratorRegistry";
-
-export type AssignmentPartSpec = {
-	key: string;
-	params?: Record<string, unknown>;
-	probability: number;
-};
-
-export type AssignmentSpecParseResult = {
-	specs: AssignmentPartSpec[];
-	error?: string;
-};
 
 export class Problem {
 	failedAttempts: number;
@@ -33,6 +22,33 @@ export abstract class ProblemGenerator {
 	abstract createRandomProblem(): Problem;
 }
 
+export type NumberShape = {
+	isSigned: boolean;
+	canBeZero: boolean;
+	// magnitude range
+	magMin: number; // must be non-negative
+	magMax: number; // must be non-negative
+	// (optional) 10^n multiplier ("exponent range"). Must be integer.
+	expMin: number;
+	expMax: number;
+};
+
+function generateNumber(shape: NumberShape): BigNumber {
+	const exp = util.randomInt(shape.expMin, shape.expMax); // exponent
+
+	let mag: number; // magnitude
+	do {
+		mag = util.randomInt(shape.magMin, shape.magMax);
+	} while (mag === 0 && !shape.canBeZero);
+	if (shape.isSigned) {
+		const sign = util.randomInt(0, 1);
+		if (sign === 1) mag *= -1;
+	}
+
+	const _magRaised = new BigNumber(mag).shiftedBy(exp);
+	return _magRaised;
+}
+
 export class Range {
 	// inclusive (includes both ends of the range)
 	constructor(
@@ -43,28 +59,19 @@ export class Range {
 
 export class MultiplicationProblemGenerator extends ProblemGenerator {
 	constructor(
-		private range: Range,
-		private expRange: Range,
+		private readonly aShape: NumberShape,
+		private readonly bShape: NumberShape,
 	) {
 		super();
 	}
 
 	createRandomProblem(): Problem {
-		const expA = util.randomInt(this.expRange.min, this.expRange.max);
-		const expB = util.randomInt(this.expRange.min, this.expRange.max);
+		const a = generateNumber(this.aShape);
+		const b = generateNumber(this.bShape);
 
-		const a = util.randomInt(this.range.min, this.range.max);
-		const b = util.randomInt(this.range.min, this.range.max);
-
-		const aRaised = new BigNumber(a).shiftedBy(expA);
-		const bRaised = new BigNumber(b).shiftedBy(expB);
-
-		const aRaisedStr = numberToString(aRaised);
-		const bRaisedStr = ensureNegativeNumbersHaveParens(bRaised);
-		return new Problem(
-			`${aRaisedStr} × ${bRaisedStr}`,
-			aRaised.multipliedBy(bRaised),
-		);
+		const aStr = numberToString(a);
+		const bStr = ensureNegativeNumbersHaveParens(b);
+		return new Problem(`${aStr} × ${bStr}`, a.multipliedBy(b));
 	}
 }
 problemGeneratorRegistry.register(
@@ -75,42 +82,40 @@ problemGeneratorRegistry.register(
 // note: the generated divisee is always larger than the generated divisor, by design
 export class DivisionProblemGenerator extends ProblemGenerator {
 	constructor(
-		private range: Range,
-		private expRange: Range,
-		private ensureAtLeastOneNonInteger: boolean,
+		private readonly aShape: NumberShape,
+		private readonly bShape: NumberShape,
+		private readonly ensureAtLeastOneNonInteger: boolean,
 	) {
 		super();
 	}
 
 	createRandomProblem(): Problem {
-		let diviseeRaised: BigNumber, divisorRaised: BigNumber;
-		while (true) {
-			const expDivisee = util.randomInt(this.expRange.min, this.expRange.max);
-			let expDivisor = util.randomInt(this.expRange.min, this.expRange.max);
-			expDivisor = Math.min(expDivisee, expDivisor);
+		let divisee: BigNumber, divisor: BigNumber;
+		do {
+			const a = generateNumber(this.aShape);
+			const b = generateNumber(this.bShape);
+			divisee = a.multipliedBy(b);
+			divisor = b;
+		} while (!this.pairSatisfiesConstraints(divisee, divisor));
 
-			const a = util.randomInt(this.range.min, this.range.max);
-			let b: number;
-			do {
-				b = util.randomInt(this.range.min, this.range.max);
-			} while (b === 0);
-			const divisee = a * b;
-			const divisor = b;
+		const result = divisee.dividedBy(divisor);
 
-			diviseeRaised = new BigNumber(divisee).shiftedBy(expDivisee);
-			divisorRaised = new BigNumber(divisor).shiftedBy(expDivisor);
-			if (this.ensureAtLeastOneNonInteger) {
-				if (diviseeRaised.isInteger() && divisorRaised.isInteger()) continue;
-				else break;
-			} else {
-				break;
+		const diviseeStr = numberToString(divisee);
+		const divisorStr = ensureNegativeNumbersHaveParens(divisor);
+		return new Problem(`${diviseeStr} : ${divisorStr}`, result);
+	}
+
+	pairSatisfiesConstraints(divisee: BigNumber, divisor: BigNumber): boolean {
+		if (divisee.isLessThan(divisor)) return false;
+		if (this.ensureAtLeastOneNonInteger) {
+			if (divisee.isInteger() && divisor.isInteger()) {
+				return false;
 			}
 		}
-		const aFinal = diviseeRaised.dividedBy(divisorRaised);
-
-		const diviseeRaisedStr = numberToString(diviseeRaised);
-		const divisorRaisedStr = ensureNegativeNumbersHaveParens(divisorRaised);
-		return new Problem(`${diviseeRaisedStr} : ${divisorRaisedStr}`, aFinal);
+		if (divisor.isZero()) {
+			return false;
+		}
+		return true;
 	}
 }
 problemGeneratorRegistry.register(DivisionProblemGenerator, "Division.v1");
@@ -383,136 +388,3 @@ problemGeneratorRegistry.register(
     }
 }
 problemGeneratorRegistry.register(MultiplicationTmpAlexProblemGenerator, "MultiplicationTmpAlex.v1");*/
-
-type WeightedProblemGenerator = {
-	problemGenerator: ProblemGenerator;
-	weight: number;
-};
-
-export class WeightedAssignmentProblemGenerator extends ProblemGenerator {
-	constructor(
-		readonly persistencyKeyValue: string,
-		private readonly weightedProblemGenerators: WeightedProblemGenerator[],
-	) {
-		super();
-		this.persistencyKey = persistencyKeyValue;
-	}
-
-	createRandomProblem(): Problem {
-		if (this.weightedProblemGenerators.length === 0) {
-			throw new Error("No problem generators available for assignment");
-		}
-		const total = this.weightedProblemGenerators.reduce(
-			(sum, entry) => sum + entry.weight,
-			0,
-		);
-		const roll = Math.random() * Math.max(1, total);
-		let running = 0;
-		for (const entry of this.weightedProblemGenerators) {
-			running += entry.weight;
-			if (roll <= running) {
-				return entry.problemGenerator.createRandomProblem();
-			}
-		}
-		return this.weightedProblemGenerators[
-			this.weightedProblemGenerators.length - 1
-		].problemGenerator.createRandomProblem();
-	}
-}
-
-export function parseAssignmentProblemGenerators(
-	jsonText: string,
-): AssignmentSpecParseResult {
-	if (!jsonText.trim()) {
-		return { specs: [], error: "Empty JSON" };
-	}
-	try {
-		const parsed = JSON.parse(jsonText);
-		if (!Array.isArray(parsed)) {
-			return { specs: [], error: "JSON must be an array" };
-		}
-		const specs = parsed.map((entry) => {
-			const key = String(entry?.key ?? "");
-			const probability = Number(entry?.probability ?? 1);
-			const params = (entry?.params ?? {}) as Record<string, unknown>;
-			return { key, probability, params } satisfies AssignmentPartSpec;
-		});
-		return { specs };
-	} catch (error: unknown) {
-		const message = error instanceof Error ? error.message : String(error);
-		return { specs: [], error: message || "Invalid JSON" };
-	}
-}
-
-export function createAssignmentProblemGenerator(
-	assignmentId: string,
-	specs: AssignmentPartSpec[],
-): ProblemGenerator | null {
-	const weightedProblemGenerators: WeightedProblemGenerator[] = [];
-	for (const spec of specs) {
-		const problemGenerator = createProblemGeneratorFromSpec(spec);
-		if (!problemGenerator) {
-			continue;
-		}
-		weightedProblemGenerators.push({
-			problemGenerator,
-			weight: Number.isFinite(spec.probability) ? spec.probability : 0,
-		});
-	}
-	if (weightedProblemGenerators.length === 0) {
-		return null;
-	}
-	return new WeightedAssignmentProblemGenerator(
-		`assignment:${assignmentId}`,
-		weightedProblemGenerators,
-	);
-}
-
-function createProblemGeneratorFromSpec(
-	spec: AssignmentPartSpec,
-): ProblemGenerator | null {
-	const params = spec.params ?? {};
-	const readNumberParam = (key: string) => {
-		const raw = params[key];
-		const value = typeof raw === "number" ? raw : Number(raw);
-		return Number.isFinite(value) ? value : 0;
-	};
-	const readBooleanParam = (key: string) => {
-		const raw = params[key];
-		if (typeof raw === "boolean") return raw;
-		else return false;
-	};
-	const rangeMin = readNumberParam("rangeMin");
-	const rangeMax = readNumberParam("rangeMax");
-	const expRangeMin = readNumberParam("expRangeMin");
-	const expRangeMax = readNumberParam("expRangeMax");
-	const ensureAtLeastOneNonInteger = readBooleanParam(
-		"ensureAtLeastOneNonInteger",
-	);
-	const range = new Range(rangeMin, rangeMax);
-	const expRange = new Range(expRangeMin, expRangeMax);
-	switch (spec.key) {
-		case "Addition.v1":
-			return new AdditionProblemGenerator(range);
-		case "SubtractionFifthGrade.v1":
-			return new SubtractionFifthGradeProblemGenerator(rangeMax);
-		case "SubtractionSixthGrade.v1":
-			return new SubtractionSixthGradeProblemGenerator(range);
-		case "Multiplication.v1":
-			return new MultiplicationProblemGenerator(range, expRange);
-		case "Division.v1":
-			return new DivisionProblemGenerator(
-				range,
-				expRange,
-				ensureAtLeastOneNonInteger,
-			);
-		case "BracketExpansion.nesting0.v1":
-			return new BracketExpansionNesting0ProblemGenerator();
-		case "BracketExpansion.nesting1.v1":
-			return new BracketExpansionNesting1ProblemGenerator();
-		case "BracketExpansion.nesting2.v1":
-			return new BracketExpansionNesting2ProblemGenerator();
-		default:
-			return null;
-	}
-}
