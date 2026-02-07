@@ -1,7 +1,7 @@
 import {
-	AssignmentRecord,
+	type AssignmentDoc,
+	assignmentConverter,
 	createAssignmentProblemGenerator,
-	parseAssignmentProblemGenerators,
 } from "@/logic/assignments";
 import { db } from "@/logic/FirebaseController";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -12,40 +12,38 @@ import { GameSessionPage } from "./GameSessionPage";
 
 export function AssignmentSessionRoute() {
 	const { assignmentId } = useParams<{ assignmentId: string }>();
-	const [assignment, setAssignment] = useState<AssignmentRecord | null>(null);
+	const [assignment, setAssignment] = useState<AssignmentDoc | null>(null);
 
 	useEffect(() => {
 		if (!assignmentId) return;
 
-		const assignmentRef = doc(db, "assignments", assignmentId);
+		const assignmentRef = doc(db, "assignments", assignmentId).withConverter(
+			assignmentConverter,
+		);
 		const unsubscribe = onSnapshot(assignmentRef, (snap) => {
 			if (!snap.exists()) {
 				setAssignment(null);
 				return;
 			}
-			setAssignment({ id: snap.id, ...snap.data() } as AssignmentRecord);
+			setAssignment({ id: snap.id, data: snap.data() } as AssignmentDoc);
 		});
 
 		return () => unsubscribe();
 	}, [assignmentId]);
 
-	const parsed = useMemo(() => {
+	const problemGenerator = useMemo(() => {
 		if (!assignment) return null;
-		return parseAssignmentProblemGenerators(assignment.spec);
+		return createAssignmentProblemGenerator(
+			assignment.id,
+			assignment.data.spec,
+		);
 	}, [assignment]);
 
-	const errorMessage = useMemo(() => {
-		if (!assignment || !parsed?.error) return "";
-		return `Error parsing assignment spec: ${parsed.error}`;
-	}, [assignment, parsed]);
-
-	const problemGenerator = useMemo(() => {
-		if (!assignment || !parsed || parsed.error) return null;
-		return createAssignmentProblemGenerator(assignment.id, parsed.specs);
-	}, [assignment, parsed]);
-
-	if (!assignment || !problemGenerator) {
-		return <ErrorPage message={errorMessage} />;
+	if (!assignment) {
+		return <ErrorPage message="Това домашно не е намерено!" />;
+	}
+	if (!problemGenerator) {
+		return <ErrorPage message="Това домашно е невалидно в базата данни!" />;
 	}
 
 	return (

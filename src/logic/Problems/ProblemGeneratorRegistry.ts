@@ -1,5 +1,8 @@
 import type { ProblemGenerator } from "./ProblemGenerators";
 
+/*type ProblemGeneratorCtor = new (
+	params: AssignmentPartParams,
+) => ProblemGenerator;*/
 interface ProblemGeneratorCtor {
 	new (...args: any[]): ProblemGenerator;
 	prototype: ProblemGenerator;

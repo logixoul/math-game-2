@@ -96,7 +96,7 @@ export function GameSessionPage({
 				]);
 			},
 		};
-	}, [assignmentId, syncProgressFromGameSession, getSession]);
+	}, [assignmentId]);
 	function getSession(): GameSession {
 		const s = sessionRef.current;
 		if (!s) throw new Error("Session not initialized");
@@ -133,7 +133,7 @@ export function GameSessionPage({
 
 	useEffect(() => {
 		startNewSession(problemGenerator);
-	}, [problemGenerator, startNewSession]);
+	}, [problemGenerator]);
 
 	useEffect(() => {
 		const wakeLock = attachWakeLock();

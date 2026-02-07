@@ -1,26 +1,23 @@
 import { AssignmentEditForm } from "@/components/AssignmentEditForm";
-import { AssignmentRecord } from "@/logic/assignments";
+import { type AssignmentDoc, assignmentConverter } from "@/logic/assignments";
 import { db, firebaseController } from "@/logic/FirebaseController";
 import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import styles from "./AssignmentsAdminPage.module.css";
 
 export function AssignmentsAdminPage() {
-	const [assignments, setAssignments] = useState<AssignmentRecord[]>([]);
+	const [assignments, setAssignments] = useState<AssignmentDoc[]>([]);
 	const bottomRef = useRef<HTMLDivElement | null>(null);
 	const [latestAddedId, setLatestAddedId] = useState<string | null>(null);
 
 	useEffect(() => {
-		const assignmentsRef = collection(db, "assignments");
+		const assignmentsRef = collection(db, "assignments").withConverter(
+			assignmentConverter,
+		);
 		const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
-			let assignments = snapshot.docs.map(
-				(doc) =>
-					({
-						id: doc.id,
-						...doc.data(),
-					}) as AssignmentRecord,
-			);
-			assignments = assignments.sort((a, b) => a.index - b.index);
+			const assignments = snapshot.docs
+				.map((doc) => ({ id: doc.id, data: doc.data() }))
+				.sort((a, b) => a.data.index - b.data.index);
 			setAssignments(assignments);
 		});
 		return () => unsubscribe();
@@ -29,7 +26,10 @@ export function AssignmentsAdminPage() {
 		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [latestAddedId]);
 	const handleCreate = async () => {
-		const maxIndex = assignments.reduce((max, a) => Math.max(max, a.index), 0);
+		const maxIndex = assignments.reduce(
+			(max, a) => Math.max(max, a.data.index),
+			0,
+		);
 		const docRef = await addDoc(collection(db, "assignments"), {
 			name: "",
 			spec: "[]",

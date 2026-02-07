@@ -23,7 +23,7 @@ import {
 	setDoc,
 } from "firebase/firestore";
 import { useSyncExternalStore } from "react";
-import { ResultStats } from "./ResultStats";
+import type { ResultStats } from "./ResultStats";
 
 export type FirebaseState = {
 	user: User | null;
@@ -32,8 +32,8 @@ export type FirebaseState = {
 type Listener = () => void;
 
 export class FirebaseController {
-	private auth!: Auth;
-	private db!: Firestore_1;
+	public auth!: Auth;
+	public db!: Firestore_1;
 	private listeners = new Set<Listener>();
 
 	private state: FirebaseState = {
@@ -189,5 +189,5 @@ export function useFirebaseSnapshot() {
 	);
 }
 
-export const db = firebaseController["db"]; // TODO: better way to export Firestore instance
-export const auth = firebaseController["auth"]; // TODO: better way to export Auth instance
+export const db = firebaseController.db; // TODO: better way to export Firestore instance
+export const auth = firebaseController.auth; // TODO: better way to export Auth instance

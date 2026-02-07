@@ -1,35 +1,64 @@
+import type { DocumentData, FirestoreDataConverter } from "firebase/firestore";
+import type { NumberShape } from "./Problems/NumberShape";
 import {
 	AdditionProblemGenerator,
 	BracketExpansionNesting0ProblemGenerator,
 	BracketExpansionNesting1ProblemGenerator,
 	BracketExpansionNesting2ProblemGenerator,
-	DivisionProblemGenerator,
-	MultiplicationProblemGenerator,
+	DivisionProblemGeneratorV2,
+	MultiplicationProblemGeneratorV2,
 	type Problem,
 	ProblemGenerator,
 	Range,
 	SubtractionFifthGradeProblemGenerator,
 	SubtractionSixthGradeProblemGenerator,
 } from "./Problems/ProblemGenerators";
+import {
+	DivisionProblemGeneratorV1,
+	MultiplicationProblemGeneratorV1,
+} from "./Problems/ProblemGeneratorsLegacy";
 
-export type AssignmentRecord = {
-	id: string;
-	uid: string;
+export type AssignmentPartParams = Record<string, unknown>;
+
+export type AssignmentPartSpec = {
+	key: string;
+	probability: number;
+	params: AssignmentPartParams;
+};
+
+export type AssignmentData = {
 	name: string;
-	spec: string;
+	spec: Array<AssignmentPartSpec>;
 	category: string;
 	index: number;
 };
 
-export type AssignmentPartSpec = {
-	key: string;
-	params?: Record<string, unknown>;
-	probability: number;
+export type AssignmentDoc = {
+	id: string;
+	data: AssignmentData;
 };
 
 export type AssignmentSpecParseResult = {
 	specs: AssignmentPartSpec[];
 	error?: string;
+};
+
+function ensureLatestSchema(data: DocumentData) {
+	if (typeof data.spec === "string") {
+		// we have an old schema version (json-as-string)
+		data.spec = parseAssignmentProblemGenerators(data.spec).specs;
+	}
+}
+
+export const assignmentConverter: FirestoreDataConverter<AssignmentData> = {
+	toFirestore(value: AssignmentData): DocumentData {
+		return value;
+	},
+	fromFirestore(snap): AssignmentData {
+		const data = snap.data();
+		ensureLatestSchema(data);
+		return data as AssignmentData;
+	},
 };
 
 export function parseAssignmentProblemGenerators(
@@ -68,7 +97,7 @@ export function createAssignmentProblemGenerator(
 		}
 		weightedProblemGenerators.push({
 			problemGenerator,
-			weight: Number.isFinite(spec.probability) ? spec.probability : 0,
+			probability: spec.probability,
 		});
 	}
 	if (weightedProblemGenerators.length === 0) {
@@ -94,10 +123,18 @@ function createProblemGeneratorFromSpec(
 		if (typeof raw === "boolean") return raw;
 		else return false;
 	};
+	const readNumberShapeParam = (key: string): NumberShape => {
+		const raw = params[key];
+		// todo: remove casts
+		if (typeof raw === "object") return raw as NumberShape;
+		else return {} as NumberShape;
+	};
 	const rangeMin = readNumberParam("rangeMin");
 	const rangeMax = readNumberParam("rangeMax");
 	const expRangeMin = readNumberParam("expRangeMin");
 	const expRangeMax = readNumberParam("expRangeMax");
+	const aShape = readNumberShapeParam("aShape");
+	const bShape = readNumberShapeParam("bShape");
 	const ensureAtLeastOneNonInteger = readBooleanParam(
 		"ensureAtLeastOneNonInteger",
 	);
@@ -111,11 +148,19 @@ function createProblemGeneratorFromSpec(
 		case "SubtractionSixthGrade.v1":
 			return new SubtractionSixthGradeProblemGenerator(range);
 		case "Multiplication.v1":
-			return new MultiplicationProblemGenerator(range, expRange);
+			return new MultiplicationProblemGeneratorV1(range, expRange);
+		case "Multiplication.v2":
+			return new MultiplicationProblemGeneratorV2(aShape, bShape);
 		case "Division.v1":
-			return new DivisionProblemGenerator(
+			return new DivisionProblemGeneratorV1(
 				range,
 				expRange,
+				ensureAtLeastOneNonInteger,
+			);
+		case "Division.v2":
+			return new DivisionProblemGeneratorV2(
+				aShape,
+				bShape,
 				ensureAtLeastOneNonInteger,
 			);
 		case "BracketExpansion.nesting0.v1":
@@ -131,7 +176,7 @@ function createProblemGeneratorFromSpec(
 
 export type WeightedProblemGenerator = {
 	problemGenerator: ProblemGenerator;
-	weight: number;
+	probability: number;
 };
 
 export class WeightedAssignmentProblemGenerator extends ProblemGenerator {
@@ -148,13 +193,13 @@ export class WeightedAssignmentProblemGenerator extends ProblemGenerator {
 			throw new Error("No problem generators available for assignment");
 		}
 		const total = this.weightedProblemGenerators.reduce(
-			(sum, entry) => sum + entry.weight,
+			(sum, entry) => sum + entry.probability,
 			0,
 		);
 		const roll = Math.random() * total;
 		let running = 0;
 		for (const entry of this.weightedProblemGenerators) {
-			running += entry.weight;
+			running += entry.probability;
 			if (roll <= running) {
 				return entry.problemGenerator.createRandomProblem();
 			}

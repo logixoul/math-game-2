@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import { ensureNegativeNumbersHaveParens, numberToString } from "../Formatting";
 import * as util from "../util";
+import { generateNumber, type NumberShape } from "./NumberShape";
 import { problemGeneratorRegistry } from "./ProblemGeneratorRegistry";
 
 export class Problem {
@@ -22,33 +23,6 @@ export abstract class ProblemGenerator {
 	abstract createRandomProblem(): Problem;
 }
 
-export type NumberShape = {
-	isSigned: boolean;
-	canBeZero: boolean;
-	// magnitude range
-	magMin: number; // must be non-negative
-	magMax: number; // must be non-negative
-	// (optional) 10^n multiplier ("exponent range"). Must be integer.
-	expMin: number;
-	expMax: number;
-};
-
-function generateNumber(shape: NumberShape): BigNumber {
-	const exp = util.randomInt(shape.expMin, shape.expMax); // exponent
-
-	let mag: number; // magnitude
-	do {
-		mag = util.randomInt(shape.magMin, shape.magMax);
-	} while (mag === 0 && !shape.canBeZero);
-	if (shape.isSigned) {
-		const sign = util.randomInt(0, 1);
-		if (sign === 1) mag *= -1;
-	}
-
-	const _magRaised = new BigNumber(mag).shiftedBy(exp);
-	return _magRaised;
-}
-
 export class Range {
 	// inclusive (includes both ends of the range)
 	constructor(
@@ -57,7 +31,7 @@ export class Range {
 	) {}
 }
 
-export class MultiplicationProblemGenerator extends ProblemGenerator {
+export class MultiplicationProblemGeneratorV2 extends ProblemGenerator {
 	constructor(
 		private readonly aShape: NumberShape,
 		private readonly bShape: NumberShape,
@@ -75,12 +49,12 @@ export class MultiplicationProblemGenerator extends ProblemGenerator {
 	}
 }
 problemGeneratorRegistry.register(
-	MultiplicationProblemGenerator,
-	"Multiplication.v1",
+	MultiplicationProblemGeneratorV2,
+	"Multiplication.v2",
 );
 
 // note: the generated divisee is always larger than the generated divisor, by design
-export class DivisionProblemGenerator extends ProblemGenerator {
+export class DivisionProblemGeneratorV2 extends ProblemGenerator {
 	constructor(
 		private readonly aShape: NumberShape,
 		private readonly bShape: NumberShape,
@@ -118,7 +92,7 @@ export class DivisionProblemGenerator extends ProblemGenerator {
 		return true;
 	}
 }
-problemGeneratorRegistry.register(DivisionProblemGenerator, "Division.v1");
+problemGeneratorRegistry.register(DivisionProblemGeneratorV2, "Division.v2");
 
 export class SubtractionFifthGradeProblemGenerator extends ProblemGenerator {
 	constructor(private rangeMax: number) {
