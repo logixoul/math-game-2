@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KeyPad } from "@/components/KeyPad";
 import { type Message, MessageLog } from "@/components/MessageLog";
 import { firebaseController } from "@/logic/FirebaseController";
@@ -5,7 +6,6 @@ import { GameSession, type GameSessionUI } from "@/logic/GameSession";
 import type * as ProblemGenerators from "@/logic/Problems/ProblemGenerators";
 import * as util from "@/logic/util";
 import { attachWakeLock } from "@/React/WakeLock";
-import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./GameSessionPage.module.css";
 
 const getNow = () => Date.now();
@@ -44,6 +44,27 @@ export function GameSessionPage({
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
 	const timedOutRef = useRef(false);
+	const currentAnswerRef = useRef(currentAnswer);
+	currentAnswerRef.current = currentAnswer;
+	const submitAnswerRef = useRef<(text: string) => void>(() => {});
+
+	const getSession = useCallback((): GameSession => {
+		const session = sessionRef.current;
+		if (!session) throw new Error("Session not initialized");
+		return session;
+	}, []);
+
+	const syncProgressFromGameSession = useCallback(() => {
+		const session = getSession();
+		setProgress({
+			pointsTowardWin: session.pointsTowardWin,
+			problemsAttempted: session.problemsAttempted,
+			pointsRequiredToWin: session.pointsRequiredToWin,
+			minProblemsAttemptedToWin: session.minProblemsAttemptedToWin,
+			errorCount: session.errorCount,
+		});
+	}, [getSession]);
+
 	const ui = useMemo<GameSessionUI>(() => {
 		return {
 			informUser: (message, color, isBold) => {
@@ -96,44 +117,31 @@ export function GameSessionPage({
 				]);
 			},
 		};
-	}, [assignmentId]);
-	function getSession(): GameSession {
-		const s = sessionRef.current;
-		if (!s) throw new Error("Session not initialized");
-		return s;
-	}
-	function syncProgressFromGameSession() {
-		const session = getSession();
-		setProgress({
-			pointsTowardWin: session.pointsTowardWin,
-			problemsAttempted: session.problemsAttempted,
-			pointsRequiredToWin: session.pointsRequiredToWin,
-			minProblemsAttemptedToWin: session.minProblemsAttemptedToWin,
-			errorCount: session.errorCount,
-		});
-	}
-	const startNewSession = (
-		nextProblemGenerator: ProblemGenerators.ProblemGenerator,
-	) => {
-		setMessages([]);
-		setSessionComplete(false);
-		setCurrentAnswer("");
-		setActivePromptIndex(0);
-		timedOutRef.current = false;
+	}, [assignmentId, getSession, syncProgressFromGameSession]);
 
-		const session = new GameSession(ui, nextProblemGenerator);
-		sessionRef.current = session;
+	const startNewSession = useCallback(
+		(nextProblemGenerator: ProblemGenerators.ProblemGenerator) => {
+			setMessages([]);
+			setSessionComplete(false);
+			setCurrentAnswer("");
+			setActivePromptIndex(0);
+			timedOutRef.current = false;
 
-		syncProgressFromGameSession();
+			const session = new GameSession(ui, nextProblemGenerator);
+			sessionRef.current = session;
 
-		ui.updateProgressIndicator();
-		ui.updateSessionTimeIndicator();
-		ui.showProblem();
-	};
+			syncProgressFromGameSession();
+
+			ui.updateProgressIndicator();
+			ui.updateSessionTimeIndicator();
+			ui.showProblem();
+		},
+		[syncProgressFromGameSession, ui],
+	);
 
 	useEffect(() => {
 		startNewSession(problemGenerator);
-	}, [problemGenerator]);
+	}, [problemGenerator, startNewSession]);
 
 	useEffect(() => {
 		const wakeLock = attachWakeLock();
@@ -212,19 +220,21 @@ export function GameSessionPage({
 		session.onUserAnswered(text);
 	};
 
-	const handleKeypadOk = () => {
-		submitAnswer(currentAnswer);
-	};
+	submitAnswerRef.current = submitAnswer;
 
-	const handleKeypadAppend = (value: string) => {
+	const handleKeypadOk = useCallback(() => {
+		submitAnswerRef.current(currentAnswerRef.current);
+	}, []);
+
+	const handleKeypadAppend = useCallback((value: string) => {
 		setCurrentAnswer((prev) => {
 			return prev + value;
 		});
-	};
+	}, []);
 
-	const handleKeypadBackspace = () => {
+	const handleKeypadBackspace = useCallback(() => {
 		setCurrentAnswer((prev) => prev.slice(0, -1));
-	};
+	}, []);
 
 	const handleReveal = () => {
 		sessionRef.current?.onUserRequestedAnswerReveal();
