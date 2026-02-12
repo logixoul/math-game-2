@@ -1,14 +1,6 @@
-import { RefObject, useMemo, useState } from "react";
-import * as util from "@/logic/util";
+import { RefObject } from "react";
+import type { Message } from "@/logic/Message";
 import styles from "./MessageLog.module.css";
-
-export type Message = {
-	text: string;
-	color: string;
-	isBold?: boolean;
-	isPrompt?: boolean;
-	answer?: string;
-};
 
 type MessageLogProps = {
 	messages: Message[];

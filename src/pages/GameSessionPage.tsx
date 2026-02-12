@@ -1,147 +1,49 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from "react";
 import { KeyPad } from "@/components/KeyPad";
-import { type Message, MessageLog } from "@/components/MessageLog";
+import { MessageLog } from "@/components/MessageLog";
 import { firebaseController } from "@/logic/FirebaseController";
-import { GameSession, type GameSessionUI } from "@/logic/GameSession";
+import { GameSession } from "@/logic/GameSession";
 import type * as ProblemGenerators from "@/logic/Problems/ProblemGenerators";
 import * as util from "@/logic/util";
 import { attachWakeLock } from "@/React/WakeLock";
 import styles from "./GameSessionPage.module.css";
-
-const getNow = () => Date.now();
 
 type GameSessionPageProps = {
 	problemGenerator: ProblemGenerators.ProblemGenerator;
 	assignmentId?: string;
 };
 
-type ProgressSnapshot = {
-	pointsTowardWin: number;
-	problemsAttempted: number;
-	pointsRequiredToWin: number;
-	minProblemsAttemptedToWin: number;
-	errorCount: number;
-};
-
 export function GameSessionPage({
 	problemGenerator,
 	assignmentId,
 }: GameSessionPageProps) {
-	const sessionRef = useRef<GameSession | null>(null);
+	const [session, setSession] = useState(() => new GameSession(problemGenerator));
 	const logRef = useRef<HTMLDivElement | null>(null);
 	const hasRecordedAttemptRef = useRef(false);
-	const [messages, setMessages] = useState<Message[]>([]);
-	const [progress, setProgress] = useState<ProgressSnapshot>({
-		// todo: fix zeros?
-		pointsTowardWin: 0,
-		problemsAttempted: 0,
-		pointsRequiredToWin: 0,
-		minProblemsAttemptedToWin: 0,
-		errorCount: 0,
-	});
-	const [minutesLeft, setMinutesLeft] = useState<number>(0);
-	const [sessionComplete, setSessionComplete] = useState(false);
 	const [currentAnswer, setCurrentAnswer] = useState("");
-	const [activePromptIndex, setActivePromptIndex] = useState<number>(0); //todo 0
-	const timedOutRef = useRef(false);
-	const currentAnswerRef = useRef(currentAnswer);
-	currentAnswerRef.current = currentAnswer;
-	const submitAnswerRef = useRef<(text: string) => void>(() => {});
-
-	const getSession = useCallback((): GameSession => {
-		const session = sessionRef.current;
-		if (!session) throw new Error("Session not initialized");
-		return session;
-	}, []);
-
-	const syncProgressFromGameSession = useCallback(() => {
-		const session = getSession();
-		setProgress({
-			pointsTowardWin: session.pointsTowardWin,
-			problemsAttempted: session.problemsAttempted,
-			pointsRequiredToWin: session.pointsRequiredToWin,
-			minProblemsAttemptedToWin: session.minProblemsAttemptedToWin,
-			errorCount: session.errorCount,
-		});
-	}, [getSession]);
-
-	const ui = useMemo<GameSessionUI>(() => {
-		return {
-			informUser: (message, color, isBold) => {
-				setMessages((prev) => [...prev, { text: message, color, isBold }]);
-			},
-			updateProgressIndicator: () => {
-				syncProgressFromGameSession();
-			},
-			updateSessionTimeIndicator: () => {
-				const session = getSession();
-				const msLeft =
-					session.maxSessionDurationMs -
-					(getNow() - session.gameStartTimestamp);
-				setMinutesLeft(Math.max(0, Math.ceil(msLeft / 60000)));
-			},
-			showProblem: () => {
-				const session = getSession();
-				const prompt = session.getCurrentProblem();
-				setMessages((prev) => {
-					const nextIndex = prev.length;
-					setActivePromptIndex(nextIndex);
-					return [
-						...prev,
-						{ text: `${prompt.text} = `, color: "white", isPrompt: true },
-					];
-				});
-				setCurrentAnswer("");
-			},
-			onWin: (resultStats) => {
-				setSessionComplete(true);
-				if (!hasRecordedAttemptRef.current) {
-					hasRecordedAttemptRef.current = true;
-					firebaseController
-						.recordAttempt(assignmentId, resultStats, "win")
-						.catch(() => {});
-				}
-				const minutes = Math.floor(resultStats.timeElapsedMs / 60000);
-				const seconds = Math.floor(resultStats.timeElapsedMs / 1000) % 60;
-				setMessages((prev) => [
-					...prev,
-					{
-						text: "КЪРТИШ! ПОБЕДА! 🥳\nМоля направи скрийншот и ми го пратѝ.",
-						color: "green",
-						isBold: true,
-					},
-					{
-						text: `Отне ти ${minutes} мин ${seconds} сек. Познал си ${resultStats.percentCorrectOnFirstTry}% от първи опит.`,
-						color: "white",
-					},
-				]);
-			},
-		};
-	}, [assignmentId, getSession, syncProgressFromGameSession]);
 
 	const startNewSession = useCallback(
 		(nextProblemGenerator: ProblemGenerators.ProblemGenerator) => {
-			setMessages([]);
-			setSessionComplete(false);
+			hasRecordedAttemptRef.current = false;
 			setCurrentAnswer("");
-			setActivePromptIndex(0);
-			timedOutRef.current = false;
-
-			const session = new GameSession(ui, nextProblemGenerator);
-			sessionRef.current = session;
-
-			syncProgressFromGameSession();
-
-			ui.updateProgressIndicator();
-			ui.updateSessionTimeIndicator();
-			ui.showProblem();
+			setSession(new GameSession(nextProblemGenerator));
 		},
-		[syncProgressFromGameSession, ui],
+		[],
 	);
 
 	useEffect(() => {
+		if (session.problemGenerator === problemGenerator) return;
 		startNewSession(problemGenerator);
-	}, [problemGenerator, startNewSession]);
+	}, [problemGenerator, session, startNewSession]);
+
+	const snap = useSyncExternalStore(session.subscribe, session.getSnapshot);
+	const sessionComplete = snap.status !== "playing";
 
 	useEffect(() => {
 		const wakeLock = attachWakeLock();
@@ -150,52 +52,25 @@ export function GameSessionPage({
 
 	useEffect(() => {
 		const intervalId = window.setInterval(() => {
-			const session = getSession();
-
-			ui.updateSessionTimeIndicator();
-			const msLeft =
-				session.maxSessionDurationMs - (getNow() - session.gameStartTimestamp);
-			if (msLeft <= 0 && !timedOutRef.current) {
-				timedOutRef.current = true;
-				setSessionComplete(true);
-				const stats = session.getResultStats();
-				if (!hasRecordedAttemptRef.current) {
-					hasRecordedAttemptRef.current = true;
-					firebaseController
-						.recordAttempt(assignmentId, stats, "timeout")
-						.catch(() => {});
-				}
-				setMessages((prev) => [
-					...prev,
-					{
-						text: "Край на тренировката - честито! (времето изтече 🙂 )",
-						color: "green",
-						isBold: true,
-					},
-					{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
-					{
-						text: `Ти игра "${stats.problemGeneratorKey}".`,
-						color: "white",
-					},
-					{
-						text: `Точки: ${stats.pointsTowardWin}.`,
-						color: "white",
-					},
-					{
-						text: `Максимални достигнати точки: ${stats.maxReachedPointsTowardWin}.`,
-						color: "white",
-					},
-					{
-						text: `Познати от първи опит: ${stats.percentCorrectOnFirstTry}%.`,
-						color: "white",
-					},
-				]);
-			}
+			session.tick(Date.now());
 		}, 1000);
 		return () => {
 			window.clearInterval(intervalId);
 		};
-	}, [ui, getSession, assignmentId]);
+	}, [session]);
+
+	useEffect(() => {
+		if (
+			(snap.status === "won" || snap.status === "timeout") &&
+			snap.resultStats &&
+			!hasRecordedAttemptRef.current
+		) {
+			hasRecordedAttemptRef.current = true;
+			firebaseController
+				.recordAttempt(assignmentId, snap.resultStats, snap.status)
+				.catch(() => {});
+		}
+	}, [assignmentId, snap.resultStats, snap.status]);
 
 	useEffect(() => {
 		const log = logRef.current;
@@ -206,25 +81,18 @@ export function GameSessionPage({
 		return () => window.cancelAnimationFrame(rafId);
 	}, []);
 
-	const submitAnswer = (text: string) => {
-		const session = getSession();
-		if (sessionComplete) return;
-
-		setMessages((prev) => {
-			if (activePromptIndex === null) return prev;
-			return prev.map((message, index) =>
-				index === activePromptIndex ? { ...message, answer: text } : message,
-			);
-		});
-		setCurrentAnswer("");
-		session.onUserAnswered(text);
-	};
-
-	submitAnswerRef.current = submitAnswer;
+	const submitAnswer = useCallback(
+		(text: string) => {
+			if (snap.status !== "playing") return;
+			setCurrentAnswer("");
+			session.onUserAnswered(text);
+		},
+		[session, snap.status],
+	);
 
 	const handleKeypadOk = useCallback(() => {
-		submitAnswerRef.current(currentAnswerRef.current);
-	}, []);
+		submitAnswer(currentAnswer);
+	}, [currentAnswer, submitAnswer]);
 
 	const handleKeypadAppend = useCallback((value: string) => {
 		setCurrentAnswer((prev) => {
@@ -237,7 +105,9 @@ export function GameSessionPage({
 	}, []);
 
 	const handleReveal = () => {
-		sessionRef.current?.onUserRequestedAnswerReveal();
+		if (snap.status !== "playing") return;
+		setCurrentAnswer("");
+		session.onUserRequestedAnswerReveal();
 	};
 
 	useEffect(() => {
@@ -268,8 +138,8 @@ export function GameSessionPage({
 				</button>
 			)}
 			<MessageLog
-				messages={messages}
-				activePromptIndex={activePromptIndex}
+				messages={snap.messages}
+				activePromptIndex={snap.activePromptIndex}
 				currentAnswer={currentAnswer}
 				logRef={logRef}
 			/>
@@ -296,21 +166,21 @@ export function GameSessionPage({
 					<div className={styles.statusProgress}>
 						<div>
 							<span className={styles.pointsIndicator}>
-								Точки: {util.ensureTextContainsSign(progress.pointsTowardWin)}
+								Точки: {util.ensureTextContainsSign(snap.pointsTowardWin)}
 							</span>
 							&nbsp;&nbsp;|&nbsp;&nbsp;
 							<span className={styles.errorsIndicator}>
-								Грешки: {progress.errorCount}
+								Грешки: {snap.errorCount}
 							</span>
 							<br />
 							За победа ти трябват още{" "}
-							{progress.pointsRequiredToWin - progress.pointsTowardWin} точки и{" "}
-							{progress.minProblemsAttemptedToWin - progress.problemsAttempted}{" "}
-							пробвани задачи
+							{snap.pointsRequiredToWin - snap.pointsTowardWin} точки и{" "}
+							{snap.minProblemsAttemptedToWin - snap.problemsAttempted} пробвани
+							задачи
 						</div>
 					</div>
 					<div className={styles.statusTimer}>
-						Имаш още {minutesLeft} минути
+						Имаш още {snap.minutesLeft} минути
 					</div>
 				</div>
 			</div>
