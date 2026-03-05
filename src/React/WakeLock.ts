@@ -7,7 +7,7 @@ export const attachWakeLock = (): WakeLockHandle => {
 	let wakeLock: WakeLockSentinel | null = null;
 
 	const requestWakeLock = async () => {
-		if (!("wakeLock" in navigator)){
+		if (!("wakeLock" in navigator)) {
 			console.warn("failure1");
 			return;
 		}
@@ -17,8 +17,8 @@ export const attachWakeLock = (): WakeLockHandle => {
 		}
 		try {
 			const lock = await navigator.wakeLock.request("screen");
-			console.log("WakeLock active!")
-			
+			console.log("WakeLock active!");
+
 			if (!isMounted) {
 				await lock.release();
 				return;

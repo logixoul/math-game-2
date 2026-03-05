@@ -1,36 +1,44 @@
 {
-  "name": "math-game-2",
-  "version": "1.0.0",
-  "description": "",
-  "main": "gulpfile.js",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "directories": {
-    "lib": "lib"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/logixoul/math-game-2.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/logixoul/math-game-2/issues"
-  },
-  "homepage": "https://github.com/logixoul/math-game-2#readme",
-  "devDependencies": {
-    "@types/react": "^18.3.24",
-    "@types/react-dom": "^18.3.7",
-    "typescript": "^4.9.5",
-    "vite": "^7.3.0"
-  },
-  "dependencies": {
-    "firebase": "^12.7.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.1"
-  }
+	"name": "math-game-2",
+	"version": "1.0.0",
+	"description": "",
+	"main": "gulpfile.js",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"test": "vitest"
+	},
+	"directories": {
+		"lib": "lib"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/logixoul/math-game-2.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/logixoul/math-game-2/issues"
+	},
+	"homepage": "https://github.com/logixoul/math-game-2#readme",
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.13",
+		"@types/react": "^18.3.24",
+		"@types/react-dom": "^18.3.7",
+		"typescript": "^4.9.5",
+		"vite": "^7.3.0"
+	},
+	"dependencies": {
+		"bignumber.js": "^9.3.1",
+		"firebase": "^12.7.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-router-dom": "^6.30.1",
+		"vitest": "^4.0.18",
+		"zod": "^4.3.6"
+	}
 }

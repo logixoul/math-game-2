@@ -1,19 +1,15 @@
 import { Outlet } from "react-router-dom";
-import { TopBar } from "./TopBar";
+import { TopBar } from "@/components/TopBar";
 import styles from "./PageLayout.module.css";
 
 type PageLayoutProps = {
-    loggedIn: boolean;
-    onLogOutRequested: () => void;
 };
 
-export function PageLayout({loggedIn, onLogOutRequested} : PageLayoutProps) {
+export function PageLayout({} : PageLayoutProps) {
     return (
-        <div className={"page"}>
+        <div className={styles.page}>
             <TopBar/>
-            <main className={styles.content}>
-                <Outlet />
-            </main>
+            <Outlet />
         </div>
     );
 }

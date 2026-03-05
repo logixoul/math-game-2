@@ -1,3 +1,9 @@
 {
-    "chatgpt.commentCodeLensEnabled": false
+	"chatgpt.commentCodeLensEnabled": false,
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "always" //,
+		//"quickfix.biome": "always"
+	}
 }

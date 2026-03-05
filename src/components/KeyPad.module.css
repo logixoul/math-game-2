@@ -1,5 +1,4 @@
 .inputArea {
-	margin-top: 16px;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
@@ -9,15 +8,21 @@
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 8px;
+
+	padding: 16px;
 }
 
 .keypadButton {
 	padding: 20px 0;
-	border: 1px solid #cbd2d9;
-	background: #ffffff;
+	border-width: 0px;
+	box-shadow: 0px 3px 1px #00000010;
+	border: 1px solid #ffffff40;
+	outline: 1px solid #00000018;
+	background: #fff4;
+	backdrop-filter: blur(5px);
 	border-radius: 6px;
-	font-size: 1.4em;
-	font-weight: bold;
+	font-size: 1.5em;
+	font-weight: 500;
 	cursor: pointer;
 	touch-action: none;
 }
@@ -29,13 +34,18 @@
 }
 
 .keypadButtonSecondary {
-	background: #edf2f7;
+	background: #1f7a8c20;
+	font-weight: normal;
+	font-size: 1.2em;
 }
 
 .keypadButtonOk {
-	background: #1f7a8c;
+	background: linear-gradient(180deg, #fff8, #fff0), #338c61;
+	box-shadow: inset 0px 2px 1px #ffffff60,
+		0px 3px 1px #00000030;
 	color: #ffffff;
 	border-color: #1f7a8c;
+	border-radius: 16px;
 }
 
 .keypadButtonReveal {
@@ -45,14 +55,4 @@
 .keypadSpacer {
 	padding: 12px 0;
 	border: 1px solid transparent;
-}
-
-.revealButton {
-	align-self: flex-start;
-	border: 1px solid #cbd2d9;
-	background: #ffffff;
-	color: #1f2933;
-	padding: 8px 12px;
-	border-radius: 6px;
-	cursor: pointer;
 }

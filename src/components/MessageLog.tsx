@@ -1,14 +1,6 @@
-import { RefObject, useMemo, useState } from "react";
-import * as util from "../util";
-import styles from "./GameSessionPage.module.css";
-
-export type Message = {
-	text: string;
-	color: string;
-	isBold?: boolean;
-	isPrompt?: boolean;
-	answer?: string;
-};
+import { RefObject } from "react";
+import type { Message } from "@/logic/Message";
+import styles from "./MessageLog.module.css";
 
 type MessageLogProps = {
 	messages: Message[];
@@ -24,7 +16,7 @@ export function MessageLog({
 	logRef,
 }: MessageLogProps) {
 	return (
-		<div className={styles.messageLog} ref={logRef}>
+		<div className={`${styles.messageLog} canGoBehindTopBar`} ref={logRef}>
 			{messages.map((message, index) => (
 				<p
 					key={`${index}-${message.text}`}

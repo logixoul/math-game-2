@@ -1,7 +1,11 @@
 {
 	"compilerOptions": {
+	  "baseUrl": "./src",
 	  "allowJs": true,
-	  "target": "es2017",
+	  "paths": {
+	    "@/*": ["*"]
+	  },
+	  "target": "es2024",
 	  "module": "ESNext",
 	  "moduleResolution": "Bundler",
 	  "types": [],
@@ -12,7 +16,7 @@
 	  "noImplicitReturns": true,
 	  "noFallthroughCasesInSwitch": true*/
 	  "strict": true,
-	  "lib": ["dom", "es2019"],
+	  "lib": ["dom", "es2024"],
 	},
 	"include": ["./src/**/*"],
   }

@@ -1,7 +1,7 @@
-import { FormEvent, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./TopBar.module.css";
-import { useFirebaseSnapshot, firebaseController } from "../FirebaseController";
+import { useFirebaseSnapshot, firebaseController } from "@/logic/FirebaseController";
 import { Popup } from "./Popup";
 
 type TopBarProps = {
@@ -9,6 +9,7 @@ type TopBarProps = {
 
 export function TopBar({  }: TopBarProps) {
 	const firebaseState = useFirebaseSnapshot();
+	const navigate = useNavigate();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
 	const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
 	const [authMethod, setAuthMethod] = useState<"google" | "email" | null>(null);
@@ -16,6 +17,29 @@ export function TopBar({  }: TopBarProps) {
 	const [password, setPassword] = useState("");
 	const [authError, setAuthError] = useState<string | null>(null);
 	const [isAuthBusy, setIsAuthBusy] = useState(false);
+	const topBarRef = useRef<HTMLElement | null>(null);
+
+	useEffect(() => {
+		const node = topBarRef.current;
+		if (!node) return;
+
+		const updateHeightVar = () => {
+			const height = node.getBoundingClientRect().height;
+			document.documentElement.style.setProperty("--topbar-height", `${height}px`);
+		};
+
+		updateHeightVar();
+
+		const observer = new ResizeObserver(updateHeightVar);
+		observer.observe(node);
+		window.addEventListener("resize", updateHeightVar);
+
+		return () => {
+			observer.disconnect();
+			window.removeEventListener("resize", updateHeightVar);
+			document.documentElement.style.removeProperty("--topbar-height");
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!isPopupOpen) {
@@ -76,17 +100,27 @@ export function TopBar({  }: TopBarProps) {
 		}
 	};
 
+	const handleLogout = async () => {
+		try {
+			await firebaseController.logout();
+		} finally {
+			navigate("/");
+		}
+	};
+
 	return (
-		<header className={styles.topBar}>
+		<header className={styles.topBar} ref={topBarRef}>
 			<Link className={styles.homeLink} to="/">
-				<img className={styles.logoImage} src="../assets/play-logo.png" width="40" height="40"></img>
+				<img className={styles.logoImage} src="../assets/play-logo.png" width="58" height="58"></img>
 				<div className={styles.logo}>
 					stefan play
 				</div>
 			</Link>
 			<div className={styles.loginStatus}>{
 				firebaseState.user ?
-					<button className={styles.logoutButton} onClick={() => firebaseController.logout()}>Изход</button>
+					<>
+						<button className={styles.logoutButton} onClick={handleLogout}>Изход</button>
+					</>
 					:
 					<>
 						<div className={styles.authButtons}>
