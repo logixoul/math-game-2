@@ -1,5 +1,5 @@
-import { defineConfig } from "vite";
 import { resolve } from "path";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   resolve: {
@@ -7,7 +7,7 @@ export default defineConfig({
       "@": resolve(__dirname, "src"),
     },
   },
-  base: "./",
+  base: "/",
   build: {
     outDir: "dist",
   },
