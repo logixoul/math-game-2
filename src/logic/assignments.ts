@@ -60,12 +60,6 @@ export const assignmentConverter: FirestoreDataConverter<AssignmentData> = {
 	},
 };
 
-export interface AssignmentPartDataInput {
-  key: string;
-  probability?: number;
-  params: AssignmentPartParams;
-}
-
 export function assignmentJsonToObject(jsonText: string): AssignmentPartData[] {
 	const parsed = JSON.parse(jsonText);
 	if(!Array.isArray(parsed)) {
