@@ -20,7 +20,7 @@ import {
 
 export type AssignmentPartParams = Record<string, unknown>;
 
-export type AssignmentPartSpec = {
+export type AssignmentPartData = {
 	key: string;
 	probability: number;
 	params: AssignmentPartParams;
@@ -28,7 +28,7 @@ export type AssignmentPartSpec = {
 
 export type AssignmentData = {
 	name: string;
-	spec: Array<AssignmentPartSpec>;
+	spec: Array<AssignmentPartData>;
 	category: string;
 	index: number;
 };
@@ -38,16 +38,15 @@ export type AssignmentDoc = {
 	data: AssignmentData;
 };
 
-export type AssignmentSpecParseResult = {
-	specs: AssignmentPartSpec[];
-	error?: string;
-};
+function ensureLatestSchema(data: DocumentData) : DocumentData {
+	let spec = data.spec;
 
-function ensureLatestSchema(data: DocumentData) {
 	if (typeof data.spec === "string") {
 		// we have an old schema version (json-as-string)
-		data.spec = parseAssignmentProblemGenerators(data.spec).specs;
+		spec = assignmentJsonToObject(spec);
 	}
+
+	return { ...data, spec };
 }
 
 export const assignmentConverter: FirestoreDataConverter<AssignmentData> = {
@@ -56,38 +55,37 @@ export const assignmentConverter: FirestoreDataConverter<AssignmentData> = {
 	},
 	fromFirestore(snap): AssignmentData {
 		const data = snap.data();
-		ensureLatestSchema(data);
-		return data as AssignmentData;
+		const migrated = ensureLatestSchema(data);
+		return migrated as AssignmentData;
 	},
 };
 
-export function parseAssignmentProblemGenerators(
-	jsonText: string,
-): AssignmentSpecParseResult {
-	if (!jsonText.trim()) {
-		return { specs: [], error: "Empty JSON" };
+export interface AssignmentPartDataInput {
+  key: string;
+  probability?: number;
+  params: AssignmentPartParams;
+}
+
+export function assignmentJsonToObject(jsonText: string): AssignmentPartData[] {
+	const parsed = JSON.parse(jsonText);
+	if(!Array.isArray(parsed)) {
+		throw new Error("Parsed JSON must be an array");
 	}
-	try {
-		const parsed = JSON.parse(jsonText);
-		if (!Array.isArray(parsed)) {
-			return { specs: [], error: "JSON must be an array" };
-		}
-		const specs = parsed.map((entry) => {
-			const key = String(entry?.key ?? "");
-			const probability = Number(entry?.probability ?? 1);
-			const params = (entry?.params ?? {}) as Record<string, unknown>;
-			return { key, probability, params } satisfies AssignmentPartSpec;
-		});
-		return { specs };
-	} catch (error: unknown) {
-		const message = error instanceof Error ? error.message : String(error);
-		return { specs: [], error: message || "Invalid JSON" };
+
+	for(const [index, entry ] of parsed.entries()) {
+		// for schema migration: if probability is missing, add it with default value 1
+		entry.probability ??= 1;
 	}
+	return parsed as AssignmentPartData[];
+}
+
+export function assignmentObjectToJson(spec: AssignmentPartData[]): string {
+	return JSON.stringify(spec, null, 2);
 }
 
 export function createAssignmentProblemGenerator(
 	assignmentId: string,
-	specs: AssignmentPartSpec[],
+	specs: AssignmentPartData[],
 ): ProblemGenerator | null {
 	const weightedProblemGenerators: WeightedProblemGenerator[] = [];
 	for (const spec of specs) {
@@ -110,7 +108,7 @@ export function createAssignmentProblemGenerator(
 }
 
 function createProblemGeneratorFromSpec(
-	spec: AssignmentPartSpec,
+	spec: AssignmentPartData,
 ): ProblemGenerator | null {
 	const params = spec.params ?? {};
 	const readNumberParam = (key: string) => {
