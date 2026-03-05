@@ -1,7 +1,7 @@
-import { BigNumber } from "bignumber.js";
 import type { Message } from "@/logic/Message";
+import { BigNumber } from "bignumber.js";
 import type { Problem, ProblemGenerator } from "./Problems/ProblemGenerators";
-import { ProblemScheduler } from "./problems/ProblemScheduler";
+import { ProblemScheduler } from "./Problems/ProblemScheduler";
 import type { ResultStats } from "./ResultStats";
 
 type GameSessionListener = () => void;
