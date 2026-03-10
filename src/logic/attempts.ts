@@ -4,7 +4,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 export async function recordAttempt(
 	userUid: string,
-	assignmentId: string | null | undefined,
+	assignmentId: string,
 	resultStats: ResultStats,
 	completionReason: "win" | "timeout",
 ): Promise<void> {
@@ -13,7 +13,6 @@ export async function recordAttempt(
 		resultStats,
 		completionReason,
 		assignmentId: assignmentId ?? null,
-		attemptType: assignmentId ? "assignment" : "free_practice",
 		createdAt: serverTimestamp(),
 	});
 }
