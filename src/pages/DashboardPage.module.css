@@ -1,9 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
+
+:root {
+  --font-heading: "Manrope", "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-body: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --text-color-1: #f4f7fb;
+}
+
 .dashboardContainer {
 	text-align: center;
 	width: fit-content;
 	margin-left: auto;
 	margin-right: auto;
 	padding: 24px;
+
+	font-family: var(--font-body);
+	font-weight: 100 !important;
+	line-height: 1.5;
+	letter-spacing: 0;
+	color: var(--text-color-1);
+	text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8);
 }
 
 .sectionsContainer {
@@ -15,20 +30,24 @@
 }
 
 .gameList {
-	list-style-type: none;
+	text-align: left;
+	list-style-type: disc;
 	padding-inline-start: 0;
-	margin: 0;
+	margin-left: 2em;
+	margin-right: 2em;
+	gap: 0em;
 }
 
 .gameCard {
-	padding: 10px;
-	margin: 10px;
+	padding: 10px 0px;
+	margin: 0px;
+	
 	border-radius: 10px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	align-items: center;
-	color: black;
+	align-items: left;
+	color: var(--text-color-1);
 	text-decoration: none;
 }
 
@@ -39,20 +58,6 @@
 	box-sizing: border-box;
 }
 
-.startButton {
-	align-self: center;
-	border: none;
-	background: #1f7a8c;
-	color: #ffffff;
-	padding: 8px 12px;
-	border-radius: 6px;
-	cursor: pointer;
-}
-
-.startButton:hover {
-	background: #166070;
-}
-
 .subtitle {
 	font-weight: 200;
 	font-style: italic;
@@ -61,20 +66,21 @@
 }
 
 .section {
-	border-radius: 3px;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	box-shadow: 0 2px 50px rgba(0, 0, 0, 0.1);
-	background: url("/assets/gradbg.png") no-repeat rgba(255, 255, 255, 0.2);
+	border-radius: 5px;
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	outline: 1px solid rgba(0, 0, 0, 0.4);
+	box-shadow: 0 2px 50px rgba(0, 0, 0, 0.8);
+	background: rgba(0, 0, 0, 0.2);
 	background-size: 100% 5em;
 	margin: 1em;
-	padding-left: 2em;
-	padding-right: 2em;
-	backdrop-filter: blur(8px);
+	backdrop-filter: blur(2.5px);
 }
 
 .section h3 {
 	color: white;
-	text-shadow: 0 2 2px rgba(0, 0, 0, 0.8);
+	background: rgba(0, 0, 0, 0.3);
+	margin: 0px;
+	padding: 1em;
 }
 
 .assignmentDue {
