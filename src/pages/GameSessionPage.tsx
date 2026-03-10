@@ -1,8 +1,15 @@
 import { KeyPad } from "@/components/KeyPad";
 import { MessageLog } from "@/components/MessageLog";
-import { firebaseController } from "@/logic/FirebaseController";
+import type { AssignmentProblemGenerator } from "@/logic/assignments";
+import { recordAttempt } from "@/logic/attempts";
+import {
+	useAuthUser,
+} from "@/logic/auth";
 import { GameSession } from "@/logic/GameSession";
-import type * as ProblemGenerators from "@/logic/Problems/ProblemGenerators";
+import {
+	getGameSessionMaxDurationMs,
+	useUserSettings,
+} from "@/logic/userSettings";
 import * as util from "@/logic/util";
 import { attachWakeLock } from "@/React/WakeLock";
 import {
@@ -15,7 +22,7 @@ import {
 import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
-	problemGenerator: ProblemGenerators.ProblemGenerator;
+	problemGenerator: AssignmentProblemGenerator;
 	assignmentId?: string;
 };
 
@@ -23,19 +30,35 @@ export function GameSessionPage({
 	problemGenerator,
 	assignmentId,
 }: GameSessionPageProps) {
-	const [session, setSession] = useState(() => new GameSession(problemGenerator));
+	const user = useAuthUser();
+	const userSettings = useUserSettings(user?.uid);
+	const maxSessionDurationMs = getGameSessionMaxDurationMs(userSettings);
+	const [session, setSession] = useState(
+		() =>
+			new GameSession(problemGenerator, {
+				maxSessionDurationMs,
+			}),
+	);
 	const logRef = useRef<HTMLDivElement | null>(null);
 	const hasRecordedAttemptRef = useRef(false);
 	const [currentAnswer, setCurrentAnswer] = useState("");
 
 	const startNewSession = useCallback(
-		(nextProblemGenerator: ProblemGenerators.ProblemGenerator) => {
+		(nextProblemGenerator: AssignmentProblemGenerator) => {
 			hasRecordedAttemptRef.current = false;
 			setCurrentAnswer("");
-			setSession(new GameSession(nextProblemGenerator));
+			setSession(
+				new GameSession(nextProblemGenerator, {
+					maxSessionDurationMs,
+				}),
+			);
 		},
-		[],
+		[maxSessionDurationMs],
 	);
+
+	useEffect(() => {
+		session.setMaxSessionDurationMs(maxSessionDurationMs);
+	}, [maxSessionDurationMs, session]);
 
 	useEffect(() => {
 		if (session.problemGenerator === problemGenerator) return;
@@ -61,16 +84,21 @@ export function GameSessionPage({
 
 	useEffect(() => {
 		if (
+			user &&
 			(snap.status === "won" || snap.status === "timeout") &&
 			snap.resultStats &&
 			!hasRecordedAttemptRef.current
 		) {
 			hasRecordedAttemptRef.current = true;
-			firebaseController
-				.recordAttempt(assignmentId, snap.resultStats, snap.status)
-				.catch(() => {});
+			const completionReason = snap.status === "won" ? "win" : "timeout";
+			recordAttempt(
+				user.uid,
+				assignmentId,
+				snap.resultStats,
+				completionReason,
+			).catch(() => {});
 		}
-	}, [assignmentId, snap.resultStats, snap.status]);
+	}, [assignmentId, snap.resultStats, snap.status, user]);
 
 	useEffect(() => {
 		const log = logRef.current;

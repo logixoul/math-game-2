@@ -1,7 +1,11 @@
 import {
-    firebaseController,
-    useFirebaseSnapshot,
-} from "@/logic/FirebaseController";
+	loginWithEmailPassword,
+	loginWithGoogle,
+	logout,
+	sendPasswordReset,
+	signupWithEmailPassword,
+	useAuthUser,
+} from "@/logic/auth";
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AuthUI.module.css";
@@ -10,7 +14,7 @@ import { Popup } from "./Popup";
 type AuthUIProps = {};
 
 export function AuthUI(_: AuthUIProps) {
-	const firebaseState = useFirebaseSnapshot();
+	const user = useAuthUser();
 	const navigate = useNavigate();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
 	const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
@@ -35,7 +39,7 @@ export function AuthUI(_: AuthUIProps) {
 		setIsAuthBusy(true);
 		setAuthError(null);
 		try {
-			await firebaseController.login();
+			await loginWithGoogle();
 			setIsPopupOpen(false);
 		} catch (error: any) {
 			setAuthError(error?.message ?? "Login failed");
@@ -50,9 +54,9 @@ export function AuthUI(_: AuthUIProps) {
 		setAuthError(null);
 		try {
 			if (authMode === "signup") {
-				await firebaseController.signupWithEmailPassword(email, password);
+				await signupWithEmailPassword(email, password);
 			} else {
-				await firebaseController.loginWithEmailPassword(email, password);
+				await loginWithEmailPassword(email, password);
 			}
 			setIsPopupOpen(false);
 		} catch (error: any) {
@@ -70,7 +74,7 @@ export function AuthUI(_: AuthUIProps) {
 		setIsAuthBusy(true);
 		setAuthError(null);
 		try {
-			await firebaseController.sendPasswordReset(email);
+			await sendPasswordReset(email);
 			setAuthError("Password reset email sent.");
 		} catch (error: any) {
 			setAuthError(error?.message ?? "Password reset failed");
@@ -81,7 +85,7 @@ export function AuthUI(_: AuthUIProps) {
 
 	const handleLogout = async () => {
 		try {
-			await firebaseController.logout();
+			await logout();
 		} finally {
 			navigate("/");
 		}
@@ -89,7 +93,7 @@ export function AuthUI(_: AuthUIProps) {
 
 	return (
 		<div className={styles.loginStatus}>
-			{firebaseState.user ? (
+			{user ? (
 				<button
 					type="button"
 					className={styles.logoutButton}

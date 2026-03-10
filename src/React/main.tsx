@@ -1,13 +1,14 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import "./global.css";
-import { QuickDebugLogger } from "../logic/QuickDebugLogger";
-import { createHashRouter, RouterProvider } from "react-router-dom";
-import { PageLayout } from "./PageLayout";
-import { DashboardPage } from "@/pages/DashboardPage";
+import { initGlobalFormattingSettings } from "@/logic/Formatting";
+import { AdminPage } from "@/pages/AdminPage";
 import { AssignmentSessionRoute } from "@/pages/AssignmentSessionRoute";
 import { AssignmentsAdminPage } from "@/pages/AssignmentsAdminPage";
-import { initGlobalFormattingSettings } from "@/logic/Formatting";
+import { DashboardPage } from "@/pages/DashboardPage";
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { createHashRouter, RouterProvider } from "react-router-dom";
+import { QuickDebugLogger } from "../logic/QuickDebugLogger";
+import { PageLayout } from "./PageLayout";
+import "./global.css";
 
 const qdl = QuickDebugLogger.instance;
 qdl.beginListeningForErrors();
@@ -25,6 +26,7 @@ const router = createHashRouter([
 		children: [
 			{ path: "/", element: <DashboardPage /> },
 			{ path: "/assignment/:assignmentId", element: <AssignmentSessionRoute /> },
+			{ path: "/admin/", element: <AdminPage /> },
 			{ path: "/admin/assignments/", element: <AssignmentsAdminPage /> },
 		]
 	}

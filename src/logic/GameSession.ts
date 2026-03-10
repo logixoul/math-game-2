@@ -1,4 +1,5 @@
 import type { Message } from "@/logic/Message";
+import { DEFAULT_GAME_SESSION_MAX_DURATION_MS } from "@/logic/userSettings";
 import { BigNumber } from "bignumber.js";
 import { AssignmentProblemGenerator } from "./assignments";
 import type { Problem } from "./Problems/ProblemGenerators";
@@ -55,14 +56,19 @@ export class GameSession {
 
 	readonly pointsRequiredToWin: number = 20;
 	readonly minProblemsAttemptedToWin: number = 20;
-	readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
+	maxSessionDurationMs: number;
 
 	private listeners = new Set<GameSessionListener>();
 	private snapshot: GameSessionSnapshot;
 
-	constructor(problemGenerator: AssignmentProblemGenerator) {
+	constructor(
+		problemGenerator: AssignmentProblemGenerator,
+		options?: { maxSessionDurationMs?: number },
+	) {
 		this.errorCount = 0;
 		this.problemGenerator = problemGenerator;
+		this.maxSessionDurationMs =
+			options?.maxSessionDurationMs ?? DEFAULT_GAME_SESSION_MAX_DURATION_MS;
 		this.problemScheduler = new ProblemScheduler(this.problemGenerator);
 
 		this.problemIterator = this.problemScheduler.generateProblems();
@@ -122,6 +128,25 @@ export class GameSession {
 	};
 
 	getSnapshot = (): GameSessionSnapshot => this.snapshot;
+
+	setMaxSessionDurationMs(nextMaxSessionDurationMs: number): void {
+		if (nextMaxSessionDurationMs === this.maxSessionDurationMs) {
+			return;
+		}
+		this.maxSessionDurationMs = nextMaxSessionDurationMs;
+		if (this.status !== "playing") {
+			this.notify();
+			return;
+		}
+		const msLeft =
+			this.maxSessionDurationMs - (Date.now() - this.gameStartTimestamp);
+		this.minutesLeft = Math.max(0, Math.ceil(msLeft / 60000));
+		if (msLeft <= 0) {
+			this.timeout();
+			return;
+		}
+		this.notify();
+	}
 
 	tick(nowMs: number): void {
 		if (this.status !== "playing") return;

@@ -1,25 +1,9 @@
-import { AssignmentDoc, assignmentConverter } from "@/logic/assignments";
-import { db } from "@/logic/FirebaseController";
-import { collection, onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useAssignments } from "@/logic/assignmentStore";
 import { Link } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
 
 export function DashboardPage() {
-	const [assignments, setAssignments] = useState<AssignmentDoc[]>([]);
-
-	useEffect(() => {
-		const assignmentsRef = collection(db, "assignments").withConverter(
-			assignmentConverter,
-		);
-		const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
-			const assignments = snapshot.docs
-				.map((doc) => ({ id: doc.id, data: doc.data() }))
-				.sort((a, b) => a.data.index - b.data.index);
-			setAssignments(assignments);
-		});
-		return () => unsubscribe();
-	}, []);
+	const assignments = useAssignments();
 	const createSection = (category: string, title: string) => {
 		const theseAssignments = assignments.filter(
 			(a) => a.data.category === category,
