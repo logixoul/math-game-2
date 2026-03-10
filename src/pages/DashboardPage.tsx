@@ -3,7 +3,16 @@ import { Link } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
 
 export function DashboardPage() {
-	const assignments = useAssignments();
+	const { assignments, isLoading } = useAssignments();
+
+	if (isLoading) {
+		return (
+			<div className="scrollablePage">
+				<div className={styles.dashboardContainer}>Зареждане...</div>
+			</div>
+		);
+	}
+
 	const createSection = (category: string, title: string) => {
 		const theseAssignments = assignments.filter(
 			(a) => a.data.category === category,

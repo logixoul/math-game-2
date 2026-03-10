@@ -6,7 +6,7 @@ import styles from "./AssignmentsAdminPage.module.css";
 
 export function AssignmentsAdminPage() {
 	const user = useAuthUser();
-	const assignments = useAssignments();
+	const { assignments, isLoading, reload } = useAssignments();
 	const bottomRef = useRef<HTMLDivElement | null>(null);
 	const [latestAddedId, setLatestAddedId] = useState<string | null>(null);
 
@@ -24,6 +24,7 @@ export function AssignmentsAdminPage() {
 			category: "Домашни",
 			index: maxIndex + 100,
 		});
+		await reload();
 		setLatestAddedId(newAssignmentId);
 	};
 
@@ -34,20 +35,24 @@ export function AssignmentsAdminPage() {
 	return (
 		<div className="scrollablePage">
 			<h2>Assignments</h2>
-			<button type="button" onClick={handleCreate}>
+			<button type="button" onClick={handleCreate} disabled={isLoading}>
 				Add
 			</button>
 
-			<ul className={styles.list}>
-				{assignments.map((assignment) => (
-					<li key={assignment.id}>
-						<AssignmentEditForm
-							assignment={assignment}
-							isCollapsedInitially={latestAddedId !== assignment.id}
-						/>
-					</li>
-				))}
-			</ul>
+			{isLoading ? (
+				<div>Зареждане...</div>
+			) : (
+				<ul className={styles.list}>
+					{assignments.map((assignment) => (
+						<li key={assignment.id}>
+							<AssignmentEditForm
+								assignment={assignment}
+								isCollapsedInitially={latestAddedId !== assignment.id}
+							/>
+						</li>
+					))}
+				</ul>
+			)}
 			<div ref={bottomRef} />
 		</div>
 	);

@@ -1,59 +1,51 @@
 import { type AssignmentData, type AssignmentDoc, assignmentConverter } from "@/logic/assignments";
 import { db } from "@/logic/firebase";
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    onSnapshot,
-    updateDoc,
+	addDoc,
+	collection,
+	deleteDoc,
+	doc,
+	getDoc,
+	getDocs,
+	updateDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export function useAssignments(): AssignmentDoc[] {
+export function useAssignments(): {
+	assignments: AssignmentDoc[];
+	isLoading: boolean;
+	reload: () => Promise<void>;
+} {
 	const [assignments, setAssignments] = useState<AssignmentDoc[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
 
-	useEffect(() => {
+	const reload = useCallback(async () => {
+		setIsLoading(true);
 		const assignmentsRef = collection(db, "assignments").withConverter(
 			assignmentConverter,
 		);
-		const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
-			const nextAssignments = snapshot.docs
-				.map((snap) => ({ id: snap.id, data: snap.data() }))
-				.sort((a, b) => a.data.index - b.data.index);
-			setAssignments(nextAssignments);
-		});
-
-		return () => unsubscribe();
+		const snapshot = await getDocs(assignmentsRef);
+		const nextAssignments = snapshot.docs
+			.map((snap) => ({ id: snap.id, data: snap.data() }))
+			.sort((a, b) => a.data.index - b.data.index);
+		setAssignments(nextAssignments);
+		setIsLoading(false);
 	}, []);
 
-	return assignments;
+	useEffect(() => {
+		void reload();
+	}, [reload]);
+
+	return { assignments, isLoading, reload };
 }
 
-export function useAssignment(assignmentId: string | null | undefined): AssignmentDoc | null {
-	const [assignment, setAssignment] = useState<AssignmentDoc | null>(null);
-
-	useEffect(() => {
-		if (!assignmentId) {
-			setAssignment(null);
-			return;
-		}
-
-		const assignmentRef = doc(db, "assignments", assignmentId).withConverter(
-			assignmentConverter,
-		);
-		const unsubscribe = onSnapshot(assignmentRef, (snapshot) => {
-			if (!snapshot.exists()) {
-				setAssignment(null);
-				return;
-			}
-			setAssignment({ id: snapshot.id, data: snapshot.data() });
-		});
-
-		return () => unsubscribe();
-	}, [assignmentId]);
-
-	return assignment;
+export async function getAssignmentById(id: string): Promise<AssignmentDoc | null> {
+	const assignmentRef = doc(db, "assignments", id).withConverter(
+		assignmentConverter,
+	);
+	const snapshot = await getDoc(assignmentRef);
+	if (!snapshot.exists()) return null;
+	return { id: snapshot.id, data: snapshot.data() };
 }
 
 export async function createAssignment(data: Partial<AssignmentData>): Promise<string> {

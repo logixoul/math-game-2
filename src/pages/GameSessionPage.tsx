@@ -23,7 +23,7 @@ import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
 	problemGenerator: AssignmentProblemGenerator;
-	assignmentId?: string;
+	assignmentId: string;
 };
 
 export function GameSessionPage({
