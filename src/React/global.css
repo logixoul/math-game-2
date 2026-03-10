@@ -1,3 +1,9 @@
+:root {
+  --font-heading: "Manrope", "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-body: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --text-color-1: #f4f7fb;
+}
+
 *,
 *::before,
 *::after {
@@ -8,7 +14,7 @@ body {
 	margin: 0;
 	font-family: "Roboto Condensed", sans-serif;
 	background: #f5f6f8;
-	color: #1f2933;
+	color: var(--text-color-1);
 }
 
 html, body {

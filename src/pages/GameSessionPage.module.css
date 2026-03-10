@@ -27,7 +27,7 @@
 	/*background: #ededed;
 	border-top: 1px solid #d0d0d0;
 	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08);*/
-	background: linear-gradient(180deg, #ffffff, #ffffff80), linear-gradient(150deg, #0a788480, #93d7c740);
+	background: rgba(0, 0, 0, 0.3);
 	padding: 10px 24px;
 	display: flex;
 	justify-content: center;
@@ -45,16 +45,16 @@
 
 .pointsIndicator {
 	font-weight: bold;
-	color: #0a8a00;
+	color: lightgreen;
 }
 
 .errorsIndicator {
 	font-weight: bold;
-	color: #c80000;
+	color: #ff4040;
 }
 
 .statusTimer {
-	color: #1f4ed8;
+	color: #4ac;
 	font-weight: 600;
 }
 
