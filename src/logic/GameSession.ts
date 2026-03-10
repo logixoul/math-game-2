@@ -1,6 +1,7 @@
 import type { Message } from "@/logic/Message";
 import { BigNumber } from "bignumber.js";
-import type { Problem, ProblemGenerator } from "./Problems/ProblemGenerators";
+import { AssignmentProblemGenerator } from "./assignments";
+import type { Problem } from "./Problems/ProblemGenerators";
 import { ProblemScheduler } from "./Problems/ProblemScheduler";
 import type { ResultStats } from "./ResultStats";
 
@@ -33,7 +34,7 @@ export type GameSessionSnapshot = {
 
 export class GameSession {
 	errorCount: number;
-	problemGenerator: ProblemGenerator;
+	problemGenerator: AssignmentProblemGenerator;
 	numCorrectAtFirstTry: number;
 	numWrongAtFirstTry: number;
 
@@ -59,7 +60,7 @@ export class GameSession {
 	private listeners = new Set<GameSessionListener>();
 	private snapshot: GameSessionSnapshot;
 
-	constructor(problemGenerator: ProblemGenerator) {
+	constructor(problemGenerator: AssignmentProblemGenerator) {
 		this.errorCount = 0;
 		this.problemGenerator = problemGenerator;
 		this.problemScheduler = new ProblemScheduler(this.problemGenerator);
@@ -71,7 +72,10 @@ export class GameSession {
 
 		this.numCorrectAtFirstTry = 0;
 		this.numWrongAtFirstTry = 0;
-		this.minutesLeft = Math.max(0, Math.ceil(this.maxSessionDurationMs / 60000));
+		this.minutesLeft = Math.max(
+			0,
+			Math.ceil(this.maxSessionDurationMs / 60000),
+		);
 
 		this.errorCount = 0;
 		this.showProblem();
@@ -121,7 +125,8 @@ export class GameSession {
 
 	tick(nowMs: number): void {
 		if (this.status !== "playing") return;
-		const msLeft = this.maxSessionDurationMs - (nowMs - this.gameStartTimestamp);
+		const msLeft =
+			this.maxSessionDurationMs - (nowMs - this.gameStartTimestamp);
 		const nextMinutesLeft = Math.max(0, Math.ceil(msLeft / 60000));
 		if (nextMinutesLeft !== this.minutesLeft) {
 			this.minutesLeft = nextMinutesLeft;
@@ -143,7 +148,7 @@ export class GameSession {
 		const percentCorrectOnFirstTry_Safe =
 			total === 0 ? 0 : percentCorrectOnFirstTry;
 		return {
-			problemGeneratorKey: this.problemGenerator.persistencyKey,
+			assignmentUiLabel: this.problemGenerator.persistencyKey,
 			timeElapsedMs: timeElapsed,
 			percentCorrectOnFirstTry: percentCorrectOnFirstTry_Safe,
 			pointsTowardWin: this.pointsTowardWin,
@@ -179,7 +184,7 @@ export class GameSession {
 			},
 			{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 			{
-				text: `Ти игра "${stats.problemGeneratorKey}".`,
+				text: `Ти игра "${stats.assignmentUiLabel}".`,
 				color: "white",
 			},
 			{

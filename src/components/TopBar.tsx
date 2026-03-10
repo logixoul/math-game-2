@@ -1,13 +1,15 @@
+import {
+	firebaseController,
+	useFirebaseSnapshot,
+} from "@/logic/FirebaseController";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import styles from "./TopBar.module.css";
-import { useFirebaseSnapshot, firebaseController } from "@/logic/FirebaseController";
 import { Popup } from "./Popup";
+import styles from "./TopBar.module.css";
 
-type TopBarProps = {
-};
+type TopBarProps = {};
 
-export function TopBar({  }: TopBarProps) {
+export function TopBar(_: TopBarProps) {
 	const firebaseState = useFirebaseSnapshot();
 	const navigate = useNavigate();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -25,7 +27,10 @@ export function TopBar({  }: TopBarProps) {
 
 		const updateHeightVar = () => {
 			const height = node.getBoundingClientRect().height;
-			document.documentElement.style.setProperty("--topbar-height", `${height}px`);
+			document.documentElement.style.setProperty(
+				"--topbar-height",
+				`${height}px`,
+			);
 		};
 
 		updateHeightVar();
@@ -111,30 +116,46 @@ export function TopBar({  }: TopBarProps) {
 	return (
 		<header className={styles.topBar} ref={topBarRef}>
 			<Link className={styles.homeLink} to="/">
-				<img className={styles.logoImage} src="../assets/play-logo.png" width="58" height="58"></img>
-				<div className={styles.logo}>
-					stefan play
-				</div>
+				<img
+					alt="Stefan Play Logo"
+					className={styles.logoImage}
+					src="../assets/play-logo.png"
+					width="58"
+					height="58"
+				></img>
+				<div className={styles.logo}>stefan play</div>
 			</Link>
-			<div className={styles.loginStatus}>{
-				firebaseState.user ?
-					<>
-						<button className={styles.logoutButton} onClick={handleLogout}>Изход</button>
-					</>
-					:
+			<div className={styles.loginStatus}>
+				{firebaseState.user ? (
+					<button
+						type="button"
+						className={styles.logoutButton}
+						onClick={handleLogout}
+					>
+						Изход
+					</button>
+				) : (
 					<>
 						<div className={styles.authButtons}>
 							<button
+								type="button"
 								className={styles.authTrigger}
 								onClick={() => setIsPopupOpen((current) => !current)}
 							>
 								Влез
 							</button>
 						</div>
-						<Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} className={styles.authPopup}>
+						<Popup
+							isOpen={isPopupOpen}
+							onClose={() => setIsPopupOpen(false)}
+							className={styles.authPopup}
+						>
 							<div className={styles.authTabs}>
 								<button
-									className={authMode === "login" ? styles.authTabActive : styles.authTab}
+									type="button"
+									className={
+										authMode === "login" ? styles.authTabActive : styles.authTab
+									}
 									onClick={() => {
 										setAuthMode("login");
 										setAuthMethod(null);
@@ -144,7 +165,12 @@ export function TopBar({  }: TopBarProps) {
 									Влез
 								</button>
 								<button
-									className={authMode === "signup" ? styles.authTabActive : styles.authTab}
+									type="button"
+									className={
+										authMode === "signup"
+											? styles.authTabActive
+											: styles.authTab
+									}
 									onClick={() => {
 										setAuthMode("signup");
 										setAuthMethod(null);
@@ -156,10 +182,16 @@ export function TopBar({  }: TopBarProps) {
 							</div>
 							{authMode && (
 								<div className={styles.authOptions}>
-									<button className={styles.authOption} onClick={handleGoogleAuth} disabled={isAuthBusy}>
+									<button
+										type="button"
+										className={styles.authOption}
+										onClick={handleGoogleAuth}
+										disabled={isAuthBusy}
+									>
 										С Google акаунт
 									</button>
 									<button
+										type="button"
 										className={styles.authOption}
 										onClick={() => {
 											setAuthMethod("email");
@@ -172,7 +204,10 @@ export function TopBar({  }: TopBarProps) {
 								</div>
 							)}
 							{authMode && authMethod === "email" && (
-								<form className={styles.authForm} onSubmit={handleEmailPassword}>
+								<form
+									className={styles.authForm}
+									onSubmit={handleEmailPassword}
+								>
 									<input
 										className={styles.authInput}
 										type="email"
@@ -187,7 +222,11 @@ export function TopBar({  }: TopBarProps) {
 										className={styles.authInput}
 										type="password"
 										placeholder="Парола"
-										autoComplete={authMode === "signup" ? "new-password" : "current-password"}
+										autoComplete={
+											authMode === "signup"
+												? "new-password"
+												: "current-password"
+										}
 										value={password}
 										onChange={(event) => setPassword(event.target.value)}
 										disabled={isAuthBusy}
@@ -201,16 +240,22 @@ export function TopBar({  }: TopBarProps) {
 									>
 										Забравена парола?
 									</button>
-									<button className={styles.authSubmit} type="submit" disabled={isAuthBusy}>
+									<button
+										className={styles.authSubmit}
+										type="submit"
+										disabled={isAuthBusy}
+									>
 										{authMode === "signup" ? "Регистрирай се" : "Влез"}
 									</button>
-									{authError && <div className={styles.authError}>{authError}</div>}
+									{authError && (
+										<div className={styles.authError}>{authError}</div>
+									)}
 								</form>
 							)}
 						</Popup>
 					</>
-			}</div>
+				)}
+			</div>
 		</header>
 	);
 }
-

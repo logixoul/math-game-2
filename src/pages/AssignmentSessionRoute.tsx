@@ -33,10 +33,7 @@ export function AssignmentSessionRoute() {
 
 	const problemGenerator = useMemo(() => {
 		if (!assignment) return null;
-		return createAssignmentProblemGenerator(
-			assignment.id,
-			assignment.data.spec,
-		);
+		return createAssignmentProblemGenerator(assignment);
 	}, [assignment]);
 
 	if (!assignment) {
