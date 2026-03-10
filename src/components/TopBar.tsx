@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { auth, firebaseController } from "@/logic/FirebaseController";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthUI } from "./AuthUI";
 import styles from "./TopBar.module.css";
 
@@ -7,6 +8,15 @@ type TopBarProps = {};
 
 export function TopBar(_: TopBarProps) {
 	const topBarRef = useRef<HTMLElement | null>(null);
+	const navigate = useNavigate();
+	const [isAdmin, setIsAdmin] = useState(false);
+
+	useEffect(() => {
+		const unsubscribe = auth.onAuthStateChanged(() => {
+			setIsAdmin(firebaseController.isAdmin());
+		});
+		return () => unsubscribe();
+	}, []);
 
 	useEffect(() => {
 		const node = topBarRef.current;
@@ -45,6 +55,15 @@ export function TopBar(_: TopBarProps) {
 				></img>
 				<div className={styles.logo}>stefan play</div>
 			</Link>
+			{isAdmin && (
+				<button
+					type="button"
+					onClick={() => navigate("/admin/assignments/")}
+					className={styles.adminButton}
+				>
+					Edit assignments (admin)
+				</button>
+			)}
 			<AuthUI />
 		</header>
 	);
