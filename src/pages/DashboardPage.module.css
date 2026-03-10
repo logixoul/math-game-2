@@ -29,20 +29,22 @@
 .gameList {
 	text-align: left;
 	list-style-type: disc;
-	list-style-position: inside;
-	padding-inline-start: 0;
+	list-style-position: outside;
+	padding-inline-start: 1.2em;
 	margin-left: 2em;
 	margin-right: 2em;
 	gap: 0em;
 }
 
 .gameCard {
-    padding: 10px 10px;
     margin: 0;
     border-radius: 10px;
 }
 
-.gameCard a {
+.gameCard > a {
+	display: block;
+	width: 100%;
+	padding: 10px 10px;
     color: var(--text-color-1);
     text-decoration: none;
 }
