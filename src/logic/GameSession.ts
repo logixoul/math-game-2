@@ -173,7 +173,7 @@ export class GameSession {
 		const percentCorrectOnFirstTry_Safe =
 			total === 0 ? 0 : percentCorrectOnFirstTry;
 		return {
-			assignmentUiLabel: this.problemGenerator.persistencyKey,
+			assignmentUiLabel: this.problemGenerator.uiLabel,
 			timeElapsedMs: timeElapsed,
 			percentCorrectOnFirstTry: percentCorrectOnFirstTry_Safe,
 			pointsTowardWin: this.pointsTowardWin,
