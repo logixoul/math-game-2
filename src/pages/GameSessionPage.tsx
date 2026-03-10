@@ -1,10 +1,3 @@
-import {
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-	useSyncExternalStore,
-} from "react";
 import { KeyPad } from "@/components/KeyPad";
 import { MessageLog } from "@/components/MessageLog";
 import { firebaseController } from "@/logic/FirebaseController";
@@ -12,6 +5,13 @@ import { GameSession } from "@/logic/GameSession";
 import type * as ProblemGenerators from "@/logic/Problems/ProblemGenerators";
 import * as util from "@/logic/util";
 import { attachWakeLock } from "@/React/WakeLock";
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from "react";
 import styles from "./GameSessionPage.module.css";
 
 type GameSessionPageProps = {
@@ -79,7 +79,7 @@ export function GameSessionPage({
 			log.scrollTo({ top: log.scrollHeight, behavior: "smooth" });
 		});
 		return () => window.cancelAnimationFrame(rafId);
-	}, []);
+	}, [snap.messages.length]);
 
 	const submitAnswer = useCallback(
 		(text: string) => {
