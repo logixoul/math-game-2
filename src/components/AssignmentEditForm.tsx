@@ -1,12 +1,9 @@
 import { AssignmentDoc, assignmentObjectToJson } from "@/logic/assignments";
-import { db } from "@/logic/FirebaseController";
 import {
-	addDoc,
-	collection,
-	deleteDoc,
-	doc,
-	updateDoc,
-} from "firebase/firestore";
+    createAssignment,
+    deleteAssignmentById,
+    updateAssignmentById,
+} from "@/logic/assignmentStore";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AssignmentEditForm.module.css";
 
@@ -62,7 +59,6 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 		const category = formData.get("category") as string;
 		const index = Number.parseInt(formData.get("index") as string, 10);
 		const spec = formData.get("spec") as string;
-		const assignmentRef = doc(db, "assignments", id);
 
 		try {
 			JSON.parse(spec);
@@ -71,7 +67,7 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 			return;
 		}
 
-		await updateDoc(assignmentRef, {
+		await updateAssignmentById(id, {
 			name: name,
 			category: category,
 			spec: spec,
@@ -81,7 +77,7 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 
 	const handleDeleteById = async (id: string) => {
 		setIsCollapsed(true);
-		await deleteDoc(doc(db, "assignments", id));
+		await deleteAssignmentById(id);
 	};
 
 	const handleClone = async (assignment: AssignmentDoc) => {
@@ -92,7 +88,7 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 			index: assignment.data.index + 100,
 		};
 
-		await addDoc(collection(db, "assignments"), newAssignment);
+		await createAssignment(newAssignment);
 	};
 
 	return (

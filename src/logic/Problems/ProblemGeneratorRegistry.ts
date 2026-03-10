@@ -35,10 +35,12 @@ export class ProblemGeneratorRegistry {
 	public create(
 		persistencyKey: string,
 		params: Record<string, unknown> = {},
-	): ProblemGenerator | null {
+	): ProblemGenerator {
 		const ctor = this.problemGeneratorMap.get(persistencyKey);
 		if (!ctor) {
-			return null;
+			throw new Error(
+				`No problem generator registered with persistency key: ${persistencyKey}`,
+			);
 		}
 		return new ctor(params);
 	}

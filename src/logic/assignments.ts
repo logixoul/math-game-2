@@ -38,7 +38,7 @@ export type AssignmentDoc = {
 	data: AssignmentData;
 };
 
-function ensureLatestSchema(data: DocumentData) : DocumentData {
+function ensureLatestSchema(data: DocumentData): DocumentData {
 	let spec = data.spec;
 
 	if (typeof data.spec === "string") {
@@ -62,11 +62,11 @@ export const assignmentConverter: FirestoreDataConverter<AssignmentData> = {
 
 export function assignmentJsonToObject(jsonText: string): AssignmentPartData[] {
 	const parsed = JSON.parse(jsonText);
-	if(!Array.isArray(parsed)) {
+	if (!Array.isArray(parsed)) {
 		throw new Error("Parsed JSON must be an array");
 	}
 
-	for(const [index, entry ] of parsed.entries()) {
+	for (const [index, entry] of parsed.entries()) {
 		// for schema migration: if probability is missing, add it with default value 1
 		entry.probability ??= 1;
 	}
@@ -78,11 +78,10 @@ export function assignmentObjectToJson(spec: AssignmentPartData[]): string {
 }
 
 export function createAssignmentProblemGenerator(
-	assignmentId: string,
-	specs: AssignmentPartData[],
-): ProblemGenerator | null {
+	assignment: AssignmentDoc,
+): AssignmentProblemGenerator {
 	const weightedProblemGenerators: WeightedProblemGenerator[] = [];
-	for (const spec of specs) {
+	for (const spec of assignment.data.spec) {
 		const problemGenerator = createProblemGeneratorFromSpec(spec);
 		if (!problemGenerator) {
 			continue;
@@ -92,11 +91,9 @@ export function createAssignmentProblemGenerator(
 			probability: spec.probability,
 		});
 	}
-	if (weightedProblemGenerators.length === 0) {
-		return null;
-	}
-	return new WeightedAssignmentProblemGenerator(
-		`assignment:${assignmentId}`,
+	return new AssignmentProblemGenerator(
+		assignment.data.name,
+		`assignment:${assignment.id}`,
 		weightedProblemGenerators,
 	);
 }
@@ -171,13 +168,13 @@ export type WeightedProblemGenerator = {
 	probability: number;
 };
 
-export class WeightedAssignmentProblemGenerator extends ProblemGenerator {
+export class AssignmentProblemGenerator {
 	constructor(
-		readonly persistencyKeyValue: string,
+		public readonly uiLabel: string,
+		public readonly persistencyKey: string,
 		private readonly weightedProblemGenerators: WeightedProblemGenerator[],
 	) {
-		super();
-		this.persistencyKey = persistencyKeyValue;
+		this.persistencyKey = persistencyKey;
 	}
 
 	createRandomProblem(): Problem {

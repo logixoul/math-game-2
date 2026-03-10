@@ -1,6 +1,8 @@
 import type { Message } from "@/logic/Message";
+import { DEFAULT_GAME_SESSION_MAX_DURATION_MS } from "@/logic/userSettings";
 import { BigNumber } from "bignumber.js";
-import type { Problem, ProblemGenerator } from "./Problems/ProblemGenerators";
+import { AssignmentProblemGenerator } from "./assignments";
+import type { Problem } from "./Problems/ProblemGenerators";
 import { ProblemScheduler } from "./Problems/ProblemScheduler";
 import type { ResultStats } from "./ResultStats";
 
@@ -33,7 +35,7 @@ export type GameSessionSnapshot = {
 
 export class GameSession {
 	errorCount: number;
-	problemGenerator: ProblemGenerator;
+	problemGenerator: AssignmentProblemGenerator;
 	numCorrectAtFirstTry: number;
 	numWrongAtFirstTry: number;
 
@@ -54,14 +56,19 @@ export class GameSession {
 
 	readonly pointsRequiredToWin: number = 20;
 	readonly minProblemsAttemptedToWin: number = 20;
-	readonly maxSessionDurationMs: number = 10 * 60 * 1000; // 10 minutes
+	maxSessionDurationMs: number;
 
 	private listeners = new Set<GameSessionListener>();
 	private snapshot: GameSessionSnapshot;
 
-	constructor(problemGenerator: ProblemGenerator) {
+	constructor(
+		problemGenerator: AssignmentProblemGenerator,
+		options?: { maxSessionDurationMs?: number },
+	) {
 		this.errorCount = 0;
 		this.problemGenerator = problemGenerator;
+		this.maxSessionDurationMs =
+			options?.maxSessionDurationMs ?? DEFAULT_GAME_SESSION_MAX_DURATION_MS;
 		this.problemScheduler = new ProblemScheduler(this.problemGenerator);
 
 		this.problemIterator = this.problemScheduler.generateProblems();
@@ -71,7 +78,10 @@ export class GameSession {
 
 		this.numCorrectAtFirstTry = 0;
 		this.numWrongAtFirstTry = 0;
-		this.minutesLeft = Math.max(0, Math.ceil(this.maxSessionDurationMs / 60000));
+		this.minutesLeft = Math.max(
+			0,
+			Math.ceil(this.maxSessionDurationMs / 60000),
+		);
 
 		this.errorCount = 0;
 		this.showProblem();
@@ -119,9 +129,29 @@ export class GameSession {
 
 	getSnapshot = (): GameSessionSnapshot => this.snapshot;
 
+	setMaxSessionDurationMs(nextMaxSessionDurationMs: number): void {
+		if (nextMaxSessionDurationMs === this.maxSessionDurationMs) {
+			return;
+		}
+		this.maxSessionDurationMs = nextMaxSessionDurationMs;
+		if (this.status !== "playing") {
+			this.notify();
+			return;
+		}
+		const msLeft =
+			this.maxSessionDurationMs - (Date.now() - this.gameStartTimestamp);
+		this.minutesLeft = Math.max(0, Math.ceil(msLeft / 60000));
+		if (msLeft <= 0) {
+			this.timeout();
+			return;
+		}
+		this.notify();
+	}
+
 	tick(nowMs: number): void {
 		if (this.status !== "playing") return;
-		const msLeft = this.maxSessionDurationMs - (nowMs - this.gameStartTimestamp);
+		const msLeft =
+			this.maxSessionDurationMs - (nowMs - this.gameStartTimestamp);
 		const nextMinutesLeft = Math.max(0, Math.ceil(msLeft / 60000));
 		if (nextMinutesLeft !== this.minutesLeft) {
 			this.minutesLeft = nextMinutesLeft;
@@ -143,7 +173,7 @@ export class GameSession {
 		const percentCorrectOnFirstTry_Safe =
 			total === 0 ? 0 : percentCorrectOnFirstTry;
 		return {
-			problemGeneratorKey: this.problemGenerator.persistencyKey,
+			assignmentUiLabel: this.problemGenerator.uiLabel,
 			timeElapsedMs: timeElapsed,
 			percentCorrectOnFirstTry: percentCorrectOnFirstTry_Safe,
 			pointsTowardWin: this.pointsTowardWin,
@@ -179,7 +209,7 @@ export class GameSession {
 			},
 			{ text: "(пратѝ ми скрийншот)", color: "green", isBold: true },
 			{
-				text: `Ти игра "${stats.problemGeneratorKey}".`,
+				text: `Ти игра "${stats.assignmentUiLabel}".`,
 				color: "white",
 			},
 			{

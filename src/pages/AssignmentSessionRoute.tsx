@@ -1,49 +1,38 @@
 import {
-	type AssignmentDoc,
-	assignmentConverter,
 	createAssignmentProblemGenerator,
+	type AssignmentDoc,
 } from "@/logic/assignments";
-import { db } from "@/logic/FirebaseController";
-import { doc, onSnapshot } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { getAssignmentById } from "@/logic/assignmentStore";
+import {
+	isRouteErrorResponse,
+	useLoaderData,
+	useRouteError,
+	type LoaderFunctionArgs,
+} from "react-router-dom";
 import { ErrorPage } from "./ErrorPage";
 import { GameSessionPage } from "./GameSessionPage";
 
-export function AssignmentSessionRoute() {
-	const { assignmentId } = useParams<{ assignmentId: string }>();
-	const [assignment, setAssignment] = useState<AssignmentDoc | null>(null);
-
-	useEffect(() => {
-		if (!assignmentId) return;
-
-		const assignmentRef = doc(db, "assignments", assignmentId).withConverter(
-			assignmentConverter,
-		);
-		const unsubscribe = onSnapshot(assignmentRef, (snap) => {
-			if (!snap.exists()) {
-				setAssignment(null);
-				return;
-			}
-			setAssignment({ id: snap.id, data: snap.data() } as AssignmentDoc);
-		});
-
-		return () => unsubscribe();
-	}, [assignmentId]);
-
-	const problemGenerator = useMemo(() => {
-		if (!assignment) return null;
-		return createAssignmentProblemGenerator(
-			assignment.id,
-			assignment.data.spec,
-		);
-	}, [assignment]);
-
-	if (!assignment) {
-		return <ErrorPage message="Това домашно не е намерено!" />;
+export async function assignmentSessionLoader({
+	params,
+}: LoaderFunctionArgs): Promise<AssignmentDoc> {
+	const assignmentId = params.assignmentId;
+	if (!assignmentId) {
+		throw new Error("Липсва ID на домашното.");
 	}
+
+	const assignment = await getAssignmentById(assignmentId);
+	if (!assignment) {
+		throw new Error("Това домашно не е намерено!");
+	}
+
+	return assignment;
+}
+
+export function AssignmentSessionRoute() {
+	const assignment = useLoaderData() as AssignmentDoc;
+	const problemGenerator = createAssignmentProblemGenerator(assignment);
 	if (!problemGenerator) {
-		return <ErrorPage message="Това домашно е невалидно в базата данни!" />;
+		throw new Error("Това домашно е невалидно в базата данни!");
 	}
 
 	return (
@@ -52,4 +41,15 @@ export function AssignmentSessionRoute() {
 			assignmentId={assignment.id}
 		/>
 	);
+}
+
+export function AssignmentSessionRouteErrorBoundary() {
+	const error = useRouteError();
+
+	if (isRouteErrorResponse(error)) {
+		return <ErrorPage message={error.statusText || `HTTP ${error.status}`} />;
+	}
+
+	const message = error instanceof Error ? error.message : "Нещо се обърка.";
+	return <ErrorPage message={message} />;
 }

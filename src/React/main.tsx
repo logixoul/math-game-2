@@ -1,13 +1,18 @@
+import { initGlobalFormattingSettings } from "@/logic/Formatting";
+import { AdminPage } from "@/pages/AdminPage";
+import {
+	assignmentSessionLoader,
+	AssignmentSessionRoute,
+	AssignmentSessionRouteErrorBoundary,
+} from "@/pages/AssignmentSessionRoute";
+import { AssignmentsAdminPage } from "@/pages/AssignmentsAdminPage";
+import { DashboardPage } from "@/pages/DashboardPage";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import "./global.css";
-import { QuickDebugLogger } from "../logic/QuickDebugLogger";
 import { createHashRouter, RouterProvider } from "react-router-dom";
+import { QuickDebugLogger } from "../logic/QuickDebugLogger";
 import { PageLayout } from "./PageLayout";
-import { DashboardPage } from "@/pages/DashboardPage";
-import { AssignmentSessionRoute } from "@/pages/AssignmentSessionRoute";
-import { AssignmentsAdminPage } from "@/pages/AssignmentsAdminPage";
-import { initGlobalFormattingSettings } from "@/logic/Formatting";
+import "./global.css";
 
 const qdl = QuickDebugLogger.instance;
 qdl.beginListeningForErrors();
@@ -24,7 +29,13 @@ const router = createHashRouter([
 		element: <PageLayout />,
 		children: [
 			{ path: "/", element: <DashboardPage /> },
-			{ path: "/assignment/:assignmentId", element: <AssignmentSessionRoute /> },
+			{
+				path: "/assignment/:assignmentId",
+				loader: assignmentSessionLoader,
+				element: <AssignmentSessionRoute />,
+				errorElement: <AssignmentSessionRouteErrorBoundary />,
+			},
+			{ path: "/admin/", element: <AdminPage /> },
 			{ path: "/admin/assignments/", element: <AssignmentsAdminPage /> },
 		]
 	}
