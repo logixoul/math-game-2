@@ -53,7 +53,7 @@ export function TopBar(_: TopBarProps) {
 				<button
 					type="button"
 					onClick={() => navigate("/admin/")}
-					className={styles.adminButton}
+					className="glassyButton"
 				>
 					Admin
 				</button>

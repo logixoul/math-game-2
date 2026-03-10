@@ -96,7 +96,7 @@ export function AuthUI(_: AuthUIProps) {
 			{user ? (
 				<button
 					type="button"
-					className={styles.logoutButton}
+					className="glassyButton"
 					onClick={handleLogout}
 				>
 					Изход
@@ -106,7 +106,7 @@ export function AuthUI(_: AuthUIProps) {
 					<div className={styles.authButtons}>
 						<button
 							type="button"
-							className={styles.authTrigger}
+							className="glassyButton"
 							onClick={() => setIsPopupOpen((current) => !current)}
 						>
 							Влез

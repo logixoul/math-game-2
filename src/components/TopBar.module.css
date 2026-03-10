@@ -41,17 +41,3 @@
 	width: 6.5em;
 	height: 6.5em;
 }
-
-.adminButton {
-	padding: 8px 12px;
-	border: 1px solid rgba(255, 255, 255, 0.35);
-	border-radius: 8px;
-	background: rgba(0, 0, 0, 0.2);
-	color: #fff;
-	font: inherit;
-	cursor: pointer;
-}
-
-.adminButton:hover {
-	background: rgba(0, 0, 0, 0.35);
-}
