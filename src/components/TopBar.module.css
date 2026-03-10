@@ -6,7 +6,7 @@
 	gap: 12px;
 	padding: 24px;
 	background: rgba(0, 0, 0, 0.26);
-	backdrop-filter: blur(4px);
+	backdrop-filter: blur(3px);
 	color: #ffffff;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 	outline: 1px solid rgba(0, 0, 0, 0.4);

@@ -13,8 +13,8 @@ export function DashboardPage() {
 				<h3>{title}</h3>
 				<ul className={styles.gameList}>
 					{theseAssignments?.map((a) => (
-						<li key={a.id}>
-							<Link to={`/assignment/${a.id}`} className={styles.gameCard}>
+						<li key={a.id} className={styles.gameCard}>
+							<Link to={`/assignment/${a.id}`}>
 								{a.data.name}
 							</Link>
 						</li>
