@@ -1,9 +1,9 @@
-import { AssignmentDoc, assignmentObjectToJson } from "@/logic/assignments";
 import {
-    createAssignment,
-    deleteAssignmentById,
-    updateAssignmentById,
+	createAssignment,
+	deleteAssignmentById,
+	updateAssignmentById,
 } from "@/logic/assignmentStore";
+import { AssignmentDoc, assignmentObjectToJson } from "@/logic/assignments";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AssignmentEditForm.module.css";
 
@@ -18,7 +18,7 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 	const [isCollapsed, setIsCollapsed] = useState(isCollapsedInitially);
 	const specJsonFromDb = useMemo(
 		() => assignmentObjectToJson(assignment.data.spec),
-		[assignment.data.spec]
+		[assignment.data.spec],
 	);
 
 	const formRef = useRef<HTMLFormElement | null>(null);
@@ -58,6 +58,10 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 		const name = formData.get("name") as string;
 		const category = formData.get("category") as string;
 		const index = Number.parseInt(formData.get("index") as string, 10);
+		const pointsRequiredToWin = Number.parseInt(
+			formData.get("pointsRequiredToWin") as string,
+			10,
+		);
 		const spec = formData.get("spec") as string;
 
 		try {
@@ -72,6 +76,7 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 			category: category,
 			spec: spec,
 			index: index,
+			pointsRequiredToWin: pointsRequiredToWin,
 		});
 	};
 
@@ -86,6 +91,7 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 			spec: assignment.data.spec,
 			category: assignment.data.category,
 			index: assignment.data.index + 100,
+			pointsRequiredToWin: assignment.data.pointsRequiredToWin,
 		};
 
 		await createAssignment(newAssignment);
@@ -138,6 +144,13 @@ export function AssignmentEditForm(props: AssignmentEditFormProps) {
 						name="index"
 						defaultValue={assignment.data.index}
 						placeholder="Index"
+					/>
+					<label htmlFor="pointsRequiredToWin">Points to win:</label>
+					<input
+						type="text"
+						name="pointsRequiredToWin"
+						defaultValue={assignment.data.pointsRequiredToWin}
+						placeholder="Points required to win"
 					/>
 					<br />
 					<label htmlFor="spec">Spec (JSON):</label>

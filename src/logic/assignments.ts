@@ -29,6 +29,7 @@ export type AssignmentPartData = {
 export type AssignmentData = {
 	name: string;
 	spec: Array<AssignmentPartData>;
+	pointsRequiredToWin: number;
 	category: string;
 	index: number;
 };
@@ -46,7 +47,9 @@ function ensureLatestSchema(data: DocumentData): DocumentData {
 		spec = assignmentJsonToObject(spec);
 	}
 
-	return { ...data, spec };
+	const pointsRequiredToWin = data.pointsRequiredToWin ?? 20;
+
+	return { ...data, spec, pointsRequiredToWin };
 }
 
 export const assignmentConverter: FirestoreDataConverter<AssignmentData> = {

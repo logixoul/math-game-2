@@ -2,9 +2,7 @@ import { KeyPad } from "@/components/KeyPad";
 import { MessageLog } from "@/components/MessageLog";
 import type { AssignmentProblemGenerator } from "@/logic/assignments";
 import { recordAttempt } from "@/logic/attempts";
-import {
-	useAuthUser,
-} from "@/logic/auth";
+import { useAuthUser } from "@/logic/auth";
 import { GameSession } from "@/logic/GameSession";
 import {
 	getGameSessionMaxDurationMs,
@@ -24,11 +22,13 @@ import styles from "./GameSessionPage.module.css";
 type GameSessionPageProps = {
 	problemGenerator: AssignmentProblemGenerator;
 	assignmentId: string;
+	pointsRequiredToWin: number;
 };
 
 export function GameSessionPage({
 	problemGenerator,
 	assignmentId,
+	pointsRequiredToWin,
 }: GameSessionPageProps) {
 	const user = useAuthUser();
 	const userSettings = useUserSettings(user?.uid);
@@ -37,6 +37,7 @@ export function GameSessionPage({
 		() =>
 			new GameSession(problemGenerator, {
 				maxSessionDurationMs,
+				pointsRequiredToWin,
 			}),
 	);
 	const logRef = useRef<HTMLDivElement | null>(null);
@@ -50,10 +51,11 @@ export function GameSessionPage({
 			setSession(
 				new GameSession(nextProblemGenerator, {
 					maxSessionDurationMs,
+					pointsRequiredToWin,
 				}),
 			);
 		},
-		[maxSessionDurationMs],
+		[maxSessionDurationMs, pointsRequiredToWin],
 	);
 
 	useEffect(() => {

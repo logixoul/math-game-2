@@ -1,13 +1,13 @@
-import {
-	createAssignmentProblemGenerator,
-	type AssignmentDoc,
-} from "@/logic/assignments";
 import { getAssignmentById } from "@/logic/assignmentStore";
 import {
+	type AssignmentDoc,
+	createAssignmentProblemGenerator,
+} from "@/logic/assignments";
+import {
 	isRouteErrorResponse,
+	type LoaderFunctionArgs,
 	useLoaderData,
 	useRouteError,
-	type LoaderFunctionArgs,
 } from "react-router-dom";
 import { ErrorPage } from "./ErrorPage";
 import { GameSessionPage } from "./GameSessionPage";
@@ -39,6 +39,7 @@ export function AssignmentSessionRoute() {
 		<GameSessionPage
 			problemGenerator={problemGenerator}
 			assignmentId={assignment.id}
+			pointsRequiredToWin={assignment.data.pointsRequiredToWin}
 		/>
 	);
 }

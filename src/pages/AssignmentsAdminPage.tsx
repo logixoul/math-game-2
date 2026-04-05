@@ -23,6 +23,7 @@ export function AssignmentsAdminPage() {
 			spec: [],
 			category: "Домашни",
 			index: maxIndex + 100,
+			pointsRequiredToWin: 20,
 		});
 		await reload();
 		setLatestAddedId(newAssignmentId);

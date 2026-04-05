@@ -54,7 +54,7 @@ export class GameSession {
 	resultStats: ResultStats | null = null;
 	gameStartTimestamp: number = Date.now();
 
-	readonly pointsRequiredToWin: number = 20;
+	readonly pointsRequiredToWin: number;
 	readonly minProblemsAttemptedToWin: number = 20;
 	maxSessionDurationMs: number;
 
@@ -63,10 +63,11 @@ export class GameSession {
 
 	constructor(
 		problemGenerator: AssignmentProblemGenerator,
-		options?: { maxSessionDurationMs?: number },
+		options?: { maxSessionDurationMs?: number; pointsRequiredToWin?: number },
 	) {
 		this.errorCount = 0;
 		this.problemGenerator = problemGenerator;
+		this.pointsRequiredToWin = options?.pointsRequiredToWin ?? 20;
 		this.maxSessionDurationMs =
 			options?.maxSessionDurationMs ?? DEFAULT_GAME_SESSION_MAX_DURATION_MS;
 		this.problemScheduler = new ProblemScheduler(this.problemGenerator);
