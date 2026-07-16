@@ -142,10 +142,10 @@ export class GameSession {
 		const msLeft =
 			this.maxSessionDurationMs - (Date.now() - this.gameStartTimestamp);
 		this.minutesLeft = Math.max(0, Math.ceil(msLeft / 60000));
-		if (msLeft <= 0) {
+		/*if (msLeft <= 0) {
 			this.timeout();
 			return;
-		}
+		}*/
 		this.notify();
 	}
 

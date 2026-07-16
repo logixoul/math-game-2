@@ -5,17 +5,17 @@ import { recordAttempt } from "@/logic/attempts";
 import { useAuthUser } from "@/logic/auth";
 import { GameSession } from "@/logic/GameSession";
 import {
-	getGameSessionMaxDurationMs,
-	useUserSettings,
+    getGameSessionMaxDurationMs,
+    useUserSettings,
 } from "@/logic/userSettings";
 import * as util from "@/logic/util";
 import { attachWakeLock } from "@/React/WakeLock";
 import {
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-	useSyncExternalStore,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    useSyncExternalStore,
 } from "react";
 import styles from "./GameSessionPage.module.css";
 
@@ -210,7 +210,7 @@ export function GameSessionPage({
 						</div>
 					</div>
 					<div className={styles.statusTimer}>
-						Имаш още {snap.minutesLeft} минути
+						Неограничено време
 					</div>
 				</div>
 			</div>
