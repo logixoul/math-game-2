@@ -2,7 +2,7 @@ import { db } from "@/logic/firebase";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-export const DEFAULT_GAME_SESSION_MAX_DURATION_MS = 10 * 60 * 1000;
+export const DEFAULT_GAME_SESSION_MAX_DURATION_MS = 40 * 60 * 1000;
 export const DEBUG_GAME_SESSION_MAX_DURATION_MS = 2000;
 
 export type UserSettings = {
