@@ -110,6 +110,22 @@ problemGeneratorRegistry.register(
 	"SubtractionFifthGrade.v1",
 );
 
+export class SubtractionBridgingGenerator extends ProblemGenerator {
+	constructor(private range: Range) {
+		super();
+	}
+
+	createRandomProblem(): Problem {
+		const a = util.randomInt(this.range.min, this.range.max);
+		const b = util.randomInt(0, 10);
+		return new Problem(`${a} - ${b}`, a - b);
+	}
+}
+problemGeneratorRegistry.register(
+	SubtractionBridgingGenerator,
+	"SubtractionBridging.v1",
+);
+
 export class SubtractionSixthGradeProblemGenerator extends ProblemGenerator {
 	constructor(private range: Range) {
 		super();

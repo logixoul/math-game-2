@@ -1,21 +1,22 @@
 import type { DocumentData, FirestoreDataConverter } from "firebase/firestore";
 import type { NumberShape } from "./Problems/NumberShape";
 import {
-	AdditionProblemGenerator,
-	BracketExpansionNesting0ProblemGenerator,
-	BracketExpansionNesting1ProblemGenerator,
-	BracketExpansionNesting2ProblemGenerator,
-	DivisionProblemGeneratorV2,
-	MultiplicationProblemGeneratorV2,
-	type Problem,
-	ProblemGenerator,
-	Range,
-	SubtractionFifthGradeProblemGenerator,
-	SubtractionSixthGradeProblemGenerator,
+    AdditionProblemGenerator,
+    BracketExpansionNesting0ProblemGenerator,
+    BracketExpansionNesting1ProblemGenerator,
+    BracketExpansionNesting2ProblemGenerator,
+    DivisionProblemGeneratorV2,
+    MultiplicationProblemGeneratorV2,
+    type Problem,
+    ProblemGenerator,
+    Range,
+    SubtractionBridgingGenerator,
+    SubtractionFifthGradeProblemGenerator,
+    SubtractionSixthGradeProblemGenerator,
 } from "./Problems/ProblemGenerators";
 import {
-	DivisionProblemGeneratorV1,
-	MultiplicationProblemGeneratorV1,
+    DivisionProblemGeneratorV1,
+    MultiplicationProblemGeneratorV1,
 } from "./Problems/ProblemGeneratorsLegacy";
 
 export type AssignmentPartParams = Record<string, unknown>;
@@ -137,6 +138,8 @@ function createProblemGeneratorFromSpec(
 			return new AdditionProblemGenerator(range);
 		case "SubtractionFifthGrade.v1":
 			return new SubtractionFifthGradeProblemGenerator(rangeMax);
+        case "SubtractionBridging.v1":
+            return new SubtractionBridgingGenerator(range);
 		case "SubtractionSixthGrade.v1":
 			return new SubtractionSixthGradeProblemGenerator(range);
 		case "Multiplication.v1":
