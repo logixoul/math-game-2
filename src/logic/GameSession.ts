@@ -161,7 +161,7 @@ export class GameSession {
 			}
 		}
 		if (msLeft <= 0) {
-			this.timeout();
+			//this.timeout();
 		}
 	}
 
