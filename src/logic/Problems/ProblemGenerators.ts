@@ -116,13 +116,11 @@ export class SubtractionBridgingGenerator extends ProblemGenerator {
 	}
 
 	createRandomProblem(): Problem {
-		const a = util.randomInt(this.range.min, this.range.max);
-        let b;
+        let a;
         do {
-		    b = util.randomInt(0, 9);
-            if(b > a % 10)
-                break;
-        } while(true);
+		    a = util.randomInt(this.range.min, this.range.max);
+        } while(a % 10 === 9);
+		const b = util.randomInt(a % 10 + 1, 9);
 		return new Problem(`${a} - ${b}`, a - b);
 	}
 }
